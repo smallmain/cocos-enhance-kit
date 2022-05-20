@@ -2,46 +2,47 @@
 sidebar_position: 1
 ---
 
-# Tutorial Intro
+# 介绍
 
-Let's discover **Docusaurus in less than 5 minutes**.
+这是一个对 Cocos Creator 引擎进行特性新增、修复与优化的**开源非官方服务包**。
 
-## Getting Started
+我们的发展方向是尽量以最符合引擎架构设计的方式加入新的特性、修复引擎已知问题以及性能优化。
 
-Get started by **creating a new site**.
+:::info 项目的起源
+2021 年 2 月，Cocos 发布 Cocos Creator 3.0，并在 3.x 发布之后不会再继续开发 2.x 版本的新特性。
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+问题修复等所有维护工作也会在 2023 年完全停止。而 2.x 以及 3.x 在一些方面都并不完善，所以我们发布了这个非官方的引擎“魔改”集合。
 
-### What you'll need
+相似的事情发生在 2014 年 4 月，官方停止了对 Windows XP 的维护，之后 Harkaz 发布了一个非官方服务包 Service Pack 4 (SP4)。
 
-- [Node.js](https://nodejs.org/en/download/) version 14 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+所以我们将这个“魔改”集合取名为 Service Pack。
 
-## Generate a new site
+我们暂时只专注于 Cocos Creator 2.x 版本的适配，虽然当前服务包新增的一些特性在 Cocos Creator 3.5 版本中甚至依然还大部分缺失，但因为它还在蒸蒸日上中（还有希望），并且其引擎架构还在不断地迭代（不稳定），对其进行修改的维护工作会很大。
+:::
 
-Generate a new Docusaurus site using the **classic template**.
+## 重要改进
 
-The classic template will automatically be added to your project after you run the command:
+- 待补充。
 
-```bash
-npm init docusaurus@latest my-website classic
-```
+## 如何使用
 
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
+待补充。
 
-The command also installs all necessary dependencies you need to run Docusaurus.
+## 实现原理
 
-## Start your site
+每个改动的原理都会进行公示，我们没做过官方那样完善的测试，但是尽量保持改动的透明。
 
-Run the development server:
+## 更新日志
 
-```bash
-cd my-website
-npm run start
-```
+待补充。
 
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
+## 贡献指南
 
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
+非常欢迎您能和我们一起来完善，所有的一切都通过 Github 进行：
 
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+- 如果您有问题或者好的想法，请使用 `Issues` 或 `Discussions` 。
+- 如果您有新的代码提交，请使用 `Pull requests`。
+
+原则上我们接受任何新增与修改，但是**任何修改都必须兼容引擎原有的特性**，并且**不允许删除引擎原有的特性**。
+
+在开发新特性时，请站在引擎的角度思考该如何设计。
