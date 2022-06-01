@@ -7,8 +7,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Cocos Service Pack',
-  tagline: '对 Cocos Creator 引擎进行特性新增、修复与优化的开源非官方服务包',
-  url: 'https://smallmain.github.io/cocos-service-pack/',
+  tagline: '给 Cocos Creator 加点料',
+  url: 'https://smallmain.github.io',
   baseUrl: '/cocos-service-pack/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -78,8 +78,9 @@ const config = {
           // { to: '/blog', label: 'Blog', position: 'left' },
           {
             href: 'https://github.com/smallmain/cocos-service-pack',
-            label: 'GitHub',
+            label: '加星鼓励',
             position: 'right',
+            className: 'header-github-link',
           },
           {
             type: 'search',
