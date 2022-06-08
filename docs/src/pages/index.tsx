@@ -20,23 +20,23 @@ function HomepageHeader() {
             <div>
               <p style={{ color: 'var(--ifm-color-primary)', fontWeight: 'bold', marginBottom: 2 }}>
                 <span className="badge badge--primary" style={{ marginRight: 8 }}>2D 渲染</span>
-                支持多纹理材质，新增多纹理合批管理器与静态合批组件
+                支持多纹理渲染（多纹理材质、多纹理合批）
+              </p>
+              <p style={{ color: 'var(--ifm-color-primary)', fontWeight: 'bold', marginBottom: 2 }}>
+                <span className="badge badge--primary" style={{ marginRight: 8 }}>2D 渲染</span>
+                支持高 DPI 文本渲染
               </p>
               <p style={{ color: 'var(--ifm-color-primary)', fontWeight: 'bold', marginBottom: 2 }}>
                 <span className="badge badge--primary" style={{ marginRight: 8 }}>动态图集</span>
-                完全重构，进行了多方面提升，并支持自动多纹理合批
+                完全重构，支持自动多纹理合批、优化算法、复用废弃空间等特性
               </p>
               <p style={{ color: 'var(--ifm-color-primary)', fontWeight: 'bold', marginBottom: 2 }}>
                 <span className="badge badge--primary" style={{ marginRight: 8 }}>Label 组件</span>
-                支持高 DPI 渲染，BITMAP 与 CHAR 缓存模式的实用性提升
-              </p>
-              <p style={{ color: 'var(--ifm-color-primary)', fontWeight: 'bold', marginBottom: 2 }}>
-                <span className="badge badge--primary" style={{ marginRight: 8 }}>RichText 组件</span>
-                支持使用自定义材质
+                重构 Char 缓存模式，支持自动多纹理合批、多图集、复用废弃空间等特性
               </p>
               <p style={{ color: 'var(--ifm-color-primary)', fontWeight: 'bold', marginBottom: 2 }}>
                 <span className="badge badge--primary" style={{ marginRight: 8 }}>Spine 组件</span>
-                支持 Region 换装，支持参与动态合图
+                支持与其它组件合批、合入动态图集与 SpriteFrame 换装
               </p>
             </div>
             <div className={styles.buttons}>
@@ -72,7 +72,7 @@ export default function Home(): JSX.Element {
       description="Description will go into a meta tag in <head />">
       <HomepageHeader />
       <main>
-        <HomepageFeatures />
+        {/* <HomepageFeatures /> */}
       </main>
     </Layout>
   );
