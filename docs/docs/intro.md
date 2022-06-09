@@ -36,6 +36,10 @@ Service Pack 暂时只适配 Cocos Creator 2.x 版本，Cocos Creator 3.x 正在
 
 :::
 
+## 功能演示
+
+待补充。
+
 ## 使用方法
 
 服务包通过自定义引擎的方式来修改引擎代码，你可以：

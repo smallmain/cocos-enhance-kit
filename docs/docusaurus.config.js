@@ -70,6 +70,11 @@ const config = {
             label: '文档',
           },
           {
+            href: 'TODO',
+            label: '演示',
+            position: 'right',
+          },
+          {
             type: 'docsVersionDropdown',
             position: 'right',
             dropdownItemsAfter: [{ to: '/versions', label: 'All versions' }],

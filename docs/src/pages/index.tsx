@@ -18,23 +18,23 @@ function HomepageHeader() {
             <h1 className="hero__title">{siteConfig.title}</h1>
             <p className="hero__subtitle">{siteConfig.tagline + "："}</p>
             <div>
-              <p style={{ color: 'var(--ifm-color-primary)', fontWeight: 'bold', marginBottom: 2 }}>
+              <p style={{ color: 'var(--ifm-color-primary)', marginBottom: 2 }}>
                 <span className="badge badge--primary" style={{ marginRight: 8 }}>2D 渲染</span>
                 支持多纹理渲染（多纹理材质、多纹理合批）
               </p>
-              <p style={{ color: 'var(--ifm-color-primary)', fontWeight: 'bold', marginBottom: 2 }}>
+              <p style={{ color: 'var(--ifm-color-primary)', marginBottom: 2 }}>
                 <span className="badge badge--primary" style={{ marginRight: 8 }}>2D 渲染</span>
                 支持高 DPI 文本渲染
               </p>
-              <p style={{ color: 'var(--ifm-color-primary)', fontWeight: 'bold', marginBottom: 2 }}>
+              <p style={{ color: 'var(--ifm-color-primary)', marginBottom: 2 }}>
                 <span className="badge badge--primary" style={{ marginRight: 8 }}>动态图集</span>
                 完全重构，支持自动多纹理合批、优化算法、复用废弃空间等特性
               </p>
-              <p style={{ color: 'var(--ifm-color-primary)', fontWeight: 'bold', marginBottom: 2 }}>
+              <p style={{ color: 'var(--ifm-color-primary)', marginBottom: 2 }}>
                 <span className="badge badge--primary" style={{ marginRight: 8 }}>Label 组件</span>
                 重构 Char 缓存模式，支持自动多纹理合批、多图集、复用废弃空间等特性
               </p>
-              <p style={{ color: 'var(--ifm-color-primary)', fontWeight: 'bold', marginBottom: 2 }}>
+              <p style={{ color: 'var(--ifm-color-primary)', marginBottom: 2 }}>
                 <span className="badge badge--primary" style={{ marginRight: 8 }}>Spine 组件</span>
                 支持与其它组件合批、合入动态图集与 SpriteFrame 换装
               </p>
@@ -46,6 +46,13 @@ function HomepageHeader() {
                 style={{ marginRight: 20 }}
               >
                 开始使用
+              </Link>
+              <Link
+                className="button button--outline button--primary button--lg"
+                href='TODO'
+                style={{ marginRight: 20 }}
+              >
+                查看演示
               </Link>
               <Link
                 className="button button--secondary button--lg"
