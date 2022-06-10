@@ -10,6 +10,8 @@ hide_title: true
 
 该项目尽量以最符合原始架构设计的方式为引擎加入新的特性、修复已知问题以及优化性能。
 
+正因为如此，大部分项目使用这个服务包就像升级引擎版本一样简单。
+
 :::info 项目的起源
 2021 年 2 月，Cocos 发布 Cocos Creator 3.0，并在 3.x 发布之后不会再继续开发 2.x 版本的新特性，所有维护工作也会在 2023 年完全停止。
 
@@ -38,7 +40,7 @@ Service Pack 暂时只适配 Cocos Creator 2.x 版本，Cocos Creator 3.x 正在
 
 ## 功能演示
 
-待补充。
+TODO
 
 ## 使用方法
 
@@ -51,8 +53,17 @@ Service Pack 暂时只适配 Cocos Creator 2.x 版本，Cocos Creator 3.x 正在
 
 ## 更新日志
 
-### v1.0
-- 待补充
+### Service Pack v1.0
+
+- **[新特性] 支持多纹理渲染**
+- **[新特性] 重构动态图集，支持多个新特性**
+- **[新特性] 重构 cc.Label 的 Char 缓存模式，支持多个新特性**
+- **[新特性] 支持高 DPI 文本渲染**
+- **[新特性] cc.Spine 组件支持参与动态图集、与其它组件合批、使用 SpriteFrame 换装**
+- [新特性] cc.Label、cc.RichText、cc.Sprite、cc.MotionStreak、cc.Spine 组件支持使用多纹理材质，并支持自动切换材质机制
+- [新特性] cc.RichText 支持使用自定义材质
+- [修复] 直接修改 Effect 的属性不回导致其变体的 hash 值刷新
+- [调整] 默认禁用 Label 原生 TTF 渲染器
 
 所有更新日志请移步 [此处](./update-log)。
 

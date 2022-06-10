@@ -3,14 +3,14 @@ import {useCurrentSidebarCategory} from '@docusaurus/theme-common';
 
 # 使用指南
 
+在 [入门教程](../start-guide/start-guide-intro) 里，你应该对如何更好地使用安装服务包后的引擎已经有所了解了。
+
+而在这里你能了解到服务包为引擎添加的每个特性、改动与原理：
+
+<DocCardList items={useCurrentSidebarCategory().items}/>
+
 :::caution 注意
 
 在几乎所有平台上引擎都是使用 WebGL 渲染模式，所以服务包的大部分特性都未支持引擎的 Canvas 渲染模式，部分特性在 3D 节点下不生效。
 
 :::
-
-在 [入门教程](../start-guide/start-guide-intro) 里，你应该对如何更好地使用安装服务包后的引擎已经有所了解了。
-
-而在这里会更进一步，你能了解到服务包为引擎添加的所有特性：
-
-<DocCardList items={useCurrentSidebarCategory().items}/>

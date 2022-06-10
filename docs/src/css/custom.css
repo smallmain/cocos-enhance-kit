@@ -65,7 +65,7 @@
 
 @media screen and (min-width: 997px) {
   :root {
-    --ifm-font-size-base: 18px;
+    --ifm-font-size-base: 16px;
   }
 
   .hero__subtitle {
@@ -96,11 +96,6 @@
   .markdown>h2 {
     margin-bottom: calc(var(--ifm-heading-vertical-rhythm-bottom) * var(--ifm-leading) * 1.5);
   }
-
-  .markdown>h3 {
-    --ifm-h3-font-size: 1.3rem;
-  }
-
 
 }
 

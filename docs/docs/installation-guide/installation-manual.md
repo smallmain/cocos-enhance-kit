@@ -5,18 +5,7 @@ description: "需掌握一定的自定义引擎知识。"
 
 # 手动安装
 
-:::tip 提示
-
-建议升级到最新的引擎版本，官方只会对 2.x 版本只会进行维护性更新，所以不用担心其稳定性问题。
-
-如果你的项目引擎版本较低，可以看一看 [使用引擎扩展安装](./installation-engine-plugin) ，支持对多个引擎版本进行一键安装。
-
-:::
-
----
-## 服务包下载
-
-### Service Pack v1.0
+## Service Pack v1.0
 
 适配 Cocos Creator v2.4.9 版本，[点此下载服务包](http://www.baidu.com)
 
@@ -27,6 +16,14 @@ description: "需掌握一定的自定义引擎知识。"
 
 - **项目所使用的引擎版本与服务包适配的引擎版本一致**
 - **项目未使用自定义引擎**
+
+:::tip 提示
+
+建议升级到最新的引擎版本，官方只会对 2.x 版本只会进行维护性更新，所以不用担心其稳定性问题。
+
+如果你的项目引擎版本较低，可以看一看 [使用引擎扩展安装](./installation-engine-plugin) ，支持对多个引擎版本进行一键安装。
+
+:::
 
 ### 1.替换自定义引擎
 
@@ -57,7 +54,7 @@ description: "需掌握一定的自定义引擎知识。"
 
 :::caution 注意
 
-**请勿将此扩展与 “使用引擎扩展安装” 中所安装的引擎扩展混淆！**
+**请勿将此引擎扩展与 “使用引擎扩展安装” 中所安装的引擎扩展混淆！**
 
 **该扩展只解决自定义引擎无法为引擎新增内置资源和扩展组件 inspector 的问题，是服务包开源的一部分**。
 
@@ -65,15 +62,11 @@ description: "需掌握一定的自定义引擎知识。"
 
 压缩包内 `service-pack-support` 目录即是扩展本身，将其放到项目的 `packages` 目录即可。
 
-更多详情可阅读官方的 [安装扩展](https://docs.cocos.com/creator/2.4/manual/zh/extension/install-and-share.html) 文档。
-
-:::caution 注意
-
-服务包会使用名为 `sp` 的 AssetBundle 存放资源，如果你的项目有使用 AssetBundle，请确保该名称未被占用。
+服务包需要使用名为 `sp` 的 AssetBundle 存放资源，如果你的项目有使用 AssetBundle，请**确保该名称未被占用**。
 
 没有必要将这个 Asset Bundle 设为远程包或者 Zip 压缩，里面只是一个多纹理 Effect 着色器资源。
 
-:::
+更多详情可阅读官方的 [安装扩展](https://docs.cocos.com/creator/2.4/manual/zh/extension/install-and-share.html) 文档。
 
 ### 3.TypeScript 类型提示（可选）
 
@@ -87,9 +80,11 @@ description: "需掌握一定的自定义引擎知识。"
 
 完成以上的步骤后重启 Cocos Creator。
 
-可在项目预览时检查 Devtools Console 打印的是否为 `Cocos Creator SP v2.4.x`，是的话则成功安装。
+可在项目预览时检查 Devtools Console 打印的是否为 `Cocos Creator SP v2.4.x`，是的话则已经成功安装。
 
 ![](./assets/installed-console.png)
+
+接下来推荐你从 [入门教程](../start-guide/start-guide-intro) 开始了解服务包为你的开发都带来了哪些新特性！
 
 ---
 ## 补丁安装
