@@ -1,0 +1,16 @@
+{
+  "name": "service-pack",
+  "version": "1.0.0",
+  "description": "This extension provides support for cocos service pack.",
+  "author": "SmallMain",
+  "main": "main.js",
+  "runtime-resource": {
+    "path": "resources",
+    "name": "resources"
+  },
+  "reload": {
+    "ignore": [
+      "resources/**/*"
+    ]
+  }
+}
