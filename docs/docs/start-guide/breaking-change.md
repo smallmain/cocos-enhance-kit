@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 4
 description: "一般情况下都不需要了解。"
 ---
 
@@ -9,6 +9,7 @@ description: "一般情况下都不需要了解。"
 
 但有些变化难以避免，在这里你可以检查所有变更，评估是否会造成巨大的影响。
 
+---
 ### 默认禁用原生 TTF 渲染器
 
 引擎的 Label 在使用 Char 缓存模式并且使用 TTF 字体时，会使用一个原生 TTF 渲染器。
@@ -23,6 +24,7 @@ description: "一般情况下都不需要了解。"
 cc.macro.ENABLE_NATIVE_TTF_RENDERER = false;
 ```
 
+---
 ### 动态图集的一些变化
 
 对动态图集的重构虽然保持了所有原有接口不变，但有些细节和以前不同了。
@@ -39,7 +41,7 @@ cc.macro.ENABLE_NATIVE_TTF_RENDERER = false;
 
 - **动态图集重复纹理的判断从 `texture._id` 改为使用 `texture._uuid`**
 
-具体的设计原因和原理可前往 [动态图集](TODO) 文档进行了解。
+具体的设计原因和原理可前往 [动态合图](TODO) 文档进行了解。
 
 - **`cc.dynamicAtlasManager.insertSpriteFrame(spriteFrame)` 不再检查纹理的 `packable` 属性**
 
@@ -49,6 +51,7 @@ cc.macro.ENABLE_NATIVE_TTF_RENDERER = false;
 
 这个就是因为动态图集被重构了，如果你的项目依赖一些未公开的类或者接口（引擎在 `creator.d.ts` 声明了的则是已经公开的），则可能需要重新编写。
 
+---
 ### 使用 Char 缓存模式的 Label 暂不支持在编辑器中设置材质
 
 如果项目中有 Label 使用了 Char 缓存模式并且设置了自定义材质，可能会失效，具体原因可前往 [Char 缓存模式](TODO) 文档进行了解。
