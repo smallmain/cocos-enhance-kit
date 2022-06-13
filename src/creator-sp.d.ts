@@ -11,6 +11,11 @@ declare module cc {
         const inited: boolean,
 
         /**
+         * 版本号
+         */
+        const version: string,
+
+        /**
          * 最大纹理插槽数量
          * 
          * 固定为 8

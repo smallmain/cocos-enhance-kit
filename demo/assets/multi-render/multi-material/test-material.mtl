@@ -1,0 +1,28 @@
+{
+  "__type__": "cc.Material",
+  "_name": "test-material",
+  "_objFlags": 0,
+  "_native": "",
+  "_effectAsset": {
+    "__uuid__": "5dcffc18-b913-460e-a0d9-5d74f4cda12b"
+  },
+  "_techniqueIndex": 0,
+  "_techniqueData": {
+    "0": {
+      "defines": {
+        "USE_TEXTURE": true
+      },
+      "props": {
+        "texture": {
+          "__uuid__": "c11dfdd2-97c6-409c-9c0f-fdfa681f16a9"
+        },
+        "texture2": {
+          "__uuid__": "1c8a3cc1-a452-4276-848d-2bdf30e6852a"
+        },
+        "texture3": {
+          "__uuid__": "6e056173-d285-473c-b206-40a7fff5386e"
+        }
+      }
+    }
+  }
+}
