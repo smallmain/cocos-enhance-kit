@@ -33,7 +33,8 @@ function CardLayout({href, icon, title, description}) {
   );
 }
 
-function CardCategory({item}) {
+function CardCategory({ item }) {
+  const doc = useDocById(item.docId ?? undefined);
   const href = findFirstCategoryLink(item); // Unexpected: categories that don't have a link have been filtered upfront
 
   if (!href) {
@@ -45,17 +46,7 @@ function CardCategory({item}) {
       href={href}
       icon=""
       title={item.label}
-      description={translate(
-        {
-          message: '{count} items',
-          id: 'theme.docs.DocCard.categoryDescription',
-          description:
-            'The default description for a category card in the generated index about how many items this category includes',
-        },
-        {
-          count: item.items.length,
-        },
-      )}
+      description={item.description}
     />
   );
 }

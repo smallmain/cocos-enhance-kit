@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+description: "随心所欲地控制动态合图的使用。"
 ---
 
 # 手动管理合图
