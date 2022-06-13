@@ -2,7 +2,9 @@
 
 ![logo](/docs/static/img/logo2.png)
 
-> 该项目还处于内部完善中
+> 该项目当前为预览版，还在完善中，存在以下问题：
+> 1.Spine 使用多纹理材质时只支持使用 REALTIME 模式
+> 2.还未适配原生平台（cocos2d-x、jsb-adapter）
 
 这是一个对 Cocos Creator 引擎进行特性增强、修复与优化的**开源非官方服务包（Service Pack）**。
 
