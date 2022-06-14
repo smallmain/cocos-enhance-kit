@@ -14,7 +14,7 @@ description: "了解并上手服务包提供的所有其他新特性。"
 
 而现在不需要了，高 DPI 文本渲染默认是关闭的，你可以通过
 
-```
+```js
 cc.sp.labelRetinaScale = 2;     // 渲染文本时纹理的缩放倍数，默认值为 1.
 ```
 
@@ -37,7 +37,7 @@ cc.sp.labelRetinaScale = 2;     // 渲染文本时纹理的缩放倍数，默认
 
 只需要一句代码即可使用 cc.SpriteFrame 替换指定 attachment 的 region 对象：
 
-```
+```js
 this.skel.setRegion('head', 'head', sp.SkeletonData.createRegion(spriteFrame));
 ```
 

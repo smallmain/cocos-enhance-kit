@@ -36,8 +36,12 @@ CCProgram vs %{
   #if USE_TEXTURE
   in vec2 a_uv0;
   out vec2 v_uv0;
+
+  #if USE_MULTI_TEXTURE
   in float a_texId;
   out float v_texId;
+  #endif
+
   #endif
 
   void main () {
@@ -51,7 +55,11 @@ CCProgram vs %{
 
     #if USE_TEXTURE
     v_uv0 = a_uv0;
+    
+    #if USE_MULTI_TEXTURE
     v_texId = a_texId;
+    #endif
+
     #endif
 
     v_color = a_color;
@@ -71,8 +79,10 @@ CCProgram fs %{
 
   #if USE_TEXTURE
   in vec2 v_uv0;
-  in float v_texId;
   uniform sampler2D texture;
+
+  #if USE_MULTI_TEXTURE 
+  in float v_texId;
   uniform sampler2D texture2;
   uniform sampler2D texture3;
   uniform sampler2D texture4;
@@ -81,28 +91,34 @@ CCProgram fs %{
   uniform sampler2D texture7;
   uniform sampler2D texture8;
   #endif
+  
+  #endif
 
   void main () {
     vec4 o = vec4(1, 1, 1, 1);
 
     #if USE_TEXTURE
-      if(v_texId < 1.0){
+      #if USE_MULTI_TEXTURE 
+        if(v_texId < 1.0){
+          CCTexture(texture, v_uv0, o);
+        } else if(v_texId < 2.0){
+          CCTexture(texture2, v_uv0, o);
+        } else if(v_texId < 3.0){
+          CCTexture(texture3, v_uv0, o);
+        } else if(v_texId < 4.0){
+          CCTexture(texture4, v_uv0, o);
+        } else if(v_texId < 5.0){
+          CCTexture(texture5, v_uv0, o);
+        } else if(v_texId < 6.0){
+          CCTexture(texture6, v_uv0, o);
+        } else if(v_texId < 7.0){
+          CCTexture(texture7, v_uv0, o);
+        } else {
+          CCTexture(texture8, v_uv0, o);
+        }
+      #else
         CCTexture(texture, v_uv0, o);
-      } else if(v_texId < 2.0){
-        CCTexture(texture2, v_uv0, o);
-      } else if(v_texId < 3.0){
-        CCTexture(texture3, v_uv0, o);
-      } else if(v_texId < 4.0){
-        CCTexture(texture4, v_uv0, o);
-      } else if(v_texId < 5.0){
-        CCTexture(texture5, v_uv0, o);
-      } else if(v_texId < 6.0){
-        CCTexture(texture6, v_uv0, o);
-      } else if(v_texId < 7.0){
-        CCTexture(texture7, v_uv0, o);
-      } else {
-        CCTexture(texture8, v_uv0, o);
-      }
+      #endif
     #endif
 
     o *= v_color;

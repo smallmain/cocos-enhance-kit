@@ -485,6 +485,11 @@ declare module cc {
         _multiHandler?: cc.sp.MultiHandler;
 
         /**
+         * 根据材质的 `USE_MULTI_TEXTURE` 宏来更新材质是否支持多纹理
+         */
+        updateMultiSupport(): boolean;
+
+        /**
          * 判断该材质是否有 MultiHandler 实例
          */
         isMultiSupport(): boolean;

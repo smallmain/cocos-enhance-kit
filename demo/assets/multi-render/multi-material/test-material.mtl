@@ -10,7 +10,8 @@
   "_techniqueData": {
     "0": {
       "defines": {
-        "USE_TEXTURE": true
+        "USE_TEXTURE": true,
+        "USE_MULTI_TEXTURE": true
       },
       "props": {
         "texture": {
@@ -21,6 +22,12 @@
         },
         "texture3": {
           "__uuid__": "6e056173-d285-473c-b206-40a7fff5386e"
+        },
+        "texture4": {
+          "__uuid__": "45be59f3-5655-4369-9e9f-455c81d2ddd9"
+        },
+        "texture5": {
+          "__uuid__": "d9c4530a-ef05-45c1-b012-eb4686f4c70f"
         }
       }
     }

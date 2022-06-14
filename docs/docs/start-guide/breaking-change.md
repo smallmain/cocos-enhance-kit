@@ -20,7 +20,7 @@ description: "一般情况下都不需要了解。"
 
 **大部分项目可以不用关心**。
 
-```
+```js
 cc.macro.ENABLE_NATIVE_TTF_RENDERER = false;
 ```
 

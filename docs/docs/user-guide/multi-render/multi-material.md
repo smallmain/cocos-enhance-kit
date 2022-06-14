@@ -1,6 +1,7 @@
 ---
 sidebar_position: 1
-description: "了解实现多纹理渲染的基础。"
+description: "了解如何手动管理多纹理材质。"
+toc_max_heading_level: 5
 ---
 
 # 多纹理材质
@@ -11,7 +12,7 @@ description: "了解实现多纹理渲染的基础。"
 
 ![material-settings](./assets/material-settings.png)
 
-可以看到上面有 `texture` - `texture8` 一共 8 个纹理插槽，将需要使用的纹理拖到上面的插槽即可完成多纹理材质的配置。
+勾选 `USE_MULTI_TEXTURE` 后可以看到上面有 `texture` - `texture8` 一共 8 个纹理插槽，将需要使用的纹理拖到上面的插槽即可完成多纹理材质的配置。
 
 ## 在组件中使用多纹理材质
 
@@ -37,30 +38,84 @@ description: "了解实现多纹理渲染的基础。"
 
 ## 自定义多纹理材质
 
-上面介绍的多纹理材质都是使用的内置的多纹理 Effect 着色器，**如果你也创建了一个拥有多个纹理插槽的 Effect 着色器，直接使用并不会被直接识别为多纹理材质。**
+上面介绍的多纹理材质都是使用的内置的多纹理 Effect 着色器，你可以直接在内置多纹理 Effect 着色器的基础上修改。
 
+除了直接在内置着色器的基础上修改之外，任何着色器中如果存在一个宏 `USE_MULTI_TEXTURE = true`，则会被认为是多纹理材质。
 
+[演示项目](TODO) 中有自定义材质的示范代码。
 
-## MultiHandler
+:::tip 提示
 
-这个是服务包新增的一个工具类，其主要用处是便捷、高性能地管理多纹理材质上面的所有纹理。
+是否为多纹理材质的判断逻辑流程：
 
-虽然你可以直接通过 `cc.Material` 上的接口来设置纹理插槽，但是出于性能考虑，**多纹理材质必须使用该类实例来进行纹理增删改的相关操作，否则可能导致不能正确渲染。**
+1. 获取材质当前使用的 Technique 中的第一个 Pass
+2. 判断这个 Pass 是否 `USE_MULTI_TEXTURE = true`
+3. 是的话，这个材质即为多纹理材质
 
-它有以下接口：
+在某些情况下通过代码修改材质可能需要调用 `material.updateMultiSupport()` 来触发这个流程。
 
-### `setTexture(index: number, texture: cc.Texture2D): void`
+:::
 
-设置纹理插槽上的纹理，
+## 通过代码设置纹理插槽
 
+每个多纹理材质都对应着一个多纹理材质管理器，这是服务包新增的一个工具类，其主要用处是便捷、高性能地管理多纹理材质上面的纹理插槽。
 
-当我们说 “多纹理材质” 时，指的是持有 `cc.sp.MultiHandler` 实例的材质。
+通过 `material.getMultiHandler()` 可以获取到管理器实例，请使用这个实例来操作多纹理材质的纹理插槽。
 
-并且使用内置多纹理 Effect 着色器的材质会自动持有一个 `cc.sp.MultiHandler` 实例。
+比如：
 
-也就是说**使用自行创建的有多个纹理插槽着色器的材质不会被直接识别为多纹理材质。**
+```js
+// 获取管理器实例
+const handler = material.getMultiHandler();
 
-:::tip
+// 设置 `texture` 纹理插槽
+handler.setTexture(0, texture);
 
+// 置空 `texture2` 纹理插槽
+handler.setTexture(1, null);
 
-##
+// 直接移除指定纹理
+handler.removeTexture(texture.getImpl());
+```
+
+从上面的代码中可以看出操作纹理插槽的时候并不是传入插槽的名称，而是需要提供下标。
+
+下标 `0` - `7` 分别对应着名称为 `texture` - `texture8` 的插槽。
+
+可以使用这两个函数进行转换：
+
+```js
+// index to name
+cc.sp.propertyIndex2Name(0);    // return: "texture"
+
+// name to index
+cc.sp.propertyName2Index("texture");    // return: 0
+```
+
+:::caution 注意
+
+注意区分材质 `cc.Material` 与材质变体 `cc.MaterialVariant`。
+
+:::
+
+:::caution 警告
+
+请勿直接通过 `setProperty` 接口修改多纹理材质的纹理插槽。
+
+如果你必须这么做，需要调用 `material.getMultiHandler().syncTextures()` 来同步插槽数据到 `MultiHandler` 上。
+
+:::
+
+## 强制设置材质的类型
+
+如果你想将某个材质强制视为多纹理材质或非多纹理材质，可以：
+
+```js
+// 视为多纹理材质
+material.setMultiSupport(true);
+
+// 视为非多纹理材质
+material.setMultiSupport(false);
+```
+
+但是这么做好像没有什么意义。

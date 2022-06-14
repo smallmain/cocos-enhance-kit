@@ -13,7 +13,7 @@ description: "随心所欲地控制动态合图的使用。"
 
 你可以通过该接口添加 SpriteFrame 的 Texture 到图集中，内部也是使用该接口。
 
-```
+```js
 cc.dynamicAtlasManager.insertSpriteFrame(spriteFrame);
 ```
 
