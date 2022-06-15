@@ -63,6 +63,7 @@ TODO
 - [新特性] cc.Label、cc.RichText、cc.Sprite、cc.MotionStreak、Spine 组件支持使用多纹理材质，并支持自动切换材质机制
 - [新特性] cc.RichText 支持使用自定义材质
 - [修复] 直接修改 Effect 的属性不回导致其变体的 hash 值刷新
+- [修复] CHAR 缓存模式 hash 计算可能会有重复的问题
 - [调整] 默认禁用 Label 原生 TTF 渲染器
 
 所有更新日志请移步 [此处](./update-log)。
@@ -96,4 +97,9 @@ TODO
 
 对于已经修改过引擎的人，由于服务包提供的是 Git Patch，所以可以让你在已有修改的基础上轻松应用上服务包的改动，甚至你可以只应用你想要的特性。
 
+### Cocos Creator 报 Error: Can not parse this input:undefined 错误
+
+没有找到服务包的内置资源，请记得安装配套的引擎扩展。
+
+---
 **最后的最后，希望这个项目能帮助到你的学习或工作，enjoy！**

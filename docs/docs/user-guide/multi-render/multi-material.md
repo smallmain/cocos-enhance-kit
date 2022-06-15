@@ -6,6 +6,7 @@ toc_max_heading_level: 5
 
 # 多纹理材质
 
+---
 ## 创建多纹理材质
 
 你可以正常创建一个材质文件，Effect 选择内置的多纹理 Effect 着色器 `multi-2d-sprite` 即可。
@@ -14,6 +15,7 @@ toc_max_heading_level: 5
 
 勾选 `USE_MULTI_TEXTURE` 后可以看到上面有 `texture` - `texture8` 一共 8 个纹理插槽，将需要使用的纹理拖到上面的插槽即可完成多纹理材质的配置。
 
+---
 ## 在组件中使用多纹理材质
 
 直接拖到组件的 `Materials` 属性上即可。
@@ -36,6 +38,7 @@ toc_max_heading_level: 5
 
 :::
 
+---
 ## 自定义多纹理材质
 
 上面介绍的多纹理材质都是使用的内置的多纹理 Effect 着色器，你可以直接在内置多纹理 Effect 着色器的基础上修改。
@@ -56,6 +59,7 @@ toc_max_heading_level: 5
 
 :::
 
+---
 ## 通过代码设置纹理插槽
 
 每个多纹理材质都对应着一个多纹理材质管理器，这是服务包新增的一个工具类，其主要用处是便捷、高性能地管理多纹理材质上面的纹理插槽。
@@ -76,6 +80,9 @@ handler.setTexture(1, null);
 
 // 直接移除指定纹理
 handler.removeTexture(texture.getImpl());
+
+// 将纹理自动设置到材质的空插槽
+handler.autoSetTexture(texture);
 ```
 
 从上面的代码中可以看出操作纹理插槽的时候并不是传入插槽的名称，而是需要提供下标。
@@ -100,12 +107,13 @@ cc.sp.propertyName2Index("texture");    // return: 0
 
 :::caution 警告
 
-请勿直接通过 `setProperty` 接口修改多纹理材质的纹理插槽。
+请勿直接通过材质原始的 `setProperty` 接口修改多纹理材质的纹理插槽。
 
 如果你必须这么做，需要调用 `material.getMultiHandler().syncTextures()` 来同步插槽数据到 `MultiHandler` 上。
 
 :::
 
+---
 ## 强制设置材质的类型
 
 如果你想将某个材质强制视为多纹理材质或非多纹理材质，可以：
@@ -118,4 +126,4 @@ material.setMultiSupport(true);
 material.setMultiSupport(false);
 ```
 
-但是这么做好像没有什么意义。
+没有特殊情况不需要这么做。

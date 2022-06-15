@@ -290,7 +290,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 960,
-      "height": 843
+      "height": 803
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -485,13 +485,13 @@
     "_batchAsBitmap": false,
     "_styleFlags": 0,
     "_underlineHeight": 0,
-    "autoSwitchMaterial": 0,
-    "allowDynamicAtlas": 0,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_N$cacheMode": 2,
+    "_N$autoSwitchMaterial": 0,
+    "_N$allowDynamicAtlas": 0,
     "_N$enableRetina": 0,
     "_id": ""
   },
@@ -600,8 +600,8 @@
     "_fillRange": 0,
     "_isTrimmedMode": false,
     "_atlas": null,
-    "autoSwitchMaterial": 2,
-    "allowDynamicAtlas": 2,
+    "_N$autoSwitchMaterial": 2,
+    "_N$allowDynamicAtlas": 2,
     "_id": ""
   },
   {
@@ -693,7 +693,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 200,
-      "height": 390
+      "height": 310
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -705,7 +705,7 @@
       "ctor": "Float64Array",
       "array": [
         -180,
-        -195,
+        -155,
         0,
         0,
         0,
@@ -769,7 +769,7 @@
       "ctor": "Float64Array",
       "array": [
         0,
-        130,
+        90,
         0,
         0,
         0,
@@ -817,13 +817,13 @@
     "_batchAsBitmap": false,
     "_styleFlags": 0,
     "_underlineHeight": 0,
-    "autoSwitchMaterial": 0,
-    "allowDynamicAtlas": 0,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_N$cacheMode": 2,
+    "_N$autoSwitchMaterial": 0,
+    "_N$allowDynamicAtlas": 0,
     "_N$enableRetina": 0,
     "_id": ""
   },
@@ -865,8 +865,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 900,
-      "height": 1200
+      "width": 700,
+      "height": 800
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -932,8 +932,8 @@
     "_fillRange": 0,
     "_isTrimmedMode": false,
     "_atlas": null,
-    "autoSwitchMaterial": 2,
-    "allowDynamicAtlas": 2,
+    "_N$autoSwitchMaterial": 2,
+    "_N$allowDynamicAtlas": 2,
     "_id": ""
   },
   {
@@ -958,7 +958,7 @@
     "_layoutSize": {
       "__type__": "cc.Size",
       "width": 200,
-      "height": 390
+      "height": 310
     },
     "_resize": 1,
     "_N$layoutType": 2,
@@ -1149,13 +1149,13 @@
     "_batchAsBitmap": false,
     "_styleFlags": 0,
     "_underlineHeight": 0,
-    "autoSwitchMaterial": 0,
-    "allowDynamicAtlas": 0,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_N$cacheMode": 2,
+    "_N$autoSwitchMaterial": 0,
+    "_N$allowDynamicAtlas": 0,
     "_N$enableRetina": 0,
     "_id": ""
   },
@@ -1264,8 +1264,8 @@
     "_fillRange": 0,
     "_isTrimmedMode": false,
     "_atlas": null,
-    "autoSwitchMaterial": 2,
-    "allowDynamicAtlas": 2,
+    "_N$autoSwitchMaterial": 2,
+    "_N$allowDynamicAtlas": 2,
     "_id": ""
   },
   {
@@ -1481,13 +1481,13 @@
     "_batchAsBitmap": false,
     "_styleFlags": 0,
     "_underlineHeight": 0,
-    "autoSwitchMaterial": 0,
-    "allowDynamicAtlas": 0,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_N$cacheMode": 2,
+    "_N$autoSwitchMaterial": 0,
+    "_N$allowDynamicAtlas": 0,
     "_N$enableRetina": 0,
     "_id": ""
   },
@@ -1596,8 +1596,8 @@
     "_fillRange": 0.7,
     "_isTrimmedMode": false,
     "_atlas": null,
-    "autoSwitchMaterial": 2,
-    "allowDynamicAtlas": 2,
+    "_N$autoSwitchMaterial": 2,
+    "_N$allowDynamicAtlas": 2,
     "_id": ""
   },
   {
@@ -1701,7 +1701,7 @@
       "ctor": "Float64Array",
       "array": [
         -380,
-        -520.5,
+        -480.5,
         0,
         0,
         0,
@@ -1813,13 +1813,13 @@
     "_batchAsBitmap": false,
     "_styleFlags": 0,
     "_underlineHeight": 0,
-    "autoSwitchMaterial": 0,
-    "allowDynamicAtlas": 0,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_N$cacheMode": 2,
+    "_N$autoSwitchMaterial": 0,
+    "_N$allowDynamicAtlas": 0,
     "_N$enableRetina": 0,
     "_id": ""
   },
@@ -1928,8 +1928,8 @@
     "_fillRange": 0.7,
     "_isTrimmedMode": false,
     "_atlas": null,
-    "autoSwitchMaterial": 2,
-    "allowDynamicAtlas": 2,
+    "_N$autoSwitchMaterial": 2,
+    "_N$allowDynamicAtlas": 2,
     "_id": ""
   },
   {
@@ -2033,7 +2033,7 @@
       "ctor": "Float64Array",
       "array": [
         -180,
-        -480,
+        -440,
         0,
         0,
         0,
@@ -2145,13 +2145,13 @@
     "_batchAsBitmap": false,
     "_styleFlags": 0,
     "_underlineHeight": 0,
-    "autoSwitchMaterial": 0,
-    "allowDynamicAtlas": 0,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_N$cacheMode": 2,
+    "_N$autoSwitchMaterial": 0,
+    "_N$allowDynamicAtlas": 0,
     "_N$enableRetina": 0,
     "_id": ""
   },
@@ -2254,13 +2254,13 @@
     "_batchAsBitmap": false,
     "_styleFlags": 0,
     "_underlineHeight": 0,
-    "autoSwitchMaterial": 2,
-    "allowDynamicAtlas": 2,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_N$cacheMode": 2,
+    "_N$autoSwitchMaterial": 2,
+    "_N$allowDynamicAtlas": 2,
     "_N$enableRetina": 0,
     "_id": ""
   },
@@ -2365,7 +2365,7 @@
       "ctor": "Float64Array",
       "array": [
         20,
-        -480,
+        -440,
         0,
         0,
         0,
@@ -2477,13 +2477,13 @@
     "_batchAsBitmap": false,
     "_styleFlags": 0,
     "_underlineHeight": 0,
-    "autoSwitchMaterial": 0,
-    "allowDynamicAtlas": 0,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_N$cacheMode": 2,
+    "_N$autoSwitchMaterial": 0,
+    "_N$allowDynamicAtlas": 0,
     "_N$enableRetina": 0,
     "_id": ""
   },
@@ -2590,13 +2590,13 @@
     "_batchAsBitmap": false,
     "_styleFlags": 0,
     "_underlineHeight": 0,
-    "autoSwitchMaterial": 2,
-    "allowDynamicAtlas": 2,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_N$cacheMode": 0,
+    "_N$autoSwitchMaterial": 2,
+    "_N$allowDynamicAtlas": 2,
     "_N$enableRetina": 0,
     "_id": ""
   },
@@ -2701,7 +2701,7 @@
       "ctor": "Float64Array",
       "array": [
         220,
-        -475,
+        -435,
         0,
         0,
         0,
@@ -2813,13 +2813,13 @@
     "_batchAsBitmap": false,
     "_styleFlags": 0,
     "_underlineHeight": 0,
-    "autoSwitchMaterial": 0,
-    "allowDynamicAtlas": 0,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_N$cacheMode": 2,
+    "_N$autoSwitchMaterial": 0,
+    "_N$allowDynamicAtlas": 0,
     "_N$enableRetina": 0,
     "_id": ""
   },
@@ -2927,8 +2927,8 @@
       "a": 255
     },
     "_fastMode": false,
-    "autoSwitchMaterial": 2,
     "_N$preview": true,
+    "_N$autoSwitchMaterial": 2,
     "_id": ""
   },
   {
@@ -3032,7 +3032,7 @@
       "ctor": "Float64Array",
       "array": [
         -380,
-        -747,
+        -707,
         0,
         0,
         0,
@@ -3144,13 +3144,13 @@
     "_batchAsBitmap": false,
     "_styleFlags": 0,
     "_underlineHeight": 0,
-    "autoSwitchMaterial": 0,
-    "allowDynamicAtlas": 0,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_N$cacheMode": 2,
+    "_N$autoSwitchMaterial": 0,
+    "_N$allowDynamicAtlas": 0,
     "_N$enableRetina": 0,
     "_id": ""
   },
@@ -3260,8 +3260,6 @@
     "_headAniInfo": null,
     "_playTimes": 0,
     "_isAniComplete": true,
-    "autoSwitchMaterial": 2,
-    "allowDynamicAtlas": 2,
     "_N$skeletonData": {
       "__uuid__": "bcd99389-a393-426e-b234-157c62b44bc4"
     },
@@ -3271,6 +3269,8 @@
     "_N$debugMesh": false,
     "_N$useTint": false,
     "_N$enableBatch": true,
+    "_N$autoSwitchMaterial": 2,
+    "_N$allowDynamicAtlas": 2,
     "_id": ""
   },
   {
@@ -3374,7 +3374,7 @@
       "ctor": "Float64Array",
       "array": [
         -180,
-        -747,
+        -707,
         0,
         0,
         0,
@@ -3486,13 +3486,13 @@
     "_batchAsBitmap": false,
     "_styleFlags": 0,
     "_underlineHeight": 0,
-    "autoSwitchMaterial": 0,
-    "allowDynamicAtlas": 0,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_N$cacheMode": 2,
+    "_N$autoSwitchMaterial": 0,
+    "_N$allowDynamicAtlas": 0,
     "_N$enableRetina": 0,
     "_id": ""
   },
@@ -3602,8 +3602,6 @@
     "_headAniInfo": null,
     "_playTimes": 0,
     "_isAniComplete": true,
-    "autoSwitchMaterial": 2,
-    "allowDynamicAtlas": 2,
     "_N$skeletonData": {
       "__uuid__": "bcd99389-a393-426e-b234-157c62b44bc4"
     },
@@ -3613,6 +3611,8 @@
     "_N$debugMesh": false,
     "_N$useTint": false,
     "_N$enableBatch": true,
+    "_N$autoSwitchMaterial": 2,
+    "_N$allowDynamicAtlas": 2,
     "_id": ""
   },
   {
@@ -3716,7 +3716,7 @@
       "ctor": "Float64Array",
       "array": [
         20,
-        -746,
+        -706,
         0,
         0,
         0,
@@ -3828,13 +3828,13 @@
     "_batchAsBitmap": false,
     "_styleFlags": 0,
     "_underlineHeight": 0,
-    "autoSwitchMaterial": 0,
-    "allowDynamicAtlas": 0,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_N$cacheMode": 2,
+    "_N$autoSwitchMaterial": 0,
+    "_N$allowDynamicAtlas": 0,
     "_N$enableRetina": 0,
     "_id": ""
   },
@@ -3943,8 +3943,8 @@
     "_fillRange": 0,
     "_isTrimmedMode": false,
     "_atlas": null,
-    "autoSwitchMaterial": 2,
-    "allowDynamicAtlas": 2,
+    "_N$autoSwitchMaterial": 2,
+    "_N$allowDynamicAtlas": 2,
     "_id": ""
   },
   {
@@ -4024,7 +4024,7 @@
     "_layoutSize": {
       "__type__": "cc.Size",
       "width": 960,
-      "height": 843
+      "height": 803
     },
     "_resize": 1,
     "_N$layoutType": 3,
@@ -4289,8 +4289,8 @@
     "_fillRange": 0,
     "_isTrimmedMode": true,
     "_atlas": null,
-    "autoSwitchMaterial": 0,
-    "allowDynamicAtlas": 0,
+    "_N$autoSwitchMaterial": 0,
+    "_N$allowDynamicAtlas": 0,
     "_id": ""
   },
   {
@@ -4410,8 +4410,8 @@
     "_fillRange": 0,
     "_isTrimmedMode": true,
     "_atlas": null,
-    "autoSwitchMaterial": 0,
-    "allowDynamicAtlas": 0,
+    "_N$autoSwitchMaterial": 0,
+    "_N$allowDynamicAtlas": 0,
     "_id": ""
   },
   {
@@ -4482,8 +4482,8 @@
     "_fillRange": 0,
     "_isTrimmedMode": false,
     "_atlas": null,
-    "autoSwitchMaterial": 0,
-    "allowDynamicAtlas": 0,
+    "_N$autoSwitchMaterial": 0,
+    "_N$allowDynamicAtlas": 0,
     "_id": ""
   },
   {
