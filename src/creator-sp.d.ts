@@ -144,6 +144,12 @@ declare module cc {
              */
             getEmptyIndex(): number;
 
+
+            /**
+             * 自动设置纹理到空插槽，返回插槽下标，失败返回 -1（提供 cc.Texture2D）
+             */
+            autoSetTexture(texture: cc.Texture2D): number;
+
         }
 
         /**
@@ -175,14 +181,9 @@ declare module cc {
 
 
             /**
-             * 使 cc.Texture2D 关联指定材质
+             * 重置多纹理材质数组，再次使用请先初始化
              */
-            linkMaterial(texture: cc.Texture2D, handler: MultiHandler, index: number): void;
-
-            /**
-             * 取消关联 cc.Texture2D 上已关联的材质
-             */
-            unlinkMaterial(texture: cc.Texture2D): void;
+            reset(): void;
 
         }
 
@@ -248,6 +249,11 @@ declare module cc {
          * 是否启用渲染时进行缩放以适配高 DPI 屏幕
          */
         enableRetina: cc.RenderComponent.EnableType;
+
+        /**
+         * 置渲染数据刷新脏标记
+         */
+        setVertsDirty(): void;
 
     }
 
@@ -399,6 +405,11 @@ declare module cc {
          */
         allowDynamicAtlas: cc.RenderComponent.EnableType;
 
+        /**
+         * 置渲染数据刷新脏标记
+         */
+        setVertsDirty(): void;
+
     }
 
     interface RichText {
@@ -423,6 +434,11 @@ declare module cc {
          */
         enableRetina: cc.RenderComponent.EnableType;
 
+        /**
+         * 置渲染数据刷新脏标记
+         */
+        setVertsDirty(): void;
+
     }
 
     interface MotionStreak {
@@ -437,34 +453,10 @@ declare module cc {
          */
         _checkSwitchMaterial(): void;
 
-    }
-
-    /**
-     * 富文本扩展组件
-     * 
-     * 因为引擎未提供其 inspector 文件，无法修改组件的 inspector，所以扩展属性通过相应的扩展组件提供
-     */
-    class RichTextSP extends cc.Component {
-
         /**
-         * 自定义内部使用的材质
+         * 置渲染数据刷新脏标记
          */
-        customMaterial: cc.Material;
-
-        /**
-         * 是否自动切换至贴图关联的材质
-         */
-        autoSwitchMaterial: cc.RenderComponent.EnableType;
-
-        /**
-         * 参与动态合图
-         */
-        allowDynamicAtlas: cc.RenderComponent.EnableType;
-
-        /**
-         * 是否启用渲染时进行缩放以适配高 DPI 屏幕
-         */
-        enableRetina: cc.RenderComponent.EnableType;
+        setVertsDirty(): void;
 
     }
 
@@ -474,6 +466,29 @@ declare module cc {
          * 关联的多纹理材质
          */
         _multiMaterial: cc.Material;
+
+        /**
+         * 关联指定材质，返回是否成功
+         * 
+         * @param material 材质
+         * @param index 材质纹理插槽下标，默认自动寻找第一个空插槽
+         */
+        linkMaterial(material: cc.Material, index?: number): boolean;
+
+        /**
+         * 取消已关联的材质
+         */
+        unlinkMaterial(): void;
+
+        /**
+         * 获取已关联的材质
+         */
+        getLinkedMaterial(): cc.Material;
+
+        /**
+         * 是否已关联材质
+         */
+        hasLinkedMaterial(): boolean;
 
     }
 
@@ -556,7 +571,7 @@ declare module cc {
             /**
              * 已使用数量
              */
-            _count;
+            _count: number;
 
             /**
              * cc.RenderTexture
@@ -681,7 +696,7 @@ declare module cc {
             /**
              * cc.Texture2D UUID
              */
-            uuid: cc.Texture2D;
+            uuid: string;
 
             /**
              * 使用该贴图的精灵帧数组
@@ -828,6 +843,11 @@ declare module sp {
          * 通过 slot 和 attachment 的名称设置 attachment 上的 region。Skeleton 优先查找它的皮肤，然后才是 Skeleton Data 中默认的皮肤。
          */
         setRegion(slotName: string, attachmentName: string, region: spine.TextureRegion): boolean;
+
+        /**
+         * 置渲染数据刷新脏标记
+         */
+        setVertsDirty(): void;
 
     }
 

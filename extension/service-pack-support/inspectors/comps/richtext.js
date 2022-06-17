@@ -47,7 +47,7 @@ Vue.component("cc-richtext", {
       :multi-values="multi"
     ></ui-prop>
 
-    <ui-prop v-prop="target.customMaterial"></ui-prop>
+    <ui-prop v-show="!_isCharCacheMode()" v-prop="target.customMaterial"></ui-prop>
     <ui-prop v-prop="target.autoSwitchMaterial"></ui-prop>
     <ui-prop v-prop="target.allowDynamicAtlas"></ui-prop>
     <ui-prop v-prop="target.enableRetina"></ui-prop>
@@ -65,6 +65,9 @@ Vue.component("cc-richtext", {
         T: Editor.T,
         _isSystemFont() {
             return this.target.useSystemFont.value
-        }
+      },
+      _isCharCacheMode() {
+        return 2 === this.target.cacheMode.value
+      },
     }
 });

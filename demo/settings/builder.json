@@ -9,7 +9,7 @@
   "packageName": "org.cocos2d.helloworld",
   "startScene": "cab4af66-dc74-41b5-8826-79b3a30ba99a",
   "title": "Cocos-Service-Pack-Demo",
-  "webOrientation": "auto",
+  "webOrientation": "landscape",
   "inlineSpriteFrames": true,
   "inlineSpriteFrames_native": true,
   "mainCompressionType": "merge_all_json",
