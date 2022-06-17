@@ -12,13 +12,11 @@ description: "了解并上手服务包提供的所有其他新特性。"
 
 以前我们会使用将 Label 字号放大一倍，Label 节点缩小一倍的方式去解决字体模糊的问题。
 
-而现在不需要了，高 DPI 文本渲染默认是关闭的，你可以通过
+而现在不需要了，你可以通过一句代码调整渲染比例：
 
 ```js
 cc.sp.labelRetinaScale = 2;     // 渲染文本时纹理的缩放倍数，默认值为 1.
 ```
-
-来开启高 DPI 文本渲染。
 
 ![labelscaledemo](./assets/labelscaledemo.png)
 
@@ -26,7 +24,7 @@ cc.sp.labelRetinaScale = 2;     // 渲染文本时纹理的缩放倍数，默认
 
 **推荐你根据设备像素比（devicePixelRatio）来动态设置该值，并且该值不要大于 `2`，这不会带来更好的效果，但却将字体纹理放大了数倍，会影响到游戏整体性能，影响动态图集的效率。**
 
-可前往 [高 DPI 支持](TODO) 文档了解更多详情。
+可前往 [高 DPI 支持](../user-guide/text-render/text-high-dpi.md) 文档了解更多详情。
 
 ---
 ## 使用 SpriteFrame 进行 Spine 换装
@@ -45,7 +43,7 @@ this.skel.setRegion('head', 'head', sp.SkeletonData.createRegion(spriteFrame));
 
 > 图片中是被换头的小男孩。
 
-这样做是直接替换了 SkeletonData 中的数据，一般情况下所有使用该数据的 Spine 组件都会受到影响，但我们提供了克隆 SkeletonData 数据的接口，可前往 [Spine](TODO) 文档了解更多详情。
+这样做是直接替换了 SkeletonData 中的数据，一般情况下所有使用该数据的 Spine 组件都会受到影响，但我们提供了克隆 SkeletonData 数据的接口，可前往 [Spine](../user-guide/spine/spine-intro.mdx) 文档了解更多详情。
 
 :::tip 提示
 
@@ -58,4 +56,4 @@ this.skel.setRegion('head', 'head', sp.SkeletonData.createRegion(spriteFrame));
 
 这可能是很少用得到的功能，虽然加上去也简单，但主要还是我们看到几乎所有渲染组件可以自定义材质，这个组件却不可以。
 
-可前往 [RichText](TODO) 了解更多详情。
+可前往 [RichText 自定义材质](../user-guide/text-render/text-richtext.md) 文档了解更多详情。

@@ -7,7 +7,7 @@ description: "需掌握一定的自定义引擎知识。"
 
 ## Service Pack v1.0.0
 
-适配 Cocos Creator v2.4.9 版本，[点此下载服务包](http://www.baidu.com)
+适配 Cocos Creator v2.4.9 版本，[点此下载服务包](TODO)
 
 ---
 ## 标准安装
@@ -21,7 +21,7 @@ description: "需掌握一定的自定义引擎知识。"
 
 建议升级到最新的引擎版本，官方只会对 2.x 版本只会进行维护性更新，所以不用担心其稳定性问题。
 
-如果你的项目引擎版本较低，可以看一看 [使用引擎扩展安装](./installation-engine-plugin) ，支持对多个引擎版本进行一键安装。
+如果你的项目引擎版本较低，可以看一看 [使用引擎扩展安装](./installation-engine-plugin.md) ，支持对多个引擎版本进行一键安装。
 
 :::
 
@@ -84,7 +84,7 @@ description: "需掌握一定的自定义引擎知识。"
 
 ![](./assets/installed-console.png)
 
-接下来推荐你从 [入门教程](../start-guide/start-guide-intro) 开始了解服务包为你的开发都带来了哪些新特性！
+接下来推荐你从 [入门教程](../start-guide/start-guide-intro.mdx) 开始了解服务包为你的开发都带来了哪些新特性！
 
 ---
 ## 补丁安装

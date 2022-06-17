@@ -5,15 +5,15 @@ description: "了解如何手动进行多纹理合批。"
 
 # 多纹理合批
 
-在 [新 UI 渲染批次合并指南](../../start-guide/batcher-guide#充分利用动态合图) 中提到了动态合图与多纹理渲染结合后，能让多张图集纹理在同一批次渲染。
+在 [新 UI 渲染批次合并指南](../../start-guide/batcher-guide.md#充分利用动态合图) 中提到了动态合图与多纹理渲染结合后，能让多张图集纹理在同一批次渲染。
 
-如果你阅读过 [多纹理材质](./multi-material) 文档的话，肯定知道能使用 `MultiHandler` 的接口来动态设置材质的纹理插槽来实现。
+如果你阅读过 [多纹理材质](./multi-material.md) 文档的话，肯定知道能使用 `MultiHandler` 的接口来动态设置材质的纹理插槽来实现。
 
 但是这种完全手动的方式实现起来比较麻烦，比如你需要使用一个纹理时，还得找到该纹理所在的材质并设置到渲染组件上。
 
 为了能更方便地进行多纹理合批，服务包封装了一个自动切换多纹理材质的机制与多纹理合批管理类 `cc.sp.MultiBatcher`。
 
-动态图集与字符图集使用了一个全局实例，可以通过 `cc.sp.multiBatcher` 访问。
+动态图集与字符图集使用的是一个全局的多纹理合批管理器实例，可以通过 `cc.sp.multiBatcher` 访问。
 
 ---
 ## 开关自动切换多纹理材质
@@ -114,7 +114,7 @@ const material = batcher.requsetMaterial(texture);
 
 会返回关联的材质，如果纹理本来就已经有关联的材质，则会直接返回已关联的材质。
 
-清空内部数组可以使用：
+清空内部数组可以使用（这不会取消纹理的关联）：
 
 ```js
 batcher.reset();
@@ -122,4 +122,4 @@ batcher.reset();
 
 ### 它的用途
 
-在 [进阶合批指南](../../start-guide/advance-batcher-guide) 中有提供一些常见的使用案例。
+在 [进阶合批指南](../../start-guide/advance-batcher-guide.md) 中有提供一些常见的使用案例。

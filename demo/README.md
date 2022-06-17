@@ -21,12 +21,9 @@
 // 扩展 Label：BITMAP 模式会复用同样式同文本的纹理，CHAR 模式改为使用多个图集，但是支持自动加入多纹理合批，这样就能与动态图集一起合批（增加配置，默认情况下动态图集最高8-1张，Char 图集为 1 张（无论如何设置，在装不完的情况下，因为需要正常渲染，都会最高使用 8 张图集，但是只有设置的数量才会加入多纹理合批，并且会创建一个专属材质，如果该材质无法完成渲染，会使用专属材质，或者可以仿照 spine flush buffer）
 // 扩展 Spine：支持自动切换材质与动态图集
 
-// 在编辑器中，Char 的显示有时候会出现异常
-// 提醒调整是否参与动态图集，需要 setVertsDirty
 // 提醒 cc.SkeletonData.createSpriteFrame ，如果 region 的旋转角度不是 270 或 0 不能完美转换，但不影响自动合图
 // Spine 需要更多测试！！！SkeletonData 克隆会有 ref 问题吗？
 
-// 注意：因 MotionSteak 直接使用 texture 而不是 spriteFrame，所以不支持动态图集
 // 注意：Spine 使用多纹理材质时只支持使用 REALTIME 模式，并且会强制关闭 useTint 与开启 enableBatch
 // 注意：序列帧动画的性能下降（具体多少待测试）
 

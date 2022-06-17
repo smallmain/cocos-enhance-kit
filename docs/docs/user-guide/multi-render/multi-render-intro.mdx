@@ -3,14 +3,19 @@ import {useCurrentSidebarCategory} from '@docusaurus/theme-common';
 
 # 多纹理渲染
 
-多纹理渲染在 [新 UI 渲染批次合并指南](../../start-guide/batcher-guide#什么是多纹理渲染) 中有所介绍。
+:::tip 提示
 
-其原理非常简单，但是为了让它能以最简单的方式在引擎中使用，所以还进行了一些封装。
+多纹理渲染属底层设施，如果你不是准备手动使用多纹理材质或者多纹理合批管理器的话，请跳过本特性文档。
 
----
-## 原生支持多纹理材质
+:::
 
-:::info 提示
+多纹理渲染在 [新 UI 渲染批次合并指南](../../start-guide/batcher-guide.md#什么是多纹理渲染) 中有所介绍。
+
+其原理非常简单，并且为了让它能以最简单的方式在引擎中使用，已经在内部做好了封装：
+
+<DocCardList items={useCurrentSidebarCategory().items}/>
+
+:::caution 注意
 
 - **支持的渲染组件**
 
@@ -23,22 +28,3 @@ import {useCurrentSidebarCategory} from '@docusaurus/theme-common';
     DragonBones 组件：因人力有限，并且这个组件与 Spine 组件可以相互代替，所以暂时不支持该组件。
 
 :::
-
-服务包在引擎内置了可以直接使用的多纹理 Effect 着色器资源，并且你可以直接使用多纹理材质而不需要编写任何代码。
-
-具体可阅读 [多纹理材质](./multi-material) 文档。
-
----
-## 自动切换材质
-
-在大部分时候，我们都不希望你需要手动去设置多纹理材质，比如当组件的纹理加入动态图集后，能自动切换为与动态图集纹理关联的多纹理材质，所以为每个组件都加入了自动切换材质的特性。
-
-这个机制的实现离不开多纹理合批管理器，具体可阅读 [多纹理合批](./multi-batcher) 文档。
-
-:::tip 提示
-
-多纹理渲染属底层设施，如果你并不是要手动使用多纹理材质或者多纹理合批管理器，请跳过本特性文档。
-
-:::
-
-<DocCardList items={useCurrentSidebarCategory().items}/>

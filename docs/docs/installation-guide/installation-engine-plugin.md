@@ -23,7 +23,7 @@ description: "推荐使用此方式进行一键安装。"
     
     这个引擎扩展只会为你提供自动化的安装方式，即使以后也只会添加版本管理方面的功能。
     
-    你可以选择 [手动安装](./installation-manual) 服务包，只需要几分钟即可完成。
+    你可以选择 [手动安装](./installation-manual.md) 服务包，只需要几分钟即可完成。
 
 :::
 
@@ -56,7 +56,7 @@ description: "推荐使用此方式进行一键安装。"
 
 ![](./assets/installed-console.png)
 
-接下来推荐你从 [入门教程](../start-guide/start-guide-intro) 开始了解服务包为你的开发都带来了哪些新特性！
+接下来推荐你从 [入门教程](../start-guide/start-guide-intro.mdx) 开始了解服务包为你的开发都带来了哪些新特性！
 
 ---
 ## 支持的引擎版本

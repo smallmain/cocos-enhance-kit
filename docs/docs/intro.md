@@ -49,7 +49,7 @@ TODO
 - 通过我们发布的引擎扩展一键安装
 - 下载源码包，使用里面的 Git Patch 文件进行安装
 
-具体教程可以参考 [安装指南](./installation-guide/installation-intro)。
+具体教程可以参考 [安装指南](./installation-guide/installation-intro.mdx)。
 
 ## 更新日志
 
@@ -66,7 +66,7 @@ TODO
 - [修复] CHAR 缓存模式 hash 计算可能会有重复的问题
 - [调整] 默认禁用 Label 原生 TTF 渲染器
 
-所有更新日志请移步 [此处](./update-log)。
+所有更新日志请移步 [此处](./update-log.md)。
 
 ## 贡献指南
 
