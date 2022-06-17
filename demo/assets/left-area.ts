@@ -13,52 +13,88 @@ export default class LeftArea extends cc.Component {
     multiBatcher: cc.Node = null;
 
     @property(cc.Node)
+    charMode: cc.Node = null;
+
+    @property(cc.Node)
+    highDPI: cc.Node = null;
+
+    @property(cc.Node)
+    spineBatch: cc.Node = null;
+
+    @property(cc.Node)
+    spineSkin: cc.Node = null;
+
+    @property(cc.Node)
     mainArea: cc.Node = null;
-
-
-    start() {
-        this.home.on('toggle', (toggle: cc.Toggle) => {
-            if (toggle.isChecked) {
-                this.changePage(toggle.node);
-            }
-        });
-
-        this.multiMaterial.on('toggle', (toggle: cc.Toggle) => {
-            if (toggle.isChecked) {
-                this.changePage(toggle.node);
-            }
-        });
-
-        this.multiBatcher.on('toggle', (toggle: cc.Toggle) => {
-            if (toggle.isChecked) {
-                this.changePage(toggle.node);
-            }
-        });
-    }
 
     tick = 0;
 
-    changePage(node: cc.Node) {
-        const cur = ++this.tick;
-        const map = new Map<cc.Node, { bundle: string, path: string }>([
+    map: Map<cc.Node, { bundle: string, path: string }>
 
-            [this.multiMaterial, { bundle: "multi-render", path: "multi-material/multi-material" }],
 
-            [this.multiBatcher, { bundle: "multi-render", path: "multi-batcher/multi-batcher" }],
+    start() {
+        this.map = new Map([
+
+            [this.home, {
+                bundle: "home",
+                path: "home",
+            }],
+
+            [this.multiMaterial, {
+                bundle: "multi-render",
+                path: "multi-material/multi-material",
+            }],
+
+            [this.multiBatcher, {
+                bundle: "multi-render",
+                path: "multi-batcher/multi-batcher",
+            }],
+
+            [this.charMode, {
+                bundle: "text-render",
+                path: "char-mode/char-mode",
+            }],
+
+            [this.highDPI, {
+                bundle: "text-render",
+                path: "high-dpi/high-dpi",
+            }],
+
+            [this.spineBatch, {
+                bundle: "spine",
+                path: "batch/spine-batch",
+            }],
+
+            [this.spineSkin, {
+                bundle: "spine",
+                path: "skin/spine-skin",
+            }],
 
         ]);
 
-        this.mainArea.destroyAllChildren();
+        this.initBtns();
+    }
 
-        const route = map.get(node);
-        if (route) {
-            cc.assetManager.loadBundle(route.bundle, (err, bundle) => {
-                if (!err) {
-                    bundle.load(route.path, cc.Prefab, (err, prefab: cc.Prefab) => {
-                        if (!err && cur === this.tick) {
-                            this.mainArea.addChild(cc.instantiate(prefab));
-                        }
-                    });
+
+    initBtns() {
+        for (const [node, route] of this.map) {
+            node.on('toggle', (toggle: cc.Toggle) => {
+                if (toggle.isChecked) {
+                    const cur = ++this.tick;
+
+                    this.mainArea.destroyAllChildren();
+
+                    if (route) {
+                        cc.assetManager.loadBundle(route.bundle, (err, bundle) => {
+                            if (!err) {
+                                bundle.load(route.path, cc.Prefab, (err, prefab: cc.Prefab) => {
+                                    if (!err && cur === this.tick) {
+                                        this.mainArea.addChild(cc.instantiate(prefab));
+                                    }
+                                });
+                            }
+                        });
+                    }
                 }
             });
         }

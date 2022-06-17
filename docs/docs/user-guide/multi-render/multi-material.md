@@ -40,6 +40,12 @@ toc_max_heading_level: 5
 
 :::
 
+:::caution 特别注意
+
+Spine 组件使用多纹理材质时会强制勾选 `enableBatch` 并强制关闭 `useTint`。
+
+:::
+
 ---
 ## 自定义多纹理材质
 
