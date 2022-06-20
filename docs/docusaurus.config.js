@@ -70,16 +70,16 @@ const config = {
             label: '文档',
           },
           {
-            href: 'TODO',
+            href: 'https://smallmain.github.io/cocos-service-pack/demo/web-desktop/index.html',
             label: '演示',
             position: 'right',
           },
-          {
-            type: 'docsVersionDropdown',
-            position: 'right',
-            dropdownItemsAfter: [{ to: '/versions', label: 'All versions' }],
-            dropdownActiveClassDisabled: true,
-          },
+          // {
+          //   type: 'docsVersionDropdown',
+          //   position: 'right',
+          //   dropdownItemsAfter: [{ to: '/versions', label: 'All versions' }],
+          //   dropdownActiveClassDisabled: true,
+          // },
           // { to: '/blog', label: 'Blog', position: 'left' },
           {
             href: 'https://github.com/smallmain/cocos-service-pack',

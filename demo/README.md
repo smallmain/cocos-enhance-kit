@@ -27,6 +27,8 @@
 
 // 之后：
 // CHAR 模式有时候空格（字符也可能）会有额外的纹理，可能是复用没考虑 space
+// 演示项目比较慢，加上加载中
+https://smallmain.github.io/cocos-service-pack/demo/web-desktop/index.html
 // 查找所有 TODO
 // 插件适配 Windows
 // 演示项目

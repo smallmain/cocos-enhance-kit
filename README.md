@@ -55,7 +55,9 @@
 
 ## 功能演示
 
-TODO
+[桌面版 Demo Web 项目](https://smallmain.github.io/cocos-service-pack/demo/web-desktop/index.html)
+
+[手机版 Demo Web 项目](https://smallmain.github.io/cocos-service-pack/demo/web-mobile/index.html)
 
 ## 使用方法
 

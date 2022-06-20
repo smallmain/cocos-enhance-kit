@@ -11,7 +11,7 @@ function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
   return (
     // 
-    <header className={clsx('hero', styles.heroBanner)} style={{ height: window.innerHeight - 100 }}>
+    <header className={clsx('hero', styles.heroBanner)} style={{ height: "80vh" }}>
       <div className="container">
         <div className="row">
           <div className="col col--8">
@@ -49,7 +49,7 @@ function HomepageHeader() {
               </Link>
               <Link
                 className="button button--outline button--primary button--lg"
-                href='TODO'
+                href='https://smallmain.github.io/cocos-service-pack/demo/web-desktop/index.html'
                 style={{ marginRight: 20 }}
               >
                 查看演示

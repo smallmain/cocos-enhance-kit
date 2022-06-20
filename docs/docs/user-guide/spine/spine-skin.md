@@ -80,4 +80,4 @@ const clonedSkeletonData = skeletonData.clone();
 克隆 SkeletonData，然后再进行换装，赋值给 Spine 组件。
 
 ---
-以上所有用法你可以在 [演示项目](TODO) 中找到示范代码。
+以上所有用法你可以在 [演示项目](https://smallmain.github.io/cocos-service-pack/demo/web-desktop/index.html) 中找到示范代码。

@@ -1,0 +1,30 @@
+{
+    "paths": {
+        "e3EaADwKFP+ZmDIVTeFF63": [
+            "home",
+            "cc.Prefab"
+        ]
+    },
+    "uuids": [
+        "e3EaADwKFP+ZmDIVTeFF63"
+    ],
+    "scenes": {},
+    "redirect": [
+        "e3EaADwKFP+ZmDIVTeFF63",
+        0
+    ],
+    "deps": [
+        "main"
+    ],
+    "packs": {},
+    "name": "home",
+    "importBase": "import",
+    "nativeBase": "native",
+    "debug": true,
+    "isZip": false,
+    "encrypted": false,
+    "versions": {
+        "import": [],
+        "native": []
+    }
+}
