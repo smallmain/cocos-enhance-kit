@@ -1,0 +1,275 @@
+From f73ec2f9660d3bdf6bc809bccf42c1ebbb132778 Mon Sep 17 00:00:00 2001
+From: SmallMain <smallmain@outlook.com>
+Date: Tue, 21 Jun 2022 11:45:33 +0800
+Subject: [PATCH 08/15] =?UTF-8?q?=E6=94=AF=E6=8C=81=E9=AB=98=20DPI=20?=
+ =?UTF-8?q?=E6=B8=B2=E6=9F=93?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ engine/cocos2d/core/components/CCLabel.js     |  7 +++
+ engine/cocos2d/core/components/CCRichText.js  | 21 +++++++++
+ .../core/renderer/utils/label/bmfont.js       | 25 ++++++++++-
+ .../cocos2d/core/renderer/utils/label/ttf.js  | 43 +++++++++++++++----
+ .../webgl/assemblers/label/2d/bmfont.js       |  5 +++
+ .../renderer/webgl/assemblers/label/2d/ttf.js |  7 +--
+ 6 files changed, 96 insertions(+), 12 deletions(-)
+
+diff --git a/engine/cocos2d/core/components/CCLabel.js b/engine/cocos2d/core/components/CCLabel.js
+index 013968b..d5116cc 100644
+--- a/engine/cocos2d/core/components/CCLabel.js
++++ b/engine/cocos2d/core/components/CCLabel.js
+@@ -587,6 +587,13 @@ let Label = cc.Class({
+             type: RenderComponent.EnableType,
+             default: RenderComponent.EnableType.GLOBAL,
+         },
++        enableRetina: {
++            type: RenderComponent.EnableType,
++            default: RenderComponent.EnableType.GLOBAL,
++            notify(oldValue) {
++                this.setVertsDirty();
++            }
++        },
+     },
+ 
+     statics: {
+diff --git a/engine/cocos2d/core/components/CCRichText.js b/engine/cocos2d/core/components/CCRichText.js
+index cc13266..7e0c254 100644
+--- a/engine/cocos2d/core/components/CCRichText.js
++++ b/engine/cocos2d/core/components/CCRichText.js
+@@ -438,6 +438,26 @@ let RichText = cc.Class({
+                 }
+             }
+         },
++
++        enableRetina: {
++            type: RenderComponent.EnableType,
++            default: RenderComponent.EnableType.GLOBAL,
++            notify: function (oldValue) {
++                if (this.enableRetina === oldValue) return;
++                for (let i = 0; i < this._labelSegments.length; i++) {
++                    const labelComponent = this._labelSegments[i].getComponent(cc.Label);
++                    if (labelComponent) {
++                        labelComponent.enableRetina = this.enableRetina;
++                    }
++                }
++                for (let i = 0; i < this._labelSegmentsCache.length; i++) {
++                    const labelComponent = this._labelSegmentsCache[i].getComponent(cc.Label);
++                    if (labelComponent) {
++                        labelComponent.enableRetina = this.enableRetina;
++                    }
++                }
++            }
++        },
+     },
+ 
+     statics: {
+@@ -1056,6 +1076,7 @@ let RichText = cc.Class({
+ 
+         labelComponent.autoSwitchMaterial = this.autoSwitchMaterial;
+         labelComponent.allowDynamicAtlas = this.allowDynamicAtlas;
++        labelComponent.enableRetina = this.enableRetina;
+ 
+         // 更新材质
+         if (this.customMaterial) {
+diff --git a/engine/cocos2d/core/renderer/utils/label/bmfont.js b/engine/cocos2d/core/renderer/utils/label/bmfont.js
+index 57951a5..9568825 100644
+--- a/engine/cocos2d/core/renderer/utils/label/bmfont.js
++++ b/engine/cocos2d/core/renderer/utils/label/bmfont.js
+@@ -75,6 +75,8 @@ let _isWrapText = false;
+ let _labelWidth = 0;
+ let _labelHeight = 0;
+ let _maxLineWidth = 0;
++let _isRetina = false;
++let _retinaScale = 1;
+ 
+ export default class BmfontAssembler extends Assembler2D {
+     updateRenderData (comp) {
+@@ -110,6 +112,12 @@ export default class BmfontAssembler extends Assembler2D {
+         this._updateContent();
+         this.updateWorldVerts(comp);
+ 
++        if (_isRetina) {
++            _contentSize.width /= _retinaScale;
++            _contentSize.height /= _retinaScale;
++            _fontSize /= _retinaScale;
++        }
++
+         _comp._actualFontSize = _fontSize;
+         _comp.node.setContentSize(_contentSize);
+ 
+@@ -137,8 +145,14 @@ export default class BmfontAssembler extends Assembler2D {
+         shareLabelInfo.margin = 0;
+     }
+ 
++    getTTFTextureSizeScale() {
++        return _isRetina ? _retinaScale : 1;
++    }
++
+     _updateProperties (comp) {
+         _string = comp.string.toString();
++        _isRetina = !(comp.font instanceof cc.BitmapFont) && (cc.sp.enableLabelRetina && comp.enableRetina === 0) || comp.enableRetina === 1;
++        _retinaScale = cc.sp.labelRetinaScale;
+         _fontSize = comp.fontSize;
+         _originFontSize = _fntConfig ? _fntConfig.fontSize : comp.fontSize;
+         _hAlign = comp.horizontalAlign;
+@@ -150,6 +164,15 @@ export default class BmfontAssembler extends Assembler2D {
+         _contentSize.width = comp.node.width;
+         _contentSize.height = comp.node.height;
+ 
++        if (_isRetina) {
++            _fontSize *= _retinaScale;
++            if (!_fntConfig) _originFontSize *= _retinaScale;
++            _contentSize.width *= _retinaScale;
++            _contentSize.height *= _retinaScale;
++            _lineHeight *= _retinaScale;
++            shareLabelInfo.margin *= _retinaScale;
++        }
++
+         // should wrap text
+         if (_overflow === Overflow.NONE) {
+             _isWrapText = false;
+@@ -706,4 +729,4 @@ export default class BmfontAssembler extends Assembler2D {
+     _quadsUpdated (comp) {}
+ 
+     _reserveQuads () {}
+-}
+\ No newline at end of file
++}
+diff --git a/engine/cocos2d/core/renderer/utils/label/ttf.js b/engine/cocos2d/core/renderer/utils/label/ttf.js
+index 49d90fa..f5f8232 100644
+--- a/engine/cocos2d/core/renderer/utils/label/ttf.js
++++ b/engine/cocos2d/core/renderer/utils/label/ttf.js
+@@ -55,6 +55,8 @@ let _fontFamily = '';
+ let _overflow = Overflow.NONE;
+ let _isWrapText = false;
+ let _premultiply = false;
++let _isRetina = false;
++let _retinaScale = 1;
+ 
+ // outline
+ let _outlineComp = null;
+@@ -115,6 +117,12 @@ export default class TTFAssembler extends Assembler2D {
+     }
+ 
+     _updateRenderData(comp) {
++        if (_isRetina) {
++            _fontSize /= _retinaScale;
++            _nodeContentSize.width /= _retinaScale;
++            _nodeContentSize.height /= _retinaScale;
++        }
++
+         comp._actualFontSize = _fontSize;
+         comp.node.setContentSize(_nodeContentSize);
+ 
+@@ -127,6 +135,10 @@ export default class TTFAssembler extends Assembler2D {
+         _texture = null;
+     }
+ 
++    getTTFTextureSizeScale() {
++        return _isRetina ? _retinaScale : 1;
++    }
++
+     updateVerts () {
+     }
+ 
+@@ -136,6 +148,9 @@ export default class TTFAssembler extends Assembler2D {
+         _contentSizeExtend.width = _contentSizeExtend.height = 0;
+         if (_outlineComp) {
+             outlineWidth = _outlineComp.width;
++            if (_isRetina) {
++                outlineWidth *= _retinaScale;
++            }
+             top = bottom = left = right = outlineWidth;
+             _contentSizeExtend.width = _contentSizeExtend.height = outlineWidth * 2;
+         }
+@@ -164,15 +179,27 @@ export default class TTFAssembler extends Assembler2D {
+         _canvas = assemblerData.canvas;
+         _texture = comp._frame._original ? comp._frame._original._texture : comp._frame._texture;
+ 
++        _isRetina = (cc.sp.enableLabelRetina && comp.enableRetina === 0) || comp.enableRetina === 1;
++        _retinaScale = cc.sp.labelRetinaScale;
+         _string = comp.string.toString();
+         _fontSize = comp._fontSize;
++        _nodeContentSize = comp.node.getContentSize();
++        _lineHeight = comp._lineHeight;
+         _drawFontSize = _fontSize;
+         _underlineThickness = comp.underlineHeight || _drawFontSize / 8;
++
++        if (_isRetina) {
++            _fontSize *= _retinaScale;
++            _nodeContentSize.width *= _retinaScale;
++            _nodeContentSize.height *= _retinaScale;
++            _lineHeight *= _retinaScale;
++            if (comp.underlineHeight) _underlineThickness *= _retinaScale;
++            _drawFontSize = _fontSize;
++        }
++
+         _overflow = comp.overflow;
+-        _canvasSize.width = comp.node.width;
+-        _canvasSize.height = comp.node.height;
+-        _nodeContentSize = comp.node.getContentSize();
+-        _lineHeight = comp._lineHeight;
++        _canvasSize.width = _nodeContentSize.width;
++        _canvasSize.height = _nodeContentSize.height;
+         _hAlign = comp.horizontalAlign;
+         _vAlign = comp.verticalAlign;
+         _color = comp.node.color;
+@@ -248,14 +275,14 @@ export default class TTFAssembler extends Assembler2D {
+ 
+     _setupOutline () {
+         _context.strokeStyle = `rgba(${_outlineColor.r}, ${_outlineColor.g}, ${_outlineColor.b}, ${_outlineColor.a / 255})`;
+-        _context.lineWidth = _outlineComp.width * 2;
++        _context.lineWidth = _outlineComp.width * 2 * (_isRetina ? _retinaScale : 1);
+     }
+ 
+     _setupShadow () {
+         _context.shadowColor = `rgba(${_shadowColor.r}, ${_shadowColor.g}, ${_shadowColor.b}, ${_shadowColor.a / 255})`;
+-        _context.shadowBlur = _shadowComp.blur;
+-        _context.shadowOffsetX = _shadowComp.offset.x;
+-        _context.shadowOffsetY = -_shadowComp.offset.y;
++        _context.shadowBlur = _shadowComp.blur * (_isRetina ? _retinaScale : 1);
++        _context.shadowOffsetX = _shadowComp.offset.x * (_isRetina ? _retinaScale : 1);
++        _context.shadowOffsetY = -_shadowComp.offset.y * (_isRetina ? _retinaScale : 1);
+     }
+ 
+     _drawTextEffect (startPosition, lineHeight) {
+diff --git a/engine/cocos2d/core/renderer/webgl/assemblers/label/2d/bmfont.js b/engine/cocos2d/core/renderer/webgl/assemblers/label/2d/bmfont.js
+index ac90d01..be7d330 100644
+--- a/engine/cocos2d/core/renderer/webgl/assemblers/label/2d/bmfont.js
++++ b/engine/cocos2d/core/renderer/webgl/assemblers/label/2d/bmfont.js
+@@ -121,6 +121,11 @@ export default class WebglBmfontAssembler extends BmfontAssembler {
+ 
+ 
+         // positions
++        const retinaScale = this.getTTFTextureSizeScale();
++        x /= retinaScale;
++        y /= retinaScale;
++        rectWidth /= retinaScale;
++        rectHeight /= retinaScale;
+         l = x;
+         r = x + rectWidth * scale;
+         b = y - rectHeight * scale;
+diff --git a/engine/cocos2d/core/renderer/webgl/assemblers/label/2d/ttf.js b/engine/cocos2d/core/renderer/webgl/assemblers/label/2d/ttf.js
+index e073440..e34d1f6 100644
+--- a/engine/cocos2d/core/renderer/webgl/assemblers/label/2d/ttf.js
++++ b/engine/cocos2d/core/renderer/webgl/assemblers/label/2d/ttf.js
+@@ -49,10 +49,11 @@ export default class WebglTTFAssembler extends TTFAssembler {
+         super.updateColor(comp, color);
+     }
+ 
+-    updateVerts (comp) {
++    updateVerts(comp) {
++        const scale = this.getTTFTextureSizeScale();
+         let node = comp.node,
+-            canvasWidth = comp._ttfTexture.width,
+-            canvasHeight = comp._ttfTexture.height,
++            canvasWidth = comp._ttfTexture.width / scale,
++            canvasHeight = comp._ttfTexture.height / scale,
+             appx = node.anchorX * node.width,
+             appy = node.anchorY * node.height;
+ 
+-- 
+2.32.0 (Apple Git-132)
+

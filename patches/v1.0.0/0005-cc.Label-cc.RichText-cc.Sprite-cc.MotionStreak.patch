@@ -1,0 +1,2078 @@
+From 0f2dafc3798f563b4302333ac90e3e2f1c3f2cc7 Mon Sep 17 00:00:00 2001
+From: SmallMain <smallmain@outlook.com>
+Date: Tue, 21 Jun 2022 11:30:54 +0800
+Subject: [PATCH 05/15] =?UTF-8?q?=E5=A4=9A=E7=BA=B9=E7=90=86=E6=B8=B2?=
+ =?UTF-8?q?=E6=9F=93=20-=20cc.Label=E3=80=81cc.RichText=E3=80=81cc.Sprite?=
+ =?UTF-8?q?=E3=80=81cc.MotionStreak=20=E7=BB=84=E4=BB=B6=E7=9A=84=E5=8E=9F?=
+ =?UTF-8?q?=E7=94=9F=E6=94=AF=E6=8C=81?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ engine/cocos2d/core/components/CCLabel.js     |  27 +-
+ .../cocos2d/core/components/CCMotionStreak.js |  46 +++-
+ .../core/components/CCRenderComponent.js      |  72 +++++-
+ engine/cocos2d/core/components/CCRichText.js  |  32 ++-
+ engine/cocos2d/core/components/CCSprite.js    |  29 ++-
+ engine/cocos2d/core/platform/CCMacro.js       |   4 +-
+ engine/cocos2d/core/renderer/assembler-2d.js  |  25 +-
+ engine/cocos2d/core/renderer/assembler.js     |  53 ++++
+ .../core/renderer/utils/label/bmfont.js       |  26 +-
+ .../cocos2d/core/renderer/utils/label/ttf.js  |  13 +-
+ .../core/renderer/webgl/assemblers/index.js   |   3 +-
+ .../webgl/assemblers/label/2d-multi/bmfont.js |  71 ++++++
+ .../webgl/assemblers/label/2d-multi/ttf.js    |  72 ++++++
+ .../renderer/webgl/assemblers/label/index.js  |  15 +-
+ .../webgl/assemblers/motion-streak-multi.js   | 233 ++++++++++++++++++
+ .../webgl/assemblers/motion-streak.js         |   3 -
+ .../assemblers/sprite/2d-multi/bar-filled.js  |  99 ++++++++
+ .../webgl/assemblers/sprite/2d-multi/mesh.js  |  94 +++++++
+ .../sprite/2d-multi/radial-filled.js          |  70 ++++++
+ .../assemblers/sprite/2d-multi/simple.js      |  76 ++++++
+ .../assemblers/sprite/2d-multi/sliced.js      |  89 +++++++
+ .../webgl/assemblers/sprite/2d-multi/tiled.js |  99 ++++++++
+ .../webgl/assemblers/sprite/2d/bar-filled.js  |  47 ++--
+ .../webgl/assemblers/sprite/2d/mesh.js        |  48 ++--
+ .../assemblers/sprite/2d/radial-filled.js     |  11 +-
+ .../webgl/assemblers/sprite/2d/simple.js      |  13 +-
+ .../webgl/assemblers/sprite/2d/sliced.js      |  15 +-
+ .../webgl/assemblers/sprite/2d/tiled.js       |  63 ++---
+ .../renderer/webgl/assemblers/sprite/index.js |  28 ++-
+ .../core/renderer/webgl/vertex-format.js      |  14 +-
+ engine/cocos2d/renderer/gfx/enums.js          |   3 +-
+ engine/modules.json                           |   3 +-
+ 32 files changed, 1359 insertions(+), 137 deletions(-)
+ create mode 100644 engine/cocos2d/core/renderer/webgl/assemblers/label/2d-multi/bmfont.js
+ create mode 100644 engine/cocos2d/core/renderer/webgl/assemblers/label/2d-multi/ttf.js
+ create mode 100644 engine/cocos2d/core/renderer/webgl/assemblers/motion-streak-multi.js
+ create mode 100644 engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/bar-filled.js
+ create mode 100644 engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/mesh.js
+ create mode 100644 engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/radial-filled.js
+ create mode 100644 engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/simple.js
+ create mode 100644 engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/sliced.js
+ create mode 100644 engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/tiled.js
+
+diff --git a/engine/cocos2d/core/components/CCLabel.js b/engine/cocos2d/core/components/CCLabel.js
+index 81e3cd4..f2c372f 100644
+--- a/engine/cocos2d/core/components/CCLabel.js
++++ b/engine/cocos2d/core/components/CCLabel.js
+@@ -192,7 +192,7 @@ let Label = cc.Class({
+     editor: CC_EDITOR && {
+         menu: 'i18n:MAIN_MENU.component.renderers/Label',
+         help: 'i18n:COMPONENT.help_url.label',
+-        inspector: 'packages://inspector/inspectors/comps/label.js',
++        inspector: 'packages://service-pack/inspectors/comps/label.js',
+     },
+ 
+     properties: {
+@@ -578,6 +578,11 @@ let Label = cc.Class({
+             },
+             tooltip: CC_DEV && 'i18n:COMPONENT.label.underline_height',
+         },
++
++        autoSwitchMaterial: {
++            type: RenderComponent.EnableType,
++            default: RenderComponent.EnableType.GLOBAL,
++        },
+     },
+ 
+     statics: {
+@@ -782,7 +787,25 @@ let Label = cc.Class({
+         }
+ 
+         if (!this._frame) return;
+-        material && material.setProperty('texture', this._frame._texture);
++
++        if (material) {
++            // 根据材质更新 uniform
++            const isMultiMaterial = material.material.isMultiSupport();
++            if (isMultiMaterial) {
++                // 贴图在 updateRenderData 才确定下来
++                // if (texture) this._updateMultiTexId(material, texture);
++                this._texIdDirty = true;
++            } else {
++                material.setProperty('texture', this._frame._texture);
++            }
++
++            // 根据材质更新 assembler
++            if (this._assembler) {
++                if ((isMultiMaterial && !this._assembler.isMulti) || !isMultiMaterial && this._assembler.isMulti) {
++                    RenderComponent.prototype._resetAssembler.call(this);
++                }
++            }
++        }
+ 
+         BlendFunc.prototype._updateMaterial.call(this);
+     },
+diff --git a/engine/cocos2d/core/components/CCMotionStreak.js b/engine/cocos2d/core/components/CCMotionStreak.js
+index 0b24abf..545c03f 100644
+--- a/engine/cocos2d/core/components/CCMotionStreak.js
++++ b/engine/cocos2d/core/components/CCMotionStreak.js
+@@ -160,6 +160,10 @@ var MotionStreak = cc.Class({
+                 if (this._texture === value) return;
+ 
+                 this._texture = value;
++
++                // 自动切换材质
++                this._checkSwitchMaterial();
++
+                 this._updateMaterial();
+             },
+             type: cc.Texture2D,
+@@ -209,6 +213,24 @@ var MotionStreak = cc.Class({
+             },
+             animatable: false,
+             tooltip: CC_DEV && 'i18n:COMPONENT.motionStreak.fastMode'
++        },
++
++        autoSwitchMaterial: {
++            type: RenderComponent.EnableType,
++            default: RenderComponent.EnableType.GLOBAL,
++        },
++    },
++
++    __preload() {
++        this._super();
++        this._checkSwitchMaterial();
++    },
++
++    _checkSwitchMaterial() {
++        if (this._assembler) {
++            const material = this._materials[0];
++            if (!material) return;
++            this._assembler.checkAndSwitchMaterial(this, this._texture, material);
+         }
+     },
+ 
+@@ -219,7 +241,29 @@ var MotionStreak = cc.Class({
+ 
+     _updateMaterial () {
+         let material = this.getMaterial(0);
+-        material && material.setProperty('texture', this._texture);
++
++        // 根据材质更新 uniform
++        const isMultiMaterial = material.material.isMultiSupport();
++        if (isMultiMaterial) {
++            this._updateMultiTexId(material, this._texture);
++        } else {
++            if (material.getProperty('texture') !== this._texture) {
++                material.setProperty('texture', this._texture);
++            }
++        }
++
++        // 根据材质更新 assembler
++        if (this._assembler) {
++            if ((isMultiMaterial && !this._assembler.isMulti) || !isMultiMaterial && this._assembler.isMulti) {
++                this._resetAssembler();
++            }
++        }
++
++        // texId
++        if (isMultiMaterial && this._texIdDirty) {
++            this._assembler.updateTexId(this);
++            this._texIdDirty = false;
++        }
+ 
+         BlendFunc.prototype._updateMaterial.call(this);
+     },
+diff --git a/engine/cocos2d/core/components/CCRenderComponent.js b/engine/cocos2d/core/components/CCRenderComponent.js
+index c23fc4d..fb7103a 100644
+--- a/engine/cocos2d/core/components/CCRenderComponent.js
++++ b/engine/cocos2d/core/components/CCRenderComponent.js
+@@ -33,6 +33,32 @@ const Material = require('../assets/material/CCMaterial');
+ 
+ let _temp_color = new Color();
+ 
++/**
++ * !#en enable type
++ * !#zh 启用类型
++ * @enum RenderComponent.EnableType
++ */
++var EnableType = cc.Enum({
++    /**
++     * !#en Global.
++     * !#zh 使用全局值
++     * @property {Number} GLOBAL
++     */
++    GLOBAL: 0,
++    /**
++     * !#en Enable.
++     * !#zh 开启
++     * @property {Number} ENABLE
++     */
++    ENABLE: 1,
++    /**
++     * !#en Disable.
++     * !#zh 关闭
++     * @property {Number} DISABLE
++     */
++    DISABLE: 2,
++});
++
+ /**
+  * !#en
+  * Base class for components which supports rendering features.
+@@ -51,6 +77,10 @@ let RenderComponent = cc.Class({
+         disallowMultiple: true
+     },
+ 
++    statics: {
++        EnableType: EnableType,
++    },
++
+     properties: {
+         _materials: {
+             default: [],
+@@ -78,12 +108,16 @@ let RenderComponent = cc.Class({
+     
+     ctor () {
+         this._vertsDirty = true;
++        this._texIdDirty = true;
++        this._texId = 0;
+         this._assembler = null;
+     },
+ 
+     _resetAssembler () {
+         Assembler.init(this);
+         this._updateColor();
++        // 切换 Assembler 时，texId 与 vDatas 数据不同步
++        this._texId = 0;
+         this.setVertsDirty();
+     },
+ 
+@@ -250,7 +284,43 @@ let RenderComponent = cc.Class({
+             renderer.material = material;
+             renderer.cullingMask = cullingMask;
+         }
+-    }
++    },
++
++    _updateMultiTexId(material, texture) {
++        const multi = material.material.getMultiHandler();
++
++        const spTexture = texture;
++        const nSpTexture = spTexture.getImpl();
++
++        // 快速检查插槽上的贴图是否相同
++        // 如果是当作普通材质使用，multi.getTexture(this._texId) !== nSpTexture 会一直为 true
++        const same = this._texId === 0
++            ? material.getProperty('texture') !== nSpTexture
++            : multi.getTexture(this._texId) !== nSpTexture;
++
++        if (same) {
++            // 如果材质变体被修改了，则直接跳过位置检查
++            const isChanged = Object.prototype.hasOwnProperty.call(material._effect._passes['0']._properties, 'texture');
++            const texId = isChanged ? -1 : multi.getIndex(nSpTexture);
++
++            if (texId !== -1) {
++                // 插槽位置不对，则更新位置
++                this._texId = texId;
++                this._texIdDirty = true;
++            } else {
++                // 插槽根本没有该纹理，则修改变体的 texture
++                material.setProperty('texture', spTexture);
++                if (this._texId !== 0) {
++                    this._texId = 0;
++                    this._texIdDirty = true;
++                }
++                // cc.warn('renderComponent use multi-material but not has valid property.');
++            }
++        } else {
++            this._texIdDirty = false;
++        }
++    },
++
+ });
+ 
+ cc.RenderComponent = module.exports = RenderComponent;
+diff --git a/engine/cocos2d/core/components/CCRichText.js b/engine/cocos2d/core/components/CCRichText.js
+index af99d65..ae1183e 100644
+--- a/engine/cocos2d/core/components/CCRichText.js
++++ b/engine/cocos2d/core/components/CCRichText.js
+@@ -28,6 +28,7 @@ const js = require('../platform/js');
+ const macro = require('../platform/CCMacro');
+ const textUtils = require('../utils/text-utils');
+ const HtmlTextParser = require('../utils/html-text-parser');
++import MaterialVariant from '../assets/material/material-variant';
+ const _htmlTextParser = new HtmlTextParser();
+ 
+ const HorizontalAlign = macro.TextAlignment;
+@@ -36,6 +37,8 @@ const RichTextChildName = "RICHTEXT_CHILD";
+ const RichTextChildImageName = "RICHTEXT_Image_CHILD";
+ const CacheMode = cc.Label.CacheMode;
+ 
++const RenderComponent = require('./CCRenderComponent');
++
+ // Returns a function, that, as long as it continues to be invoked, will not
+ // be triggered. The function will be called after it stops being called for
+ // N milliseconds. If `immediate` is passed, trigger the function on the
+@@ -129,7 +132,7 @@ let RichText = cc.Class({
+     editor: CC_EDITOR && {
+         menu: 'i18n:MAIN_MENU.component.renderers/RichText',
+         help: 'i18n:COMPONENT.help_url.richtext',
+-        inspector: 'packages://inspector/inspectors/comps/richtext.js',
++        inspector: 'packages://service-pack/inspectors/comps/richtext.js',
+         executeInEditMode: true
+     },
+ 
+@@ -346,6 +349,30 @@ let RichText = cc.Class({
+                     this.handleTouchEvent ? this._addEventListeners() : this._removeEventListeners();
+                 }
+             }
++        },
++
++        autoSwitchMaterial: {
++            type: RenderComponent.EnableType,
++            default: RenderComponent.EnableType.GLOBAL,
++            notify: function (oldValue) {
++                if (this.autoSwitchMaterial === oldValue) return;
++                for (let i = 0; i < this._labelSegments.length; i++) {
++                    const labelComponent = this._labelSegments[i].getComponent(cc.Label);
++                    if (labelComponent) {
++                        labelComponent.autoSwitchMaterial = this.autoSwitchMaterial;
++                    }
++                    const spriteComponent = this._labelSegments[i].getComponent(cc.Sprite);
++                    if (spriteComponent) {
++                        spriteComponent.autoSwitchMaterial = this.autoSwitchMaterial;
++                    }
++                }
++                for (let i = 0; i < this._labelSegmentsCache.length; i++) {
++                    const labelComponent = this._labelSegmentsCache[i].getComponent(cc.Label);
++                    if (labelComponent) {
++                        labelComponent.autoSwitchMaterial = this.autoSwitchMaterial;
++                    }
++                }
++            }
+         }
+     },
+ 
+@@ -656,6 +683,8 @@ let RichText = cc.Class({
+         if (spriteFrame) {
+             let spriteNode = new cc.PrivateNode(RichTextChildImageName);
+             let spriteComponent = spriteNode.addComponent(cc.Sprite);
++
++            spriteComponent.autoSwitchMaterial = this.autoSwitchMaterial;
+             switch (richTextElement.style.imageAlign)
+             {
+                 case 'top':
+@@ -948,6 +977,7 @@ let RichText = cc.Class({
+ 
+         labelComponent.cacheMode = this.cacheMode;
+ 
++        labelComponent.autoSwitchMaterial = this.autoSwitchMaterial;
+         let isAsset = this.font instanceof cc.Font;
+         if (isAsset && !this._isSystemFontUsed) {
+             labelComponent.font = this.font;
+diff --git a/engine/cocos2d/core/components/CCSprite.js b/engine/cocos2d/core/components/CCSprite.js
+index a265b1a..f0cf757 100644
+--- a/engine/cocos2d/core/components/CCSprite.js
++++ b/engine/cocos2d/core/components/CCSprite.js
+@@ -160,7 +160,7 @@ var Sprite = cc.Class({
+     editor: CC_EDITOR && {
+         menu: 'i18n:MAIN_MENU.component.renderers/Sprite',
+         help: 'i18n:COMPONENT.help_url.sprite',
+-        inspector: 'packages://inspector/inspectors/comps/sprite.js',
++        inspector: 'packages://service-pack/inspectors/comps/sprite.js',
+     },
+ 
+     properties: {
+@@ -383,7 +383,12 @@ var Sprite = cc.Class({
+             animatable: false,
+             type: SizeMode,
+             tooltip: CC_DEV && 'i18n:COMPONENT.sprite.size_mode'
+-        }
++        },
++
++        autoSwitchMaterial: {
++            type: RenderComponent.EnableType,
++            default: RenderComponent.EnableType.GLOBAL,
++        },
+     },
+ 
+     statics: {
+@@ -449,8 +454,24 @@ var Sprite = cc.Class({
+             if (material.getDefine('USE_TEXTURE') !== undefined) {
+                 material.define('USE_TEXTURE', true);
+             }
+-            if (material.getProperty('texture') !== texture) {
+-                material.setProperty('texture', texture);
++
++            // 根据材质更新 uniform
++            const isMultiMaterial = material.material.isMultiSupport();
++            if (isMultiMaterial) {
++                // 在 assembler 中进行更新性能会更好，不需要每次 setSpriteFrame 都更新，并且动态图集会导致两次触发
++                // if (texture) this._updateMultiTexId(material, texture);
++                this._texIdDirty = true;
++            } else {
++                if (material.getProperty('texture') !== texture) {
++                    material.setProperty('texture', texture);
++                }
++            }
++
++            // 根据材质更新 assembler
++            if (this._assembler) {
++                if ((isMultiMaterial && !this._assembler.isMulti) || !isMultiMaterial && this._assembler.isMulti) {
++                    this._resetAssembler();
++                }
+             }
+         }
+ 
+diff --git a/engine/cocos2d/core/platform/CCMacro.js b/engine/cocos2d/core/platform/CCMacro.js
+index dddc686..037ee54 100644
+--- a/engine/cocos2d/core/platform/CCMacro.js
++++ b/engine/cocos2d/core/platform/CCMacro.js
+@@ -384,9 +384,9 @@ cc.macro = {
+      * 是否使用原生的文本渲染机制, 布局和编辑器有差异.
+      * 
+      * @property {Boolean} ENABLE_NATIVE_TTF_RENDERER
+-     * @default true
++     * @default false
+      */
+-    ENABLE_NATIVE_TTF_RENDERER: true
++    ENABLE_NATIVE_TTF_RENDERER: false
+ 
+ };
+ 
+diff --git a/engine/cocos2d/core/renderer/assembler-2d.js b/engine/cocos2d/core/renderer/assembler-2d.js
+index 29287a1..8390f28 100644
+--- a/engine/cocos2d/core/renderer/assembler-2d.js
++++ b/engine/cocos2d/core/renderer/assembler-2d.js
+@@ -131,22 +131,13 @@ export default class Assembler2D extends Assembler {
+         }
+     }
+ 
+-    packToDynamicAtlas (comp, frame) {
+-        if (CC_TEST) return;
+-        
+-        if (!frame._original && dynamicAtlasManager && frame._texture.packable) {
+-            let packedFrame = dynamicAtlasManager.insertSpriteFrame(frame);
+-            if (packedFrame) {
+-                frame._setDynamicAtlasFrame(packedFrame);
+-            }
+-        }
+-        let material = comp._materials[0];
+-        if (!material) return;
+-        
+-        if (material.getProperty('texture') !== frame._texture) {
+-            // texture was packed to dynamic atlas, should update uvs
+-            comp._vertsDirty = true;
+-            comp._updateMaterial();
++    updateTexId(comp) {
++        const texId = comp._texId;
++        let texIdOffset = this.texIdOffset;
++        let floatsPerVert = this.floatsPerVert;
++        let verts = this._renderData.vDatas[0];
++        for (let i = 0, l = verts.length; i < l; i++) {
++            verts[floatsPerVert * i + texIdOffset] = texId;
+         }
+     }
+ }
+@@ -159,6 +150,8 @@ cc.js.addon(Assembler2D.prototype, {
+ 
+     uvOffset: 2,
+     colorOffset: 4,
++
++    isMulti: false,
+ });
+ 
+ cc.Assembler2D = Assembler2D;
+diff --git a/engine/cocos2d/core/renderer/assembler.js b/engine/cocos2d/core/renderer/assembler.js
+index b2cafd0..a65088b 100644
+--- a/engine/cocos2d/core/renderer/assembler.js
++++ b/engine/cocos2d/core/renderer/assembler.js
+@@ -1,5 +1,6 @@
+ import { vfmtPosUvColor } from './webgl/vertex-format';
+ import assemblerPool from './assembler-pool';
++import dynamicAtlasManager from './utils/dynamic-atlas/manager';
+ 
+ export default class Assembler {
+     constructor () {
+@@ -12,12 +13,64 @@ export default class Assembler {
+     updateRenderData (comp) {
+     }
+ 
++    updateRenderDataForSwitchMaterial(comp) {
++
++    }
++
+     fillBuffers (comp, renderer) {
+     }
+     
+     getVfmt () {
+         return vfmtPosUvColor;
+     }
++
++    packDynamicAtlasAndCheckMaterial(comp, frame) {
++        if (CC_TEST) return false;
++
++            if (!frame._original && dynamicAtlasManager && frame._texture.packable) {
++                let packedFrame = dynamicAtlasManager.insertSpriteFrame(frame);
++                if (packedFrame) {
++                    frame._setDynamicAtlasFrame(packedFrame);
++                }
++            }
++
++        const material = comp._materials[0];
++        if (!material) return false;
++
++        // 自动切换材质
++        if (this.checkAndSwitchMaterial(comp, frame._texture, material)) {
++            return true;
++        }
++
++        if (material.material.isMultiSupport()) {
++            comp._texIdDirty = true;
++        } else {
++            if (material.getProperty('texture') !== frame._texture) {
++                // texture was packed to dynamic atlas, should update uvs
++                comp._vertsDirty = true;
++                comp._updateMaterial();
++            }
++        }
++
++        return false;
++    }
++
++    checkAndSwitchMaterial(comp, texture, material) {
++        const autoSwitchMaterial = comp.autoSwitchMaterial;
++        if ((cc.sp.autoSwitchMaterial && autoSwitchMaterial === 0) || autoSwitchMaterial === 1) {
++            if (texture._multiMaterial) {
++                if (material.material !== texture._multiMaterial) {
++                    comp.setMaterial(0, texture._multiMaterial);
++                    // setMaterial 中会置 comp._texIdDirty = true;
++                    if (!this.isMulti) {
++                        comp._assembler.updateRenderDataForSwitchMaterial(comp);
++                        return true;
++                    }
++                }
++            }
++        }
++    }
++
+ }
+ 
+ 
+diff --git a/engine/cocos2d/core/renderer/utils/label/bmfont.js b/engine/cocos2d/core/renderer/utils/label/bmfont.js
+index 0b91a27..57951a5 100644
+--- a/engine/cocos2d/core/renderer/utils/label/bmfont.js
++++ b/engine/cocos2d/core/renderer/utils/label/bmfont.js
+@@ -84,12 +84,32 @@ export default class BmfontAssembler extends Assembler2D {
+         _comp = comp;
+         
+         this._reserveQuads(comp, comp.string.toString().length);
+-        this._updateFontFamily(comp);
++
++        const assemblerChanged = this._updateFontFamily(comp);
++
++        // 打包到动态图集时可能会切换 Assembler
++        if (!assemblerChanged) {
++            this._updateRenderData(comp);
++        }
++    }
++
++    _preUpdateRenderData(comp) {
++        _comp = comp;
++
++        this._reserveQuads(comp, comp.string.toString().length);
++
++        let fontAsset = comp.font;
++        _spriteFrame = fontAsset.spriteFrame;
++        _fntConfig = fontAsset._fntConfig;
++        shareLabelInfo.fontAtlas = fontAsset._fontDefDictionary;
++    }
++
++    _updateRenderData(comp) {
+         this._updateProperties(comp);
+         this._updateLabelInfo(comp);
+         this._updateContent();
+         this.updateWorldVerts(comp);
+-        
++
+         _comp._actualFontSize = _fontSize;
+         _comp.node.setContentSize(_contentSize);
+ 
+@@ -108,7 +128,7 @@ export default class BmfontAssembler extends Assembler2D {
+         _fntConfig = fontAsset._fntConfig;
+         shareLabelInfo.fontAtlas = fontAsset._fontDefDictionary;
+ 
+-        this.packToDynamicAtlas(comp, _spriteFrame);
++        return this.packDynamicAtlasAndCheckMaterial(comp, _spriteFrame);
+     }
+ 
+     _updateLabelInfo() {
+diff --git a/engine/cocos2d/core/renderer/utils/label/ttf.js b/engine/cocos2d/core/renderer/utils/label/ttf.js
+index 56edd9b..9d85e3f 100644
+--- a/engine/cocos2d/core/renderer/utils/label/ttf.js
++++ b/engine/cocos2d/core/renderer/utils/label/ttf.js
+@@ -106,8 +106,15 @@ export default class TTFAssembler extends Assembler2D {
+         this._calculateLabelFont();
+         this._updateLabelDimensions();
+         this._updateTexture(comp);
+-        this._calDynamicAtlas(comp);
++        const assemblerChanged = this._calDynamicAtlas(comp);
+ 
++        // 打包到动态图集时可能会切换 Assembler
++        if (!assemblerChanged) {
++            this._updateRenderData(comp);
++        }
++    }
++
++    _updateRenderData(comp) {
+         comp._actualFontSize = _fontSize;
+         comp.node.setContentSize(_nodeContentSize);
+ 
+@@ -336,14 +343,14 @@ export default class TTFAssembler extends Assembler2D {
+     }
+ 
+     _calDynamicAtlas (comp) {
+-        if(comp.cacheMode !== Label.CacheMode.BITMAP) return;
++        if(comp.cacheMode !== Label.CacheMode.BITMAP) return false;
+         let frame = comp._frame;
+         // Delete cache in atlas.
+         deleteFromDynamicAtlas(comp, frame);
+         if (!frame._original) {
+             frame.setRect(cc.rect(0, 0, _canvas.width, _canvas.height));
+         }
+-        this.packToDynamicAtlas(comp, frame);
++        return this.packDynamicAtlasAndCheckMaterial(comp, frame);
+     }
+ 
+     _updateLabelDimensions () {
+diff --git a/engine/cocos2d/core/renderer/webgl/assemblers/index.js b/engine/cocos2d/core/renderer/webgl/assemblers/index.js
+index 4ffbc1c..e24a556 100644
+--- a/engine/cocos2d/core/renderer/webgl/assemblers/index.js
++++ b/engine/cocos2d/core/renderer/webgl/assemblers/index.js
+@@ -24,9 +24,10 @@
+  ****************************************************************************/
+ 
+ cc.assemblers = {};
+- 
++
+ require('./sprite');
+ require('./mask-assembler');
+ require('./graphics');
+ require('./label');
+ require('./motion-streak');
++require('./motion-streak-multi');
+diff --git a/engine/cocos2d/core/renderer/webgl/assemblers/label/2d-multi/bmfont.js b/engine/cocos2d/core/renderer/webgl/assemblers/label/2d-multi/bmfont.js
+new file mode 100644
+index 0000000..3fe3d2e
+--- /dev/null
++++ b/engine/cocos2d/core/renderer/webgl/assemblers/label/2d-multi/bmfont.js
+@@ -0,0 +1,71 @@
++/****************************************************************************
++ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
++
++ https://www.cocos.com/
++
++ Permission is hereby granted, free of charge, to any person obtaining a copy
++ of this software and associated engine source code (the "Software"), a limited,
++ worldwide, royalty-free, non-assignable, revocable and non-exclusive license
++ to use Cocos Creator solely to develop games on your target platforms. You shall
++ not use Cocos Creator software for developing other software or tools that's
++ used for developing games. You are not granted to publish, distribute,
++ sublicense, and/or sell copies of Cocos Creator.
++
++ The software or tools in this License Agreement are licensed, not sold.
++ Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
++
++ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ THE SOFTWARE.
++ ****************************************************************************/
++
++import WebglBmfontAssembler from '../2d/bmfont';
++import { vfmtPosUvColorTexId } from '../../../../webgl/vertex-format';
++
++export default class MultiWebglBmfontAssembler extends WebglBmfontAssembler {
++    initData () {
++        let data = this._renderData;
++        data.createFlexData(0, this.verticesCount, this.indicesCount, this.getVfmt());
++    }
++
++    getVfmt() {
++        return vfmtPosUvColorTexId;
++    }
++
++    getBuffer() {
++        return cc.renderer._handle.getBuffer("mesh", this.getVfmt());
++    }
++
++    updateRenderData(comp) {
++        super.updateRenderData(comp);
++
++        if (comp._texIdDirty) {
++            comp._updateMultiTexId(comp.getMaterial(0), comp._frame._texture);
++        }
++
++        // 不进行 Dirty 判断，文本可能会变化，但是纹理不会变
++        this.updateTexId(comp);
++        comp._texIdDirty = false;
++    }
++
++    updateRenderDataForSwitchMaterial(comp) {
++        super._preUpdateRenderData(comp);
++        super._updateRenderData(comp);
++
++        if (comp._texIdDirty) {
++            comp._updateMultiTexId(comp.getMaterial(0), comp._frame._texture);
++        }
++
++        // 不进行 Dirty 判断，文本可能会变化，但是纹理不会变
++        this.updateTexId(comp);
++        comp._texIdDirty = false;
++    }
++}
++
++MultiWebglBmfontAssembler.prototype.floatsPerVert = 6;
++MultiWebglBmfontAssembler.prototype.texIdOffset = 5;
++MultiWebglBmfontAssembler.prototype.isMulti = true;
+diff --git a/engine/cocos2d/core/renderer/webgl/assemblers/label/2d-multi/ttf.js b/engine/cocos2d/core/renderer/webgl/assemblers/label/2d-multi/ttf.js
+new file mode 100644
+index 0000000..4e63a79
+--- /dev/null
++++ b/engine/cocos2d/core/renderer/webgl/assemblers/label/2d-multi/ttf.js
+@@ -0,0 +1,72 @@
++/****************************************************************************
++ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
++
++ https://www.cocos.com/
++
++ Permission is hereby granted, free of charge, to any person obtaining a copy
++ of this software and associated engine source code (the "Software"), a limited,
++ worldwide, royalty-free, non-assignable, revocable and non-exclusive license
++ to use Cocos Creator solely to develop games on your target platforms. You shall
++ not use Cocos Creator software for developing other software or tools that's
++ used for developing games. You are not granted to publish, distribute,
++ sublicense, and/or sell copies of Cocos Creator.
++
++ The software or tools in this License Agreement are licensed, not sold.
++ Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
++
++ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ THE SOFTWARE.
++ ****************************************************************************/
++
++import WebglTTFAssembler from '../2d/ttf';
++import { vfmtPosUvColorTexId } from '../../../../webgl/vertex-format';
++
++export default class MultiWebglTTFAssembler extends WebglTTFAssembler {
++    initData() {
++        let data = this._renderData;
++        data.createFlexData(0, this.verticesCount, this.indicesCount, this.getVfmt());
++        const indices = data.iDatas[0];
++        data.initQuadIndices(indices);
++    }
++
++    getVfmt() {
++        return vfmtPosUvColorTexId;
++    }
++
++    getBuffer() {
++        return cc.renderer._handle.getBuffer("mesh", this.getVfmt());
++    }
++
++    updateRenderData(comp) {
++        super.updateRenderData(comp);
++
++        if (comp._texIdDirty) {
++            comp._updateMultiTexId(comp.getMaterial(0), comp._frame._texture);
++        }
++
++        // 不进行 Dirty 判断，文本可能会变化，但是纹理不会变
++        this.updateTexId(comp);
++        comp._texIdDirty = false;
++    }
++
++    updateRenderDataForSwitchMaterial(comp) {
++        super._updateRenderData(comp);
++
++        if (comp._texIdDirty) {
++            comp._updateMultiTexId(comp.getMaterial(0), comp._frame._texture);
++        }
++
++        // 不进行 Dirty 判断，文本可能会变化，但是纹理不会变
++        this.updateTexId(comp);
++        comp._texIdDirty = false;
++    }
++}
++
++MultiWebglTTFAssembler.prototype.floatsPerVert = 6;
++MultiWebglTTFAssembler.prototype.texIdOffset = 5;
++MultiWebglTTFAssembler.prototype.isMulti = true;
+diff --git a/engine/cocos2d/core/renderer/webgl/assemblers/label/index.js b/engine/cocos2d/core/renderer/webgl/assemblers/label/index.js
+index ad2d511..5e3da64 100644
+--- a/engine/cocos2d/core/renderer/webgl/assemblers/label/index.js
++++ b/engine/cocos2d/core/renderer/webgl/assemblers/label/index.js
+@@ -34,6 +34,9 @@ import TTF3D from './3d/ttf';
+ import Bmfont3D from './3d/bmfont';
+ import Letter3D from './3d/letter';
+ 
++import TTFMulti from './2d-multi/ttf';
++import BmfontMulti from './2d-multi/bmfont';
++
+ let NativeTTF = undefined;
+ if(CC_JSB) {
+     NativeTTF = require("./2d/nativeTTF");
+@@ -69,10 +72,13 @@ Label._canvasPool = {
+ Assembler.register(cc.Label, {
+     getConstructor(label) {
+         let is3DNode = label.node.is3DNode;
+-        let ctor = is3DNode ? TTF3D : TTF;
++        const material = label.getMaterials()[0];
++        let isMultiMaterial = material && material.material.isMultiSupport();
++
++        let ctor = is3DNode ? TTF3D : (isMultiMaterial ? TTFMulti : TTF);
+         
+         if (label.font instanceof cc.BitmapFont) {
+-            ctor = is3DNode ? Bmfont3D : Bmfont;
++            ctor = is3DNode ? Bmfont3D : (isMultiMaterial ? BmfontMulti : Bmfont);
+         } else if (label.cacheMode === Label.CacheMode.CHAR) {
+ 
+             if(CC_JSB && !is3DNode && !!jsb.LabelRenderer && label.font instanceof cc.TTFFont && label._useNativeTTF()){
+@@ -94,5 +100,8 @@ Assembler.register(cc.Label, {
+     TTF3D,
+     Bmfont3D,
+     Letter3D,
+-    NativeTTF
++    NativeTTF,
++
++    TTFMulti,
++    BmfontMulti
+ });
+diff --git a/engine/cocos2d/core/renderer/webgl/assemblers/motion-streak-multi.js b/engine/cocos2d/core/renderer/webgl/assemblers/motion-streak-multi.js
+new file mode 100644
+index 0000000..5a41c3b
+--- /dev/null
++++ b/engine/cocos2d/core/renderer/webgl/assemblers/motion-streak-multi.js
+@@ -0,0 +1,233 @@
++/****************************************************************************
++ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
++
++ https://www.cocos.com/
++
++ Permission is hereby granted, free of charge, to any person obtaining a copy
++ of this software and associated engine source code (the "Software"), a limited,
++ worldwide, royalty-free, non-assignable, revocable and non-exclusive license
++ to use Cocos Creator solely to develop games on your target platforms. You shall
++ not use Cocos Creator software for developing other software or tools that's
++ used for developing games. You are not granted to publish, distribute,
++ sublicense, and/or sell copies of Cocos Creator.
++
++ The software or tools in this License Agreement are licensed, not sold.
++ Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
++
++ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ THE SOFTWARE.
++ ****************************************************************************/
++
++import MotionStreakAssembler from "./motion-streak";
++import { vfmtPosUvColorTexId } from '../../webgl/vertex-format';
++const MotionStreak = require('../../../components/CCMotionStreak');
++const RenderFlow = require('../../render-flow');
++
++function Point(point, dir) {
++    this.point = point || cc.v2();
++    this.dir = dir || cc.v2();
++    this.distance = 0;
++    this.time = 0;
++}
++
++Point.prototype.setPoint = function (x, y) {
++    this.point.x = x;
++    this.point.y = y;
++};
++
++Point.prototype.setDir = function (x, y) {
++    this.dir.x = x;
++    this.dir.y = y;
++};
++
++let _normal = cc.v2();
++let _vec2 = cc.v2();
++
++function normal(out, dir) {
++    //get perpendicular
++    out.x = -dir.y;
++    out.y = dir.x;
++    return out
++}
++
++export default class MultiMotionStreakAssembler extends MotionStreakAssembler {
++    initData() {
++        this._renderData.createFlexData(0, 16, (16 - 2) * 3, this.getVfmt());
++    }
++
++    getVfmt() {
++        return vfmtPosUvColorTexId;
++    }
++
++    getBuffer() {
++        return cc.renderer._handle.getBuffer("mesh", this.getVfmt());
++    }
++
++    update(comp, dt) {
++        if (CC_EDITOR && !comp.preview) return;
++
++        let stroke = comp._stroke / 2;
++
++        let node = comp.node;
++        let matrix = node._worldMatrix.m;
++        let tx = matrix[12], ty = matrix[13];
++
++        let points = comp._points;
++
++        let cur;
++        if (points.length > 1) {
++            let difx = points[0].point.x - tx;
++            let dify = points[0].point.y - ty;
++            if ((difx * difx + dify * dify) < comp.minSeg) {
++                cur = points[0];
++            }
++        }
++
++        if (!cur) {
++            cur = new Point();
++            points.splice(0, 0, cur);
++        }
++
++        cur.setPoint(tx, ty);
++        cur.time = comp._fadeTime + dt;
++
++        let verticesCount = 0;
++        let indicesCount = 0;
++
++        if (points.length < 2) {
++            return;
++        }
++
++        let color = comp._color,
++            cr = color.r, cg = color.g, cb = color.b, ca = color.a;
++
++        let prev = points[1];
++        prev.distance = cur.point.sub(prev.point, _vec2).mag();
++        _vec2.normalizeSelf();
++        prev.setDir(_vec2.x, _vec2.y);
++        cur.setDir(_vec2.x, _vec2.y);
++
++        let flexBuffer = this._renderData._flexBuffer;
++        flexBuffer.reserve(points.length * 2, (points.length - 1) * 6);
++        let vData = flexBuffer.vData;
++        let uintVData = flexBuffer.uintVData;
++        let vertsOffset = 6;
++
++        let fadeTime = comp._fadeTime;
++        let findLast = false;
++        for (let i = points.length - 1; i >= 0; i--) {
++            let p = points[i];
++            let point = p.point;
++            let dir = p.dir;
++            p.time -= dt;
++
++            if (p.time < 0) {
++                points.splice(i, 1);
++                continue;
++            }
++
++            let progress = p.time / fadeTime;
++
++            let next = points[i - 1];
++            if (!findLast) {
++                if (!next) {
++                    points.splice(i, 1);
++                    continue;
++                }
++
++                point.x = next.point.x - dir.x * progress;
++                point.y = next.point.y - dir.y * progress;
++            }
++            findLast = true;
++
++            normal(_normal, dir);
++
++
++            let da = progress * ca;
++            let c = ((da << 24) >>> 0) + (cb << 16) + (cg << 8) + cr;
++
++            let offset = verticesCount * vertsOffset;
++
++            vData[offset] = point.x + _normal.x * stroke;
++            vData[offset + 1] = point.y + _normal.y * stroke;
++            vData[offset + 2] = 1;
++            vData[offset + 3] = progress;
++            uintVData[offset + 4] = c;
++            vData[offset + 5] = comp._texId;
++
++            offset += vertsOffset;
++
++            vData[offset] = point.x - _normal.x * stroke;
++            vData[offset + 1] = point.y - _normal.y * stroke;
++            vData[offset + 2] = 0;
++            vData[offset + 3] = progress;
++            uintVData[offset + 4] = c;
++            vData[offset + 5] = comp._texId;
++
++            verticesCount += 2;
++        }
++
++        indicesCount = verticesCount <= 2 ? 0 : (verticesCount - 2) * 3;
++
++        flexBuffer.used(verticesCount, indicesCount);
++    }
++
++    fillBuffers(comp, renderer) {
++        let { vData, usedVertices, usedIndices, usedVerticesFloats } = this._renderData._flexBuffer;
++
++        let buffer = this.getBuffer(renderer);
++        let offsetInfo = buffer.request(usedVertices, usedIndices);
++
++        // buffer data may be realloc, need get reference after request.
++
++        // fill vertices
++        let vertexOffset = offsetInfo.byteOffset >> 2,
++            vbuf = buffer._vData;
++
++        if (vData.length + vertexOffset > vbuf.length) {
++            vbuf.set(vData.subarray(0, usedVerticesFloats), vertexOffset);
++        }
++        else {
++            vbuf.set(vData, vertexOffset);
++        }
++
++        // fill indices
++        let ibuf = buffer._iData,
++            indiceOffset = offsetInfo.indiceOffset,
++            vertexId = offsetInfo.vertexOffset;
++
++        // index buffer
++        for (let i = 0, l = usedVertices; i < l; i += 2) {
++            let start = vertexId + i;
++            ibuf[indiceOffset++] = start;
++            ibuf[indiceOffset++] = start + 2;
++            ibuf[indiceOffset++] = start + 1;
++            ibuf[indiceOffset++] = start + 1;
++            ibuf[indiceOffset++] = start + 2;
++            ibuf[indiceOffset++] = start + 3;
++        }
++
++        comp.node._renderFlag |= RenderFlow.FLAG_UPDATE_RENDER_DATA;
++    }
++
++}
++
++MotionStreakAssembler.register(MotionStreak, {
++    getConstructor(comp) {
++        const material = comp.getMaterials()[0];
++        let isMultiMaterial = material && material.material.isMultiSupport();
++        return isMultiMaterial ? MultiMotionStreakAssembler : MotionStreakAssembler;
++    },
++
++    MotionStreakAssembler,
++    MultiMotionStreakAssembler
++});
++
++MultiMotionStreakAssembler.prototype.floatsPerVert = 6;
++MultiMotionStreakAssembler.prototype.texIdOffset = 5;
++MultiMotionStreakAssembler.prototype.isMulti = true;
+diff --git a/engine/cocos2d/core/renderer/webgl/assemblers/motion-streak.js b/engine/cocos2d/core/renderer/webgl/assemblers/motion-streak.js
+index d3161f8..8f40585 100644
+--- a/engine/cocos2d/core/renderer/webgl/assemblers/motion-streak.js
++++ b/engine/cocos2d/core/renderer/webgl/assemblers/motion-streak.js
+@@ -25,7 +25,6 @@
+ 
+ import Assembler2D from '../../assembler-2d';
+ 
+-const MotionStreak = require('../../../components/CCMotionStreak');
+ const RenderFlow = require('../../render-flow');
+ 
+ function Point (point, dir) {
+@@ -226,5 +225,3 @@ export default class MotionStreakAssembler extends Assembler2D {
+         comp.node._renderFlag |= RenderFlow.FLAG_UPDATE_RENDER_DATA;
+     }
+ }
+-
+-MotionStreakAssembler.register(MotionStreak, MotionStreakAssembler);
+diff --git a/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/bar-filled.js b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/bar-filled.js
+new file mode 100644
+index 0000000..7bbfb6c
+--- /dev/null
++++ b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/bar-filled.js
+@@ -0,0 +1,99 @@
++/****************************************************************************
++ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
++
++ https://www.cocos.com/
++
++ Permission is hereby granted, free of charge, to any person obtaining a copy
++ of this software and associated engine source code (the "Software"), a limited,
++ worldwide, royalty-free, non-assignable, revocable and non-exclusive license
++ to use Cocos Creator solely to develop games on your target platforms. You shall
++ not use Cocos Creator software for developing other software or tools that's
++ used for developing games. You are not granted to publish, distribute,
++ sublicense, and/or sell copies of Cocos Creator.
++
++ The software or tools in this License Agreement are licensed, not sold.
++ Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
++
++ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ THE SOFTWARE.
++ ****************************************************************************/
++
++import { vfmtPosUvColorTexId } from '../../../../webgl/vertex-format';
++import BarFilledAssembler from '../2d/bar-filled';
++
++export default class BarFilledAssemblerMulti extends BarFilledAssembler {
++    initData() {
++        let data = this._renderData;
++        data.createFlexData(0, this.verticesCount, this.indicesCount, this.getVfmt());
++        const indices = data.iDatas[0];
++        data.initQuadIndices(indices);
++    }
++
++    getVfmt() {
++        return vfmtPosUvColorTexId;
++    }
++
++    getBuffer() {
++        return cc.renderer._handle.getBuffer("mesh", this.getVfmt());
++    }
++
++    updateRenderData (sprite) {
++        super.updateRenderData(sprite);
++
++        if (sprite._texIdDirty) {
++            sprite._updateMultiTexId(sprite.getMaterial(0), sprite._spriteFrame._texture);
++            if (sprite._texIdDirty) {
++                this.updateTexId(sprite);
++                sprite._texIdDirty = false;
++            }
++        }
++    }
++
++    updateRenderDataForSwitchMaterial(sprite) {
++        if (sprite._vertsDirty) {
++            let fillStart = sprite._fillStart;
++            let fillRange = sprite._fillRange;
++
++            if (fillRange < 0) {
++                fillStart += fillRange;
++                fillRange = -fillRange;
++            }
++
++            fillRange = fillStart + fillRange;
++
++            fillStart = fillStart > 1.0 ? 1.0 : fillStart;
++            fillStart = fillStart < 0.0 ? 0.0 : fillStart;
++
++            fillRange = fillRange > 1.0 ? 1.0 : fillRange;
++            fillRange = fillRange < 0.0 ? 0.0 : fillRange;
++            fillRange = fillRange - fillStart;
++            fillRange = fillRange < 0 ? 0 : fillRange;
++
++            let fillEnd = fillStart + fillRange;
++            fillEnd = fillEnd > 1 ? 1 : fillEnd;
++
++            this.updateUVs(sprite, fillStart, fillEnd);
++            this.updateVerts(sprite, fillStart, fillEnd);
++
++            sprite._vertsDirty = false;
++        }
++
++        if (sprite._texIdDirty) {
++            sprite._updateMultiTexId(sprite.getMaterial(0), sprite._spriteFrame._texture);
++            if (sprite._texIdDirty) {
++                this.updateTexId(sprite);
++                sprite._texIdDirty = false;
++            }
++        }
++    }
++
++}
++
++BarFilledAssemblerMulti.prototype.floatsPerVert = 6;
++BarFilledAssemblerMulti.prototype.texIdOffset = 5;
++BarFilledAssemblerMulti.prototype.isMulti = true;
+diff --git a/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/mesh.js b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/mesh.js
+new file mode 100644
+index 0000000..1166031
+--- /dev/null
++++ b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/mesh.js
+@@ -0,0 +1,94 @@
++/****************************************************************************
++ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
++
++ https://www.cocos.com/
++
++ Permission is hereby granted, free of charge, to any person obtaining a copy
++ of this software and associated engine source code (the "Software"), a limited,
++ worldwide, royalty-free, non-assignable, revocable and non-exclusive license
++ to use Cocos Creator solely to develop games on your target platforms. You shall
++ not use Cocos Creator software for developing other software or tools that's
++ used for developing games. You are not granted to publish, distribute,
++ sublicense, and/or sell copies of Cocos Creator.
++
++ The software or tools in this License Agreement are licensed, not sold.
++ Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
++
++ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ THE SOFTWARE.
++ ****************************************************************************/
++
++import { vfmtPosUvColorTexId } from '../../../../webgl/vertex-format';
++import MeshSpriteAssembler from '../2d/mesh';
++
++export default class MultiMeshSpriteAssembler extends MeshSpriteAssembler {
++    getVfmt() {
++        return vfmtPosUvColorTexId;
++    }
++
++    getBuffer() {
++        return cc.renderer._handle.getBuffer("mesh", this.getVfmt());
++    }
++
++    updateRenderData(sprite) {
++        let frame = sprite.spriteFrame;
++
++        super.updateRenderData(sprite);
++
++        if (frame) {
++            if (sprite._texIdDirty) {
++                sprite._updateMultiTexId(sprite.getMaterial(0), frame._texture);
++            }
++
++            // 不进行 Dirty 判断，Mesh 可能会变化，但是纹理不会变
++            this.updateTexId(sprite);
++            sprite._texIdDirty = false;
++        }
++    }
++
++    updateRenderDataForSwitchMaterial(sprite) {
++        let frame = sprite.spriteFrame;
++
++        if (frame) {
++            let vertices = frame.vertices;
++            if (vertices) {
++                this.verticesCount = vertices.x.length;
++                this.indicesCount = vertices.triangles.length;
++
++                let renderData = this._renderData;
++                let flexBuffer = renderData._flexBuffer;
++                if (flexBuffer.reserve(this.verticesCount, this.indicesCount)) {
++                    this.updateColor(sprite);
++                    sprite._vertsDirty = true;
++                }
++                flexBuffer.used(this.verticesCount, this.indicesCount);
++
++                this.updateIndices(vertices.triangles);
++
++                if (sprite._vertsDirty) {
++                    this.updateUVs(sprite);
++                    this.updateVerts(sprite);
++                    this.updateWorldVerts(sprite);
++                    sprite._vertsDirty = false;
++                }
++            }
++        }
++
++        if (sprite._texIdDirty) {
++            sprite._updateMultiTexId(sprite.getMaterial(0), frame._texture);
++        }
++
++        // 不进行 Dirty 判断，Mesh 可能会变化，但是纹理不会变
++        this.updateTexId(sprite);
++        sprite._texIdDirty = false;
++    }
++}
++
++MultiMeshSpriteAssembler.prototype.floatsPerVert = 6;
++MultiMeshSpriteAssembler.prototype.texIdOffset = 5;
++MultiMeshSpriteAssembler.prototype.isMulti = true;
+diff --git a/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/radial-filled.js b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/radial-filled.js
+new file mode 100644
+index 0000000..70f18d4
+--- /dev/null
++++ b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/radial-filled.js
+@@ -0,0 +1,70 @@
++/****************************************************************************
++ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
++
++ https://www.cocos.com/
++
++ Permission is hereby granted, free of charge, to any person obtaining a copy
++ of this software and associated engine source code (the "Software"), a limited,
++ worldwide, royalty-free, non-assignable, revocable and non-exclusive license
++ to use Cocos Creator solely to develop games on your target platforms. You shall
++ not use Cocos Creator software for developing other software or tools that's
++ used for developing games. You are not granted to publish, distribute,
++ sublicense, and/or sell copies of Cocos Creator.
++
++ The software or tools in this License Agreement are licensed, not sold.
++ Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
++
++ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ THE SOFTWARE.
++ ****************************************************************************/
++
++import { vfmtPosUvColorTexId } from '../../../../webgl/vertex-format';
++import RadialFilledAssembler from '../2d/radial-filled';
++
++export default class MultiRadialFilledAssembler extends RadialFilledAssembler {
++    initData (sprite) {
++        this._renderData.createFlexData(0, 4, 6, this.getVfmt());
++        this.updateIndices();
++    }
++
++    getVfmt() {
++        return vfmtPosUvColorTexId;
++    }
++
++    getBuffer() {
++        return cc.renderer._handle.getBuffer("mesh", this.getVfmt());
++    }
++
++    updateRenderData (sprite) {
++        super.updateRenderData(sprite);
++
++        if (sprite._texIdDirty) {
++            sprite._updateMultiTexId(sprite.getMaterial(0), sprite.spriteFrame._texture);
++        }
++
++        // 不进行 Dirty 判断，Mesh 可能会变化，但是纹理不会变
++        this.updateTexId(sprite);
++        sprite._texIdDirty = false;
++    }
++
++    updateRenderDataForSwitchMaterial(sprite) {
++        this._updateRenderData(sprite);
++
++        if (sprite._texIdDirty) {
++            sprite._updateMultiTexId(sprite.getMaterial(0), sprite.spriteFrame._texture);
++        }
++
++        // 不进行 Dirty 判断，Mesh 可能会变化，但是纹理不会变
++        this.updateTexId(sprite);
++        sprite._texIdDirty = false;
++    }
++}
++
++MultiRadialFilledAssembler.prototype.floatsPerVert = 6;
++MultiRadialFilledAssembler.prototype.texIdOffset = 5;
++MultiRadialFilledAssembler.prototype.isMulti = true;
+diff --git a/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/simple.js b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/simple.js
+new file mode 100644
+index 0000000..6e91a55
+--- /dev/null
++++ b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/simple.js
+@@ -0,0 +1,76 @@
++/****************************************************************************
++ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
++
++ https://www.cocos.com/
++
++ Permission is hereby granted, free of charge, to any person obtaining a copy
++ of this software and associated engine source code (the "Software"), a limited,
++ worldwide, royalty-free, non-assignable, revocable and non-exclusive license
++ to use Cocos Creator solely to develop games on your target platforms. You shall
++ not use Cocos Creator software for developing other software or tools that's
++ used for developing games. You are not granted to publish, distribute,
++ sublicense, and/or sell copies of Cocos Creator.
++
++ The software or tools in this License Agreement are licensed, not sold.
++ Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
++
++ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ THE SOFTWARE.
++ ****************************************************************************/
++
++import { vfmtPosUvColorTexId } from '../../../../webgl/vertex-format';
++import SimpleSpriteAssembler from '../2d/simple';
++
++export default class MultiSimpleSpriteAssembler extends SimpleSpriteAssembler {
++    initData() {
++        let data = this._renderData;
++        data.createFlexData(0, this.verticesCount, this.indicesCount, this.getVfmt());
++        const indices = data.iDatas[0];
++        data.initQuadIndices(indices);
++    }
++
++    getVfmt() {
++        return vfmtPosUvColorTexId;
++    }
++
++    getBuffer() {
++        return cc.renderer._handle.getBuffer("mesh", this.getVfmt());
++    }
++
++    updateRenderData (sprite) {
++        super.updateRenderData(sprite);
++
++        if (sprite._texIdDirty) {
++            sprite._updateMultiTexId(sprite.getMaterial(0), sprite._spriteFrame._texture);
++            if (sprite._texIdDirty) {
++                this.updateTexId(sprite);
++                sprite._texIdDirty = false;
++            }
++        }
++    }
++
++    updateRenderDataForSwitchMaterial(sprite) {
++        if (sprite._vertsDirty) {
++            this.updateUVs(sprite);
++            this.updateVerts(sprite);
++            sprite._vertsDirty = false;
++        }
++
++        if (sprite._texIdDirty) {
++            sprite._updateMultiTexId(sprite.getMaterial(0), sprite._spriteFrame._texture);
++            if (sprite._texIdDirty) {
++                this.updateTexId(sprite);
++                sprite._texIdDirty = false;
++            }
++        }
++    }
++}
++
++MultiSimpleSpriteAssembler.prototype.floatsPerVert = 6;
++MultiSimpleSpriteAssembler.prototype.texIdOffset = 5;
++MultiSimpleSpriteAssembler.prototype.isMulti = true;
+diff --git a/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/sliced.js b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/sliced.js
+new file mode 100644
+index 0000000..ec51f02
+--- /dev/null
++++ b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/sliced.js
+@@ -0,0 +1,89 @@
++/****************************************************************************
++ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
++
++ http://www.cocos.com
++
++ Permission is hereby granted, free of charge, to any person obtaining a copy
++ of this software and associated engine source code (the "Software"), a limited,
++ worldwide, royalty-free, non-assignable, revocable and non-exclusive license
++ to use Cocos Creator solely to develop games on your target platforms. You shall
++ not use Cocos Creator software for developing other software or tools that's
++ used for developing games. You are not granted to publish, distribute,
++ sublicense, and/or sell copies of Cocos Creator.
++
++ The software or tools in this License Agreement are licensed, not sold.
++ Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
++
++ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ THE SOFTWARE.
++ ****************************************************************************/
++
++import { vfmtPosUvColorTexId } from '../../../../webgl/vertex-format';
++import SlicedAssembler from '../2d/sliced';
++
++export default class MultiSlicedAssembler extends SlicedAssembler {
++    initData (sprite) {
++        if (this._renderData.meshCount > 0) return;
++        this._renderData.createFlexData(0, this.verticesCount, this.indicesCount, this.getVfmt());
++
++        let indices = this._renderData.iDatas[0];
++        let indexOffset = 0;
++        for (let r = 0; r < 3; ++r) {
++            for (let c = 0; c < 3; ++c) {
++                let start = r * 4 + c;
++                indices[indexOffset++] = start;
++                indices[indexOffset++] = start + 1;
++                indices[indexOffset++] = start + 4;
++                indices[indexOffset++] = start + 1;
++                indices[indexOffset++] = start + 5;
++                indices[indexOffset++] = start + 4;
++            }
++        }
++    }
++
++    getVfmt() {
++        return vfmtPosUvColorTexId;
++    }
++
++    getBuffer() {
++        return cc.renderer._handle.getBuffer("mesh", this.getVfmt());
++    }
++
++    updateRenderData (sprite) {
++        super.updateRenderData(sprite);
++
++        if (sprite._texIdDirty) {
++            sprite._updateMultiTexId(sprite.getMaterial(0), sprite._spriteFrame._texture);
++            if (sprite._texIdDirty) {
++                this.updateTexId(sprite);
++                sprite._texIdDirty = false;
++            }
++        }
++    }
++
++    updateRenderDataForSwitchMaterial(sprite) {
++        if (sprite._vertsDirty) {
++            this.updateUVs(sprite);
++            this.updateVerts(sprite);
++            sprite._vertsDirty = false;
++        }
++
++        if (sprite._texIdDirty) {
++            sprite._updateMultiTexId(sprite.getMaterial(0), sprite._spriteFrame._texture);
++            if (sprite._texIdDirty) {
++                this.updateTexId(sprite);
++                sprite._texIdDirty = false;
++            }
++        }
++    }
++
++}
++
++MultiSlicedAssembler.prototype.floatsPerVert = 6;
++MultiSlicedAssembler.prototype.texIdOffset = 5;
++MultiSlicedAssembler.prototype.isMulti = true;
+diff --git a/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/tiled.js b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/tiled.js
+new file mode 100644
+index 0000000..9b170b2
+--- /dev/null
++++ b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d-multi/tiled.js
+@@ -0,0 +1,99 @@
++/****************************************************************************
++ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
++
++ https://www.cocos.com/
++
++ Permission is hereby granted, free of charge, to any person obtaining a copy
++ of this software and associated engine source code (the "Software"), a limited,
++ worldwide, royalty-free, non-assignable, revocable and non-exclusive license
++ to use Cocos Creator solely to develop games on your target platforms. You shall
++ not use Cocos Creator software for developing other software or tools that's
++ used for developing games. You are not granted to publish, distribute,
++ sublicense, and/or sell copies of Cocos Creator.
++
++ The software or tools in this License Agreement are licensed, not sold.
++ Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
++
++ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ THE SOFTWARE.
++ ****************************************************************************/
++
++import { vfmtPosUvColorTexId } from '../../../../webgl/vertex-format';
++import TiledAssembler from '../2d/tiled';
++
++export default class MultiTiledAssembler extends TiledAssembler {
++    getVfmt() {
++        return vfmtPosUvColorTexId;
++    }
++
++    getBuffer() {
++        return cc.renderer._handle.getBuffer("mesh", this.getVfmt());
++    }
++
++    updateRenderData(sprite) {
++        super.updateRenderData(sprite);
++
++        if (sprite._texIdDirty) {
++            sprite._updateMultiTexId(sprite.getMaterial(0), sprite.spriteFrame._texture);
++        }
++
++        // 不进行 Dirty 判断，Mesh 可能会变化，但是纹理不会变
++        this.updateTexId(sprite);
++        sprite._texIdDirty = false;
++    }
++
++    updateRenderDataForSwitchMaterial(sprite) {
++        let frame = sprite._spriteFrame;
++        let node = sprite.node;
++
++        let contentWidth = this.contentWidth = Math.abs(node.width);
++        let contentHeight = this.contentHeight = Math.abs(node.height);
++        let rect = frame._rect;
++        let leftWidth = frame.insetLeft, rightWidth = frame.insetRight, centerWidth = rect.width - leftWidth - rightWidth,
++            topHeight = frame.insetTop, bottomHeight = frame.insetBottom, centerHeight = rect.height - topHeight - bottomHeight;
++        this.sizableWidth = contentWidth - leftWidth - rightWidth;
++        this.sizableHeight = contentHeight - topHeight - bottomHeight;
++        this.sizableWidth = this.sizableWidth > 0 ? this.sizableWidth : 0;
++        this.sizableHeight = this.sizableHeight > 0 ? this.sizableHeight : 0;
++        let hRepeat = this.hRepeat = centerWidth === 0 ? this.sizableWidth : this.sizableWidth / centerWidth;
++        let vRepeat = this.vRepeat = centerHeight === 0 ? this.sizableHeight : this.sizableHeight / centerHeight;
++        let row = this.row = Math.ceil(vRepeat + 2);
++        let col = this.col = Math.ceil(hRepeat + 2);
++
++        // update data property
++        let count = row * col;
++        this.verticesCount = count * 4;
++        this.indicesCount = count * 6;
++
++        let renderData = this._renderData;
++        let flexBuffer = renderData._flexBuffer;
++        if (flexBuffer.reserve(this.verticesCount, this.indicesCount)) {
++            this._updateIndices();
++            this.updateColor(sprite);
++        }
++        flexBuffer.used(this.verticesCount, this.indicesCount);
++
++        if (sprite._vertsDirty) {
++            this.updateUVs(sprite);
++            this.updateVerts(sprite);
++            sprite._vertsDirty = false;
++        }
++
++        if (sprite._texIdDirty) {
++            sprite._updateMultiTexId(sprite.getMaterial(0), sprite.spriteFrame._texture);
++        }
++
++        // 不进行 Dirty 判断，Mesh 可能会变化，但是纹理不会变
++        this.updateTexId(sprite);
++        sprite._texIdDirty = false;
++    }
++}
++
++MultiTiledAssembler.prototype.floatsPerVert = 6;
++MultiTiledAssembler.prototype.texIdOffset = 5;
++MultiTiledAssembler.prototype.isMulti = true;
+diff --git a/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/bar-filled.js b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/bar-filled.js
+index 34d8af7..5622c2e 100644
+--- a/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/bar-filled.js
++++ b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/bar-filled.js
+@@ -31,37 +31,38 @@ const FillType = Sprite.FillType;
+ export default class BarFilledAssembler extends Assembler2D {
+     updateRenderData (sprite) {
+         let frame = sprite._spriteFrame;
+-        this.packToDynamicAtlas(sprite, frame);
++        const assemblerChanged = this.packDynamicAtlasAndCheckMaterial(sprite, frame);
+ 
+-        if (!sprite._vertsDirty) {
+-            return;
+-        }
+-
+-        let fillStart = sprite._fillStart;
+-        let fillRange = sprite._fillRange;
++        // 打包到动态图集时可能会切换 Assembler
++        if (!assemblerChanged) {
++            if (sprite._vertsDirty) {
++                let fillStart = sprite._fillStart;
++                let fillRange = sprite._fillRange;
+ 
+-        if (fillRange < 0) {
+-            fillStart += fillRange;
+-            fillRange = -fillRange;
+-        }
++                if (fillRange < 0) {
++                    fillStart += fillRange;
++                    fillRange = -fillRange;
++                }
+ 
+-        fillRange = fillStart + fillRange;
++                fillRange = fillStart + fillRange;
+ 
+-        fillStart = fillStart > 1.0 ? 1.0 : fillStart;
+-        fillStart = fillStart < 0.0 ? 0.0 : fillStart;
++                fillStart = fillStart > 1.0 ? 1.0 : fillStart;
++                fillStart = fillStart < 0.0 ? 0.0 : fillStart;
+ 
+-        fillRange = fillRange > 1.0 ? 1.0 : fillRange;
+-        fillRange = fillRange < 0.0 ? 0.0 : fillRange;
+-        fillRange = fillRange - fillStart;
+-        fillRange = fillRange < 0 ? 0 : fillRange;
++                fillRange = fillRange > 1.0 ? 1.0 : fillRange;
++                fillRange = fillRange < 0.0 ? 0.0 : fillRange;
++                fillRange = fillRange - fillStart;
++                fillRange = fillRange < 0 ? 0 : fillRange;
+ 
+-        let fillEnd = fillStart + fillRange;
+-        fillEnd = fillEnd > 1 ? 1 : fillEnd;
++                let fillEnd = fillStart + fillRange;
++                fillEnd = fillEnd > 1 ? 1 : fillEnd;
+ 
+-        this.updateUVs(sprite, fillStart, fillEnd);
+-        this.updateVerts(sprite, fillStart, fillEnd);
++                this.updateUVs(sprite, fillStart, fillEnd);
++                this.updateVerts(sprite, fillStart, fillEnd);
+ 
+-        sprite._vertsDirty = false;
++                sprite._vertsDirty = false;
++            }
++        }
+     }
+ 
+     updateUVs (sprite, fillStart, fillEnd) {
+diff --git a/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/mesh.js b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/mesh.js
+index a2571ca..8b8b934 100644
+--- a/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/mesh.js
++++ b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/mesh.js
+@@ -31,30 +31,34 @@ export default class MeshSpriteAssembler extends Assembler2D {
+     }
+     
+     updateRenderData (sprite) {
+-        this.packToDynamicAtlas(sprite, sprite._spriteFrame);
+-
+         let frame = sprite.spriteFrame;
+-        if (frame) {
+-            let vertices = frame.vertices;
+-            if (vertices) {
+-                this.verticesCount = vertices.x.length;
+-                this.indicesCount = vertices.triangles.length;
+-
+-                let renderData = this._renderData;
+-                let flexBuffer = renderData._flexBuffer;
+-                if (flexBuffer.reserve(this.verticesCount, this.indicesCount)) {
+-                    this.updateColor(sprite);
+-                    sprite._vertsDirty = true;
+-                }
+-                flexBuffer.used(this.verticesCount, this.indicesCount);
+-
+-                this.updateIndices(vertices.triangles);
+ 
+-                if (sprite._vertsDirty) {
+-                    this.updateUVs(sprite);
+-                    this.updateVerts(sprite);
+-                    this.updateWorldVerts(sprite);
+-                    sprite._vertsDirty = false;
++        const assemblerChanged = this.packDynamicAtlasAndCheckMaterial(sprite, frame);
++
++        // 打包到动态图集时可能会切换 Assembler
++        if (!assemblerChanged) {
++            if (frame) {
++                let vertices = frame.vertices;
++                if (vertices) {
++                    this.verticesCount = vertices.x.length;
++                    this.indicesCount = vertices.triangles.length;
++
++                    let renderData = this._renderData;
++                    let flexBuffer = renderData._flexBuffer;
++                    if (flexBuffer.reserve(this.verticesCount, this.indicesCount)) {
++                        this.updateColor(sprite);
++                        sprite._vertsDirty = true;
++                    }
++                    flexBuffer.used(this.verticesCount, this.indicesCount);
++
++                    this.updateIndices(vertices.triangles);
++
++                    if (sprite._vertsDirty) {
++                        this.updateUVs(sprite);
++                        this.updateVerts(sprite);
++                        this.updateWorldVerts(sprite);
++                        sprite._vertsDirty = false;
++                    }
+                 }
+             }
+         }
+diff --git a/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/radial-filled.js b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/radial-filled.js
+index 6bedde3..da5342d 100644
+--- a/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/radial-filled.js
++++ b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/radial-filled.js
+@@ -179,7 +179,16 @@ export default class RadialFilledAssembler extends Assembler2D {
+         super.updateRenderData(sprite);
+ 
+         let frame = sprite.spriteFrame;
+-        this.packToDynamicAtlas(sprite, frame);
++        const assemblerChanged = this.packDynamicAtlasAndCheckMaterial(sprite, frame);
++
++        // 打包到动态图集时可能会切换 Assembler
++        if (!assemblerChanged) {
++            this._updateRenderData(sprite);
++        }
++    }
++
++    _updateRenderData(sprite) {
++        let frame = sprite.spriteFrame;
+ 
+         if (sprite._vertsDirty) {
+             let fillStart = sprite._fillStart;
+diff --git a/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/simple.js b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/simple.js
+index 939e7b1..178b70a 100644
+--- a/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/simple.js
++++ b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/simple.js
+@@ -27,12 +27,15 @@ import Assembler2D from '../../../../assembler-2d';
+ 
+ export default class SimpleSpriteAssembler extends Assembler2D {
+     updateRenderData (sprite) {
+-        this.packToDynamicAtlas(sprite, sprite._spriteFrame);
++        const assemblerChanged = this.packDynamicAtlasAndCheckMaterial(sprite, sprite._spriteFrame);
+ 
+-        if (sprite._vertsDirty) {
+-            this.updateUVs(sprite);
+-            this.updateVerts(sprite);
+-            sprite._vertsDirty = false;
++        // 打包到动态图集时可能会切换 Assembler
++        if (!assemblerChanged) {
++            if (sprite._vertsDirty) {
++                this.updateUVs(sprite);
++                this.updateVerts(sprite);
++                sprite._vertsDirty = false;
++            }
+         }
+     }
+ 
+diff --git a/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/sliced.js b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/sliced.js
+index 9013a9b..69b3c4f 100644
+--- a/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/sliced.js
++++ b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/sliced.js
+@@ -52,12 +52,15 @@ export default class SlicedAssembler extends Assembler2D {
+ 
+     updateRenderData (sprite) {
+         let frame = sprite._spriteFrame;
+-        this.packToDynamicAtlas(sprite, frame);
+-
+-        if (sprite._vertsDirty) {
+-            this.updateUVs(sprite);
+-            this.updateVerts(sprite);
+-            sprite._vertsDirty = false;
++        const assemblerChanged = this.packDynamicAtlasAndCheckMaterial(sprite, frame);
++
++        // 打包到动态图集时可能会切换 Assembler
++        if (!assemblerChanged) {
++            if (sprite._vertsDirty) {
++                this.updateUVs(sprite);
++                this.updateVerts(sprite);
++                sprite._vertsDirty = false;
++            }
+         }
+     }
+ 
+diff --git a/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/tiled.js b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/tiled.js
+index 5028e8b..b0c0296 100644
+--- a/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/tiled.js
++++ b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/2d/tiled.js
+@@ -59,41 +59,44 @@ export default class TiledAssembler extends Assembler2D {
+ 
+     updateRenderData (sprite) {
+         let frame = sprite._spriteFrame;
+-        this.packToDynamicAtlas(sprite, frame);
++        const assemblerChanged = this.packDynamicAtlasAndCheckMaterial(sprite, frame);
+ 
+-        let node = sprite.node;
++        // 打包到动态图集时可能会切换 Assembler
++        if (!assemblerChanged) {
++            let node = sprite.node;
+ 
+-        let contentWidth = this.contentWidth = Math.abs(node.width);
+-        let contentHeight = this.contentHeight = Math.abs(node.height);
+-        let rect = frame._rect;
+-        let leftWidth = frame.insetLeft, rightWidth = frame.insetRight, centerWidth = rect.width - leftWidth - rightWidth,
+-            topHeight = frame.insetTop, bottomHeight = frame.insetBottom, centerHeight = rect.height - topHeight - bottomHeight;
+-        this.sizableWidth = contentWidth - leftWidth - rightWidth;
+-        this.sizableHeight = contentHeight - topHeight - bottomHeight;
+-        this.sizableWidth = this.sizableWidth > 0 ? this.sizableWidth : 0;
+-        this.sizableHeight = this.sizableHeight > 0 ? this.sizableHeight : 0;
+-        let hRepeat = this.hRepeat = centerWidth === 0 ? this.sizableWidth : this.sizableWidth / centerWidth;
+-        let vRepeat = this.vRepeat = centerHeight === 0 ? this.sizableHeight : this.sizableHeight / centerHeight;
+-        let row = this.row = Math.ceil(vRepeat + 2);
+-        let col = this.col = Math.ceil(hRepeat + 2);
++            let contentWidth = this.contentWidth = Math.abs(node.width);
++            let contentHeight = this.contentHeight = Math.abs(node.height);
++            let rect = frame._rect;
++            let leftWidth = frame.insetLeft, rightWidth = frame.insetRight, centerWidth = rect.width - leftWidth - rightWidth,
++                topHeight = frame.insetTop, bottomHeight = frame.insetBottom, centerHeight = rect.height - topHeight - bottomHeight;
++            this.sizableWidth = contentWidth - leftWidth - rightWidth;
++            this.sizableHeight = contentHeight - topHeight - bottomHeight;
++            this.sizableWidth = this.sizableWidth > 0 ? this.sizableWidth : 0;
++            this.sizableHeight = this.sizableHeight > 0 ? this.sizableHeight : 0;
++            let hRepeat = this.hRepeat = centerWidth === 0 ? this.sizableWidth : this.sizableWidth / centerWidth;
++            let vRepeat = this.vRepeat = centerHeight === 0 ? this.sizableHeight : this.sizableHeight / centerHeight;
++            let row = this.row = Math.ceil(vRepeat + 2);
++            let col = this.col = Math.ceil(hRepeat + 2);
+ 
+-        // update data property
+-        let count = row * col;
+-        this.verticesCount = count * 4;
+-        this.indicesCount = count * 6;
++            // update data property
++            let count = row * col;
++            this.verticesCount = count * 4;
++            this.indicesCount = count * 6;
+ 
+-        let renderData = this._renderData;
+-        let flexBuffer = renderData._flexBuffer;
+-        if (flexBuffer.reserve(this.verticesCount, this.indicesCount)) {
+-            this._updateIndices();
+-            this.updateColor(sprite);
+-        }
+-        flexBuffer.used(this.verticesCount, this.indicesCount);
++            let renderData = this._renderData;
++            let flexBuffer = renderData._flexBuffer;
++            if (flexBuffer.reserve(this.verticesCount, this.indicesCount)) {
++                this._updateIndices();
++                this.updateColor(sprite);
++            }
++            flexBuffer.used(this.verticesCount, this.indicesCount);
+ 
+-        if (sprite._vertsDirty) {
+-            this.updateUVs(sprite);
+-            this.updateVerts(sprite);
+-            sprite._vertsDirty = false;
++            if (sprite._vertsDirty) {
++                this.updateUVs(sprite);
++                this.updateVerts(sprite);
++                sprite._vertsDirty = false;
++            }
+         }
+     }
+ 
+diff --git a/engine/cocos2d/core/renderer/webgl/assemblers/sprite/index.js b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/index.js
+index 885ddc4..de11d9c 100644
+--- a/engine/cocos2d/core/renderer/webgl/assemblers/sprite/index.js
++++ b/engine/cocos2d/core/renderer/webgl/assemblers/sprite/index.js
+@@ -15,27 +15,36 @@ import RadialFilled3D from "./3d/radial-filled";
+ import BarFilled3D from "./3d/bar-filled";
+ import Mesh3D from './3d/mesh';
+ 
++import SimpleMulti from "./2d-multi/simple";
++import SlicedMulti from "./2d-multi/sliced";
++import TiledMulti from "./2d-multi/tiled";
++import RadialFilledMulti from "./2d-multi/radial-filled";
++import BarFilledMulti from "./2d-multi/bar-filled";
++import MeshMulti from "./2d-multi/mesh";
++
+ let ctor = {
+     getConstructor(sprite) {
+         let is3DNode = sprite.node.is3DNode;
++        const material = sprite.getMaterials()[0];
++        let isMultiMaterial = material && material.material.isMultiSupport();
+ 
+-        let ctor = is3DNode ? Simple3D : Simple;
++        let ctor = is3DNode ? Simple3D : (isMultiMaterial ? SimpleMulti : Simple);
+         switch (sprite.type) {
+             case Type.SLICED:
+-                ctor = is3DNode ? Sliced3D : Sliced;
++                ctor = is3DNode ? Sliced3D : (isMultiMaterial ? SlicedMulti : Sliced);
+                 break;
+             case Type.TILED:
+-                ctor = is3DNode ? Tiled3D : Tiled;
++                ctor = is3DNode ? Tiled3D : (isMultiMaterial ? TiledMulti : Tiled);
+                 break;
+             case Type.FILLED:
+                 if (sprite._fillType === FillType.RADIAL) {
+-                    ctor = is3DNode ? RadialFilled3D : RadialFilled;
++                    ctor = is3DNode ? RadialFilled3D : (isMultiMaterial ? RadialFilledMulti : RadialFilled);
+                 } else {
+-                    ctor = is3DNode ? BarFilled3D : BarFilled;
++                    ctor = is3DNode ? BarFilled3D : (isMultiMaterial ? BarFilledMulti : BarFilled);
+                 }
+                 break;
+             case Type.MESH:
+-                ctor = is3DNode ? Mesh3D : Mesh;
++                ctor = is3DNode ? Mesh3D : (isMultiMaterial ? MeshMulti : Mesh);
+                 break;
+         }
+ 
+@@ -55,6 +64,13 @@ let ctor = {
+     RadialFilled3D,
+     BarFilled3D,
+     Mesh3D,
++
++    SimpleMulti,
++    SlicedMulti,
++    TiledMulti,
++    RadialFilledMulti,
++    BarFilledMulti,
++    MeshMulti,
+ };
+ 
+ Assembler.register(cc.Sprite, ctor);
+diff --git a/engine/cocos2d/core/renderer/webgl/vertex-format.js b/engine/cocos2d/core/renderer/webgl/vertex-format.js
+index 53e817a..4a93586 100644
+--- a/engine/cocos2d/core/renderer/webgl/vertex-format.js
++++ b/engine/cocos2d/core/renderer/webgl/vertex-format.js
+@@ -41,6 +41,15 @@ var vfmtPosUvColor = new gfx.VertexFormat([
+ vfmtPosUvColor.name = 'vfmtPosUvColor';
+ gfx.VertexFormat.XY_UV_Color = vfmtPosUvColor;
+ 
++var vfmtPosUvColorTexId = new gfx.VertexFormat([
++    { name: gfx.ATTR_POSITION, type: gfx.ATTR_TYPE_FLOAT32, num: 2 },
++    { name: gfx.ATTR_UV0, type: gfx.ATTR_TYPE_FLOAT32, num: 2 },
++    { name: gfx.ATTR_COLOR, type: gfx.ATTR_TYPE_UINT8, num: 4, normalize: true },
++    { name: gfx.ATTR_TEX_ID, type: gfx.ATTR_TYPE_FLOAT32, num: 1 },
++]);
++vfmtPosUvColorTexId.name = 'vfmtPosUvColorTexId';
++gfx.VertexFormat.XY_UV_Color_TexId = vfmtPosUvColorTexId;
++
+ var vfmtPosUvTwoColor = new gfx.VertexFormat([
+     { name: gfx.ATTR_POSITION, type: gfx.ATTR_TYPE_FLOAT32, num: 2 },
+     { name: gfx.ATTR_UV0, type: gfx.ATTR_TYPE_FLOAT32, num: 2 },
+@@ -76,5 +85,6 @@ module.exports = {
+     vfmtPosUvTwoColor,
+     vfmtPosUv,
+     vfmtPosColor,
+-    vfmtPos
+-};
+\ No newline at end of file
++    vfmtPos,
++    vfmtPosUvColorTexId
++};
+diff --git a/engine/cocos2d/renderer/gfx/enums.js b/engine/cocos2d/renderer/gfx/enums.js
+index 9ecc685..69770ac 100644
+--- a/engine/cocos2d/renderer/gfx/enums.js
++++ b/engine/cocos2d/renderer/gfx/enums.js
+@@ -178,6 +178,7 @@ export const enums = {
+   ATTR_TEX_COORD6: 'a_texCoord6',
+   ATTR_TEX_COORD7: 'a_texCoord7',
+   ATTR_TEX_COORD8: 'a_texCoord8',
++  ATTR_TEX_ID: 'a_texId',
+ 
+ 
+   // vertex attribute type
+@@ -360,4 +361,4 @@ export function glTextureFmt(fmt) {
+   }
+ 
+   return result;
+-}
+\ No newline at end of file
++}
+diff --git a/engine/modules.json b/engine/modules.json
+index 4c1da42..71b0b44 100644
+--- a/engine/modules.json
++++ b/engine/modules.json
+@@ -164,7 +164,8 @@
+     "name": "MotionStreak",
+     "entries": [
+       "./cocos2d/core/components/CCMotionStreak.js",
+-      "./cocos2d/core/renderer/webgl/assemblers/motion-streak.js"
++      "./cocos2d/core/renderer/webgl/assemblers/motion-streak.js",
++      "./cocos2d/core/renderer/webgl/assemblers/motion-streak-multi.js"
+     ],
+     "dependencies": ["WebGL Renderer"]
+   },
+-- 
+2.32.0 (Apple Git-132)
+

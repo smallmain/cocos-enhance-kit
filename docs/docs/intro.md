@@ -49,7 +49,7 @@ Service Pack 暂时只适配 Cocos Creator 2.x 版本，Cocos Creator 3.x 正在
 服务包通过自定义引擎的方式来修改引擎代码，你可以：
 
 - 通过我们发布的引擎扩展一键安装
-- 下载源码包，使用里面的 Git Patch 文件进行安装
+- 下载源码包进行手动安装
 
 具体教程可以参考 [安装指南](./installation-guide/installation-intro.mdx)。
 

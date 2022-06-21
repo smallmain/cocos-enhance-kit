@@ -7,7 +7,7 @@ description: "需掌握一定的自定义引擎知识。"
 
 ## Service Pack v1.0.0
 
-适配 Cocos Creator v2.4.9 版本，[点此下载服务包](pathname://TODO)
+适配 Cocos Creator v2.4.9 版本，[点此下载服务包](https://github.com/smallmain/cocos-service-pack/releases/tag/v1.0.0-alpha)
 
 ---
 ## 标准安装

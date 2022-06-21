@@ -1,0 +1,1236 @@
+From 1076ad9f8452a04c250a90701a5603d550742666 Mon Sep 17 00:00:00 2001
+From: SmallMain <smallmain@outlook.com>
+Date: Tue, 21 Jun 2022 11:37:49 +0800
+Subject: [PATCH 06/15] =?UTF-8?q?=E6=96=B0=E7=9A=84=E5=8A=A8=E6=80=81?=
+ =?UTF-8?q?=E5=9B=BE=E9=9B=86=E5=AE=9E=E7=8E=B0?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ engine/cocos2d/core/asset-manager/builtins.js |   2 +-
+ engine/cocos2d/core/assets/CCSpriteFrame.js   |   5 +
+ engine/cocos2d/core/components/CCLabel.js     |   4 +
+ engine/cocos2d/core/components/CCRichText.js  |  30 +-
+ engine/cocos2d/core/components/CCSprite.js    |   4 +
+ engine/cocos2d/core/renderer/assembler.js     |   3 +
+ .../renderer/utils/dynamic-atlas/atlas.js     | 139 +---
+ .../renderer/utils/dynamic-atlas/manager.js   | 172 ++++-
+ .../utils/dynamic-atlas/reusable-atlas.ts     | 593 ++++++++++++++++++
+ .../cocos2d/core/renderer/utils/label/ttf.js  |  28 +
+ 10 files changed, 810 insertions(+), 170 deletions(-)
+ create mode 100644 engine/cocos2d/core/renderer/utils/dynamic-atlas/reusable-atlas.ts
+
+diff --git a/engine/cocos2d/core/asset-manager/builtins.js b/engine/cocos2d/core/asset-manager/builtins.js
+index f794369..ea87ebe 100644
+--- a/engine/cocos2d/core/asset-manager/builtins.js
++++ b/engine/cocos2d/core/asset-manager/builtins.js
+@@ -95,7 +95,7 @@ var builtins = {
+             effect.addRef();
+             cc.sp.inited = true;
+             cc.sp.multiBatcher.init();
+-
++            if (cc.dynamicAtlasManager.maxAtlasCount === -1) cc.dynamicAtlasManager.maxAtlasCount = cc.sp.MAX_MULTITEXTURE_NUM;
+             cb();
+         });
+     },
+diff --git a/engine/cocos2d/core/assets/CCSpriteFrame.js b/engine/cocos2d/core/assets/CCSpriteFrame.js
+index cfb95ae..37837bd 100644
+--- a/engine/cocos2d/core/assets/CCSpriteFrame.js
++++ b/engine/cocos2d/core/assets/CCSpriteFrame.js
+@@ -824,6 +824,11 @@ let SpriteFrame = cc.Class(/** @lends cc.SpriteFrame# */{
+                 handle.result.push(this, '_textureSetter', textureUuid);
+             }
+         }
++    },
++
++    destroy() {
++        cc.dynamicAtlasManager && cc.dynamicAtlasManager.deleteSpriteFrame(this);
++        this._super();
+     }
+ });
+ 
+diff --git a/engine/cocos2d/core/components/CCLabel.js b/engine/cocos2d/core/components/CCLabel.js
+index f2c372f..013968b 100644
+--- a/engine/cocos2d/core/components/CCLabel.js
++++ b/engine/cocos2d/core/components/CCLabel.js
+@@ -583,6 +583,10 @@ let Label = cc.Class({
+             type: RenderComponent.EnableType,
+             default: RenderComponent.EnableType.GLOBAL,
+         },
++        allowDynamicAtlas: {
++            type: RenderComponent.EnableType,
++            default: RenderComponent.EnableType.GLOBAL,
++        },
+     },
+ 
+     statics: {
+diff --git a/engine/cocos2d/core/components/CCRichText.js b/engine/cocos2d/core/components/CCRichText.js
+index ae1183e..160184a 100644
+--- a/engine/cocos2d/core/components/CCRichText.js
++++ b/engine/cocos2d/core/components/CCRichText.js
+@@ -373,7 +373,31 @@ let RichText = cc.Class({
+                     }
+                 }
+             }
+-        }
++        },
++
++        allowDynamicAtlas: {
++            type: RenderComponent.EnableType,
++            default: RenderComponent.EnableType.GLOBAL,
++            notify: function (oldValue) {
++                if (this.allowDynamicAtlas === oldValue) return;
++                for (let i = 0; i < this._labelSegments.length; i++) {
++                    const labelComponent = this._labelSegments[i].getComponent(cc.Label);
++                    if (labelComponent) {
++                        labelComponent.allowDynamicAtlas = this.allowDynamicAtlas;
++                    }
++                    const spriteComponent = this._labelSegments[i].getComponent(cc.Sprite);
++                    if (spriteComponent) {
++                        spriteComponent.allowDynamicAtlas = this.allowDynamicAtlas;
++                    }
++                }
++                for (let i = 0; i < this._labelSegmentsCache.length; i++) {
++                    const labelComponent = this._labelSegmentsCache[i].getComponent(cc.Label);
++                    if (labelComponent) {
++                        labelComponent.allowDynamicAtlas = this.allowDynamicAtlas;
++                    }
++                }
++            }
++        },
+     },
+ 
+     statics: {
+@@ -685,6 +709,8 @@ let RichText = cc.Class({
+             let spriteComponent = spriteNode.addComponent(cc.Sprite);
+ 
+             spriteComponent.autoSwitchMaterial = this.autoSwitchMaterial;
++            spriteComponent.allowDynamicAtlas = this.allowDynamicAtlas;
++
+             switch (richTextElement.style.imageAlign)
+             {
+                 case 'top':
+@@ -978,6 +1004,8 @@ let RichText = cc.Class({
+         labelComponent.cacheMode = this.cacheMode;
+ 
+         labelComponent.autoSwitchMaterial = this.autoSwitchMaterial;
++        labelComponent.allowDynamicAtlas = this.allowDynamicAtlas;
++
+         let isAsset = this.font instanceof cc.Font;
+         if (isAsset && !this._isSystemFontUsed) {
+             labelComponent.font = this.font;
+diff --git a/engine/cocos2d/core/components/CCSprite.js b/engine/cocos2d/core/components/CCSprite.js
+index f0cf757..806a50d 100644
+--- a/engine/cocos2d/core/components/CCSprite.js
++++ b/engine/cocos2d/core/components/CCSprite.js
+@@ -389,6 +389,10 @@ var Sprite = cc.Class({
+             type: RenderComponent.EnableType,
+             default: RenderComponent.EnableType.GLOBAL,
+         },
++        allowDynamicAtlas: {
++            type: RenderComponent.EnableType,
++            default: RenderComponent.EnableType.GLOBAL,
++        },
+     },
+ 
+     statics: {
+diff --git a/engine/cocos2d/core/renderer/assembler.js b/engine/cocos2d/core/renderer/assembler.js
+index a65088b..0174930 100644
+--- a/engine/cocos2d/core/renderer/assembler.js
++++ b/engine/cocos2d/core/renderer/assembler.js
+@@ -27,12 +27,15 @@ export default class Assembler {
+     packDynamicAtlasAndCheckMaterial(comp, frame) {
+         if (CC_TEST) return false;
+ 
++        const allowDynamicAtlas = comp.allowDynamicAtlas;
++        if ((cc.sp.allowDynamicAtlas && allowDynamicAtlas === 0) || allowDynamicAtlas === 1) {
+             if (!frame._original && dynamicAtlasManager && frame._texture.packable) {
+                 let packedFrame = dynamicAtlasManager.insertSpriteFrame(frame);
+                 if (packedFrame) {
+                     frame._setDynamicAtlasFrame(packedFrame);
+                 }
+             }
++        }
+ 
+         const material = comp._materials[0];
+         if (!material) return false;
+diff --git a/engine/cocos2d/core/renderer/utils/dynamic-atlas/atlas.js b/engine/cocos2d/core/renderer/utils/dynamic-atlas/atlas.js
+index e6b990a..e489846 100644
+--- a/engine/cocos2d/core/renderer/utils/dynamic-atlas/atlas.js
++++ b/engine/cocos2d/core/renderer/utils/dynamic-atlas/atlas.js
+@@ -1,140 +1,5 @@
+-const RenderTexture = require('../../../assets/CCRenderTexture');
+-
+-const space = 2;
+-
+-function Atlas (width, height) {
+-    let texture = new RenderTexture();
+-    texture.initWithSize(width, height);
+-    texture.update();
+-    
+-    this._texture = texture;
+-
+-    this._x = space;
+-    this._y = space;
+-    this._nexty = space;
+-
+-    this._width = width;
+-    this._height = height;
+-
+-    this._innerTextureInfos = {};
+-    this._innerSpriteFrames = [];
+-
+-    this._count = 0;
++// 保留备用
++function Atlas(width, height) {
+ }
+ 
+-Atlas.DEFAULT_HASH = (new RenderTexture())._getHash();
+-
+-cc.js.mixin(Atlas.prototype, {
+-    insertSpriteFrame (spriteFrame) {
+-        let rect = spriteFrame._rect,
+-            texture = spriteFrame._texture,
+-            info = this._innerTextureInfos[texture._id];
+-
+-        let sx = rect.x, sy = rect.y;
+-
+-        if (info) {
+-            sx += info.x;
+-            sy += info.y;
+-        }
+-        else {
+-            let width = texture.width, height = texture.height;        
+-
+-            if ((this._x + width + space) > this._width) {
+-                this._x = space;
+-                this._y = this._nexty;
+-            }
+-
+-            if ((this._y + height + space) > this._nexty) {
+-                this._nexty = this._y + height + space;
+-            }
+-
+-            if (this._nexty > this._height) {
+-                return null;
+-            }
+-
+-            // texture bleeding
+-            if (cc.dynamicAtlasManager.textureBleeding) {
+-                // Smaller frame is more likely to be affected by linear filter
+-                if (width <= 8 || height <= 8) {
+-                    this._texture.drawTextureAt(texture, this._x-1, this._y-1);
+-                    this._texture.drawTextureAt(texture, this._x-1, this._y+1);
+-                    this._texture.drawTextureAt(texture, this._x+1, this._y-1);
+-                    this._texture.drawTextureAt(texture, this._x+1, this._y+1);
+-                }
+-
+-                this._texture.drawTextureAt(texture, this._x-1, this._y);
+-                this._texture.drawTextureAt(texture, this._x+1, this._y);
+-                this._texture.drawTextureAt(texture, this._x, this._y-1);
+-                this._texture.drawTextureAt(texture, this._x, this._y+1);
+-            }
+-
+-            this._texture.drawTextureAt(texture, this._x, this._y);
+-
+-            this._innerTextureInfos[texture._id] = {
+-                x: this._x,
+-                y: this._y,
+-                texture: texture
+-            };
+-
+-            this._count++;
+-
+-            sx += this._x;
+-            sy += this._y;
+-
+-            this._x += width + space;
+-
+-            this._dirty = true;
+-        }
+-
+-        let frame = {
+-            x: sx,
+-            y: sy,
+-            texture: this._texture
+-        }
+-        
+-        this._innerSpriteFrames.push(spriteFrame);
+-
+-        return frame;
+-    },
+-
+-    update () {
+-        if (!this._dirty) return;
+-        this._texture.update();
+-        this._dirty = false;
+-    },
+-
+-    deleteInnerTexture (texture) {
+-        if (texture && this._innerTextureInfos[texture._id]) {
+-            delete this._innerTextureInfos[texture._id];
+-            this._count--;
+-        }
+-    },
+-
+-    isEmpty () {
+-        return this._count <= 0;
+-    },
+-    
+-    reset () {
+-        this._x = space;
+-        this._y = space;
+-        this._nexty = space;
+-
+-        let frames = this._innerSpriteFrames;
+-        for (let i = 0, l = frames.length; i < l; i++) {
+-            let frame = frames[i];
+-            if (!frame.isValid) {
+-                continue;
+-            }
+-            frame._resetDynamicAtlasFrame();
+-        }
+-        this._innerSpriteFrames.length = 0;
+-        this._innerTextureInfos = {};
+-    },
+-
+-    destroy () {
+-        this.reset();
+-        this._texture.destroy();
+-    }
+-});
+-
+ module.exports = Atlas;
+diff --git a/engine/cocos2d/core/renderer/utils/dynamic-atlas/manager.js b/engine/cocos2d/core/renderer/utils/dynamic-atlas/manager.js
+index d377566..8cd4b35 100644
+--- a/engine/cocos2d/core/renderer/utils/dynamic-atlas/manager.js
++++ b/engine/cocos2d/core/renderer/utils/dynamic-atlas/manager.js
+@@ -1,12 +1,15 @@
+-const Atlas = require('./atlas');
++// const Atlas = require('./atlas');
++import { Atlas, Rect } from './reusable-atlas';
+ 
+ let _atlases = [];
+ let _atlasIndex = -1;
+ 
+-let _maxAtlasCount = 5;
++let _maxAtlasCount = -1;
+ let _textureSize = 2048;
+ let _maxFrameSize = 512;
+ let _textureBleeding = true;
++let _autoMultiBatch = true;
++let _autoResetBeforeSceneLoad = true;
+ 
+ let _debugNode = null;
+ 
+@@ -15,12 +18,15 @@ function newAtlas () {
+     if (!atlas) {
+         atlas = new Atlas(_textureSize, _textureSize);
+         _atlases.push(atlas);
++        if (dynamicAtlasManager.autoMultiBatch) cc.sp.multiBatcher.requsetMaterial(atlas._texture);
+     }
+     return atlas;
+ }
+ 
+-function beforeSceneLoad () {
+-    dynamicAtlasManager.reset();
++function beforeSceneLoad() {
++    if (_autoResetBeforeSceneLoad) {
++        dynamicAtlasManager.reset();
++    }
+ }
+ 
+ let _enabled = false;
+@@ -32,6 +38,7 @@ let _enabled = false;
+  */
+ let dynamicAtlasManager = {
+     Atlas: Atlas,
++    Rect: Rect,
+ 
+     /**
+      * !#en Enable or disable the dynamic atlas, see [Dynamic Atlas](https://docs.cocos.com/creator/manual/en/advanced-topics/dynamic-atlas.html) for details.
+@@ -39,10 +46,10 @@ let dynamicAtlasManager = {
+      * @property enabled
+      * @type {Boolean}
+      */
+-    get enabled () {
++    get enabled() {
+         return _enabled;
+     },
+-    set enabled (value) {
++    set enabled(value) {
+         if (_enabled === value) return;
+ 
+         if (value) {
+@@ -62,10 +69,10 @@ let dynamicAtlasManager = {
+      * @property maxAtlasCount
+      * @type {Number}
+      */
+-    get maxAtlasCount () {
++    get maxAtlasCount() {
+         return _maxAtlasCount;
+     },
+-    set maxAtlasCount (value) {
++    set maxAtlasCount(value) {
+         _maxAtlasCount = value;
+     },
+ 
+@@ -75,7 +82,7 @@ let dynamicAtlasManager = {
+      * @property atlasCount
+      * @type {Number}
+      */
+-    get atlasCount () {
++    get atlasCount() {
+         return _atlases.length;
+     },
+ 
+@@ -85,11 +92,11 @@ let dynamicAtlasManager = {
+      * @property textureBleeding
+      * @type {Boolean}
+      */
+-    get textureBleeding () {
++    get textureBleeding() {
+         return _textureBleeding;
+     },
+ 
+-    set textureBleeding (enable) {
++    set textureBleeding(enable) {
+         _textureBleeding = enable;
+     },
+ 
+@@ -99,10 +106,10 @@ let dynamicAtlasManager = {
+      * @property textureSize
+      * @type {Number}
+      */
+-    get textureSize () {
++    get textureSize() {
+         return _textureSize;
+     },
+-    set textureSize (value) {
++    set textureSize(value) {
+         _textureSize = value;
+     },
+ 
+@@ -112,13 +119,65 @@ let dynamicAtlasManager = {
+      * @property maxFrameSize
+      * @type {Number}
+      */
+-    get maxFrameSize () {
++    get maxFrameSize() {
+         return _maxFrameSize;
+     },
+-    set maxFrameSize (value) {
++    set maxFrameSize(value) {
+         _maxFrameSize = value;
+     },
+ 
++    /**
++     * !#en Is enable autoMultiBatch.
++     * !#zh 是否开启自动多纹理合批
++     * @property autoMultiBatch
++     * @type {Boolean}
++     */
++    get autoMultiBatch() {
++        return _autoMultiBatch;
++    },
++
++    set autoMultiBatch(enable) {
++        if (_autoMultiBatch === enable) return;
++
++        if (enable) {
++            for (let i = 0, l = _atlases.length; i < l; i++) {
++                cc.sp.multiBatcher.requsetMaterial(_atlases[i]._texture);
++            }
++        }
++
++        _autoMultiBatch = enable;
++    },
++
++    /**
++     * !#en Is enable autoResetBeforeSceneLoad.
++     * !#zh 是否在场景切换时清空所有图集
++     * @property autoResetBeforeSceneLoad
++     * @type {Boolean}
++     */
++    get autoResetBeforeSceneLoad() {
++        return _autoResetBeforeSceneLoad;
++    },
++
++    set autoResetBeforeSceneLoad(enable) {
++        if (_autoResetBeforeSceneLoad === enable) return;
++        _autoResetBeforeSceneLoad = enable;
++    },
++
++    /**
++     * !#en atlases
++     * !#zh 图集数组
++     * @property atlases
++     * @type {Atlas}
++     */
++    get atlases() {
++        return _atlases;
++    },
++
++    /**
++     * 已用空间集合
++     */
++    rects: Object.create(null),
++
+     /**
+      * !#en The minimum size of the picture that can be added to the atlas.
+      * !#zh 可以添加进图集的图片的最小尺寸。
+@@ -133,26 +192,77 @@ let dynamicAtlasManager = {
+      * @method insertSpriteFrame
+      * @param {SpriteFrame} spriteFrame
+      */
+-    insertSpriteFrame (spriteFrame) {
++    insertSpriteFrame(spriteFrame) {
+         if (CC_EDITOR) return null;
+-        if (!_enabled || _atlasIndex === _maxAtlasCount ||
+-            !spriteFrame || spriteFrame._original) return null;
++        if (!_enabled || !spriteFrame || spriteFrame._original) return null;
+ 
+-        if (!spriteFrame._texture.packable) return null;
++        let atlas, frame;
+ 
+-        let atlas = _atlases[_atlasIndex];
+-        if (!atlas) {
+-            atlas = newAtlas();
++        // 是否贴图已经在图集中
++        let rect = spriteFrame._rect,
++            texture = spriteFrame._texture,
++            info = this.rects[texture._uuid];
++
++        let sx = rect.x, sy = rect.y;
++
++        if (info) {
++            sx += info.x;
++            sy += info.y;
++
++            info.spriteFrames.push(spriteFrame);
++
++            frame = {
++                x: sx,
++                y: sy,
++                texture: info.atlas._texture,
++            };
++
++            return frame;
+         }
+ 
+-        let frame = atlas.insertSpriteFrame(spriteFrame);
+-        if (!frame && _atlasIndex !== _maxAtlasCount) {
++        // 尝试加入已有图集
++        for (let i = 0; i <= _atlasIndex; i++) {
++            atlas = _atlases[i];
++            frame = atlas.insertSpriteFrame(spriteFrame);
++            if (frame) {
++                return frame;
++            }
++        }
++
++        // 创建新图集尝试加入
++        if (_atlasIndex + 1 < _maxAtlasCount) {
+             atlas = newAtlas();
+             return atlas.insertSpriteFrame(spriteFrame);
+         }
++
+         return frame;
+     },
+ 
++    /**
++     * !#en Delete a sprite frame from the dynamic atlas.
++     * !#zh 使精灵帧取消使用动态图集
++     * @method deleteSpriteFrame
++     * @param {SpriteFrame} spriteFrame
++     */
++    deleteSpriteFrame(spriteFrame) {
++        if (spriteFrame && !CC_TEST) {
++            if (spriteFrame._original) {
++                this.deleteAtlasSpriteFrame(spriteFrame);
++                spriteFrame._resetDynamicAtlasFrame();
++            }
++        }
++    },
++
++    /**
++     * !#en Delete a texture from the dynamic atlas.
++     * !#zh 从动态图集删除该贴图，使用该贴图的精灵帧会被还原
++     * @method deleteTexture
++     * @param {Texture2D} texture
++     */
++    deleteTexture(texture) {
++        this.deleteAtlasTexture(texture);
++    },
++
+     /**
+      * !#en Resets all dynamic atlas, and the existing ones will be destroyed.
+      * !#zh 重置所有动态图集，已有的动态图集会被销毁。
+@@ -170,18 +280,18 @@ let dynamicAtlasManager = {
+         if (!spriteFrame._original) return;
+ 
+         let texture = spriteFrame._original._texture;
+-        this.deleteAtlasTexture(texture);
++        for (let i = _atlases.length - 1; i >= 0; i--) {
++            if (_atlases[i].deleteSpriteFrame(texture, spriteFrame)) {
++                return;
++            }
++        }
+     },
+ 
+     deleteAtlasTexture (texture) {
+         if (texture) {
+             for (let i = _atlases.length - 1; i >= 0; i--) {
+-                _atlases[i].deleteInnerTexture(texture);
+-
+-                if (_atlases[i].isEmpty()) {
+-                    _atlases[i].destroy();
+-                    _atlases.splice(i, 1);
+-                    _atlasIndex--;
++                if (_atlases[i].deleteInnerTexture(texture, true)) {
++                    return;
+                 }
+             }
+         }
+diff --git a/engine/cocos2d/core/renderer/utils/dynamic-atlas/reusable-atlas.ts b/engine/cocos2d/core/renderer/utils/dynamic-atlas/reusable-atlas.ts
+new file mode 100644
+index 0000000..9ba1adc
+--- /dev/null
++++ b/engine/cocos2d/core/renderer/utils/dynamic-atlas/reusable-atlas.ts
+@@ -0,0 +1,593 @@
++// @ts-expect-error
++const RenderTexture = require('../../../assets/CCRenderTexture');
++
++
++/**
++ * 矩形
++ */
++export class Rect {
++
++    /**
++     * 对象池
++     */
++    static pool: Rect[] = [];
++
++    /**
++     * 对象池指针
++     */
++    static pointer: number = 0;
++
++
++    /**
++     * 复用
++     */
++    static reuse(atlas: Atlas, width: number, height: number, x: number, y: number) {
++        if (this.pointer === 0) {
++            for (let i = 0; i < 128; i++) {
++                Rect.pool[i] = new Rect(atlas, 0, 0, 0, 0);
++            }
++            this.pointer += 128;
++        }
++
++        this.pointer--;
++        const rect = this.pool[this.pointer];
++
++        rect.atlas = atlas;
++        rect.width = width;
++        rect.height = height;
++        rect.x = x;
++        rect.y = y;
++
++        return rect;
++    }
++
++
++    /**
++     * 回收
++     */
++    static recycle(rect: Rect) {
++        rect.atlas = undefined!;
++        rect.uuid = "";
++        rect.spriteFrames.length = 0;
++        rect.parentRect = undefined;
++        rect.subRectA = undefined;
++        rect.subRectB = undefined;
++        rect.subRectC = undefined;
++
++        rect.cacheIndex = -1;
++
++        this.pool[this.pointer] = rect;
++        this.pointer++;
++    }
++
++
++    /**
++     * 所属 Atlas
++     */
++    atlas: Atlas;
++
++    /**
++     * 宽度
++     */
++    width: number = 0;
++
++    /**
++     * 高度
++     */
++    height: number = 0;
++
++    /**
++     * 横坐标
++     */
++    x: number = 0;
++
++    /**
++     * 纵坐标
++     */
++    y: number = 0;
++
++    /**
++     * 在 freeRects 中的下标
++     */
++    cacheIndex: number = -1;
++
++    /**
++     * cc.Texture2D UUID
++     */
++    uuid: string = '';
++
++    /**
++     * 使用该贴图的精灵帧数组
++     */
++    spriteFrames: any[] = [];
++
++    /**
++     * 父矩形
++     */
++    parentRect: Rect | undefined;
++
++    /**
++     * 子矩形之一
++     */
++    subRectA: Rect | undefined;
++
++    /**
++     * 子矩形之一
++     */
++    subRectB: Rect | undefined;
++
++    /**
++     * 子矩形之一
++     */
++    subRectC: Rect | undefined;
++
++    /**
++     * 子矩形或自身计数
++     */
++    used: number = 0;
++
++    /**
++     * 像素数
++     */
++    get sizes() {
++        return this.width * this.height;
++    }
++
++
++    constructor(atlas: Atlas, width: number, height: number, x: number, y: number) {
++        this.atlas = atlas;
++        this.width = width;
++        this.height = height;
++        this.x = x;
++        this.y = y;
++    }
++
++}
++
++
++/**
++ * 动态图集
++ *
++ * 装箱算法：类似断头台装箱算法
++ * 合并算法：树形回退模式
++ */
++export class Atlas {
++
++    /**
++     * 当自由空间的某边长度不足该值则直接忽略该空间
++     */
++    static ignoreRectSize: number = 10;
++
++    /**
++     * 默认 Atlas
++     */
++    static DEFAULT_HASH = (new RenderTexture())._getHash();
++
++    /**
++     * 宽度
++     */
++    width: number = 0;
++
++    /**
++     * 高度
++     */
++    height: number = 0;
++
++    /**
++     * 间距
++     */
++    padding: number = 0;
++
++    /**
++     * 边距
++     */
++    border: number = 0;
++
++    /**
++     * 根矩形
++     */
++    rootRect: Rect;
++
++    /**
++     * 自由空间
++     */
++    freeRects: Rect[] = [];
++
++    /**
++     * 已使用数量
++     */
++    _count = 0;
++
++    /**
++     * cc.RenderTexture
++     */
++    _texture: any;
++
++    /**
++     * texture update dirty
++     */
++    _dirty: boolean = false;
++
++
++    constructor(width: number, height: number, padding: number = 2, border: number = 2) {
++        const texture = new RenderTexture();
++        texture.initWithSize(width, height);
++        texture.update();
++        this._texture = texture;
++
++        this.width = width;
++        this.height = height;
++        this.padding = padding;
++        this.border = border;
++
++        this.rootRect = Rect.reuse(
++            this,
++            this.width + this.padding - this.border * 2,
++            this.height + this.padding - this.border * 2,
++            this.border,
++            this.border,
++        );
++        this.pushFreeRect(this.rootRect);
++    }
++
++
++    /**
++     * push to free rects
++     */
++    protected pushFreeRect(rect: Rect) {
++        const i = this.freeRects.push(rect) - 1;
++        rect.cacheIndex = i;
++    }
++
++
++    /**
++     * faster remove from free rects
++     */
++    protected removeFreeRect(index: number) {
++        const temp = this.freeRects[index];
++        const temp2 = this.freeRects[this.freeRects.length - 1];
++        temp2.cacheIndex = index;
++        temp.cacheIndex = -1;
++        this.freeRects[index] = temp2;
++        this.freeRects.pop();
++    }
++
++
++    /**
++     * change member from free rects
++     */
++    protected replaceFreeRect(index: number, rect: Rect) {
++        this.freeRects[index].cacheIndex = -1;
++        rect.cacheIndex = index;
++        this.freeRects[index] = rect;
++    }
++
++
++    /**
++     * 插入 SpriteFrame
++     */
++    insertSpriteFrame(spriteFrame: any) {
++        let rect = spriteFrame._rect,
++            texture = spriteFrame._texture;
++
++        let sx = rect.x, sy = rect.y;
++        let width = texture.width, height = texture.height;
++
++        const result = this.insert(texture);
++
++        if (!result) {
++            return null;
++        }
++
++        // texture bleeding
++        if (cc.dynamicAtlasManager.textureBleeding) {
++            // Smaller frame is more likely to be affected by linear filter
++            if (width <= 8 || height <= 8) {
++                this._texture.drawTextureAt(texture, result.x - 1, result.y - 1);
++                this._texture.drawTextureAt(texture, result.x - 1, result.y + 1);
++                this._texture.drawTextureAt(texture, result.x + 1, result.y - 1);
++                this._texture.drawTextureAt(texture, result.x + 1, result.y + 1);
++            }
++
++            this._texture.drawTextureAt(texture, result.x - 1, result.y);
++            this._texture.drawTextureAt(texture, result.x + 1, result.y);
++            this._texture.drawTextureAt(texture, result.x, result.y - 1);
++            this._texture.drawTextureAt(texture, result.x, result.y + 1);
++        }
++
++        this._texture.drawTextureAt(texture, result.x, result.y);
++
++        this._count++;
++
++        sx += result.x;
++        sy += result.y;
++
++        result.spriteFrames.push(spriteFrame);
++
++        this._dirty = true;
++
++        let frame = {
++            x: sx,
++            y: sy,
++            texture: this._texture,
++        };
++
++        return frame;
++    }
++
++
++    /**
++     * 插入子函数
++     */
++    insert(texture: any) {
++        const width = texture.width + this.padding, height = texture.height + this.padding;
++        let score = Number.MAX_VALUE;
++        let areaFit = 0;
++        let original: Rect | undefined = undefined;
++        let originalIndex = 0;
++
++        // 查找足够容纳的空区域
++        for (let i = 0; i < this.freeRects.length; i++) {
++            const rect = this.freeRects[i];
++            if (rect.width >= width && rect.height >= height) {
++                areaFit = rect.sizes - width * height;
++                if (areaFit < score) {
++                    original = rect;
++                    originalIndex = i;
++                    score = areaFit;
++                }
++            }
++        }
++
++        // 切割空区域
++        if (original) {
++            if (original.width === width && original.height === height) {
++                original.uuid = texture._uuid;
++                original.used++;
++                if (original.parentRect) original.parentRect.used++;
++                cc.dynamicAtlasManager.rects[texture._uuid] = original;
++                this.removeFreeRect(originalIndex);
++                return original;
++            }
++
++            const best = Rect.reuse(this, width, height, original.x, original.y);
++            let tmp: Rect;
++            if (best.y + best.height < original.y + original.height) {
++                tmp = Rect.reuse(
++                    this,
++                    original.width,
++                    original.y + original.height - (best.y + best.height),
++                    original.x,
++                    best.y + best.height,
++                );
++
++                tmp.parentRect = original;
++                original.subRectB = tmp;
++
++                if (tmp.width > Atlas.ignoreRectSize && tmp.height > Atlas.ignoreRectSize) {
++                    // 替换旧区域
++                    this.replaceFreeRect(originalIndex, tmp);
++                    originalIndex = -1;
++                }
++            }
++
++            if (best.x + best.width < original.x + original.width) {
++                tmp = Rect.reuse(
++                    this,
++                    original.x + original.width - (best.x + best.width),
++                    original.height - (original.y + original.height - (best.y + best.height)),
++                    best.x + best.width,
++                    original.y,
++                );
++
++                tmp.parentRect = original;
++                original.subRectC = tmp;
++
++                if (tmp.width > Atlas.ignoreRectSize && tmp.height > Atlas.ignoreRectSize) {
++                    if (originalIndex !== -1) {
++                        // 替换旧区域
++                        this.replaceFreeRect(originalIndex, tmp);
++                        originalIndex = -1;
++                    } else {
++                        this.pushFreeRect(tmp);
++                    }
++                }
++            }
++
++            if (originalIndex !== -1) {
++                this.removeFreeRect(originalIndex);
++            }
++
++            best.parentRect = original;
++            original.subRectA = best;
++            best.used++;
++            original.used++;
++            if (original.used === 1 && original.parentRect) original.parentRect.used++;
++            best.uuid = texture._uuid;
++            cc.dynamicAtlasManager.rects[texture._uuid] = best;
++            return best;
++        } else {
++            return undefined;
++        }
++    }
++
++
++    /**
++     * update texture
++     */
++    update() {
++        if (!this._dirty) return;
++        this._texture.update();
++        this._dirty = false;
++    }
++
++
++    /**
++     * 删除精灵帧
++     */
++    deleteSpriteFrame(texture: any, frame: any) {
++        if (texture) {
++            const rect: Rect | undefined = cc.dynamicAtlasManager.rects[texture._uuid];
++            if (rect) {
++                const index = rect.spriteFrames.indexOf(frame);
++                if (index !== -1) {
++                    rect.spriteFrames.splice(index, 1);
++
++                    // 判断如果没有引用则删除 Texture
++                    if (rect.spriteFrames.length === 0) {
++                        rect.atlas.deleteInnerRect(rect);
++                    }
++                } else {
++                    cc.warn('[Dynamic Atlas] can\'t find spriteFrame in Rect.');
++                }
++
++                return true;
++            }
++        }
++
++        return false;
++    }
++
++
++    /**
++     * 删除子矩形
++     */
++    deleteInnerRect(rect: Rect) {
++        delete cc.dynamicAtlasManager.rects[rect.uuid];
++        rect.uuid = "";
++        this._count--;
++
++        // 还原 SpriteFrame
++        for (const spriteFrame of rect.spriteFrames) {
++            if (spriteFrame.isValid) {
++                spriteFrame._resetDynamicAtlasFrame();
++            }
++        }
++        rect.spriteFrames.length = 0;
++
++        this.tryMergeRecycle(rect);
++    }
++
++
++    /**
++     * 删除贴图
++     */
++    deleteInnerTexture(texture: any) {
++        if (texture) {
++            const rect: Rect | undefined = cc.dynamicAtlasManager.rects[texture._uuid];
++            if (rect) {
++                rect.atlas.deleteInnerRect(rect);
++                return true;
++            }
++        }
++        return false;
++    }
++
++
++    /**
++     * 尝试合并和回收
++     */
++    protected tryMergeRecycle(rect: Rect) {
++        let old: Rect | undefined = undefined;
++        let parent: Rect | undefined = rect;
++        while (parent) {
++            parent.used--;
++            if (parent.used === 0) {
++                // 回收所有子矩形
++                if (parent.subRectA) {
++                    // 可能是 ignoreRect
++                    const i = parent.subRectA.cacheIndex;
++                    if (i !== -1) {
++                        this.removeFreeRect(i);
++                    }
++                    Rect.recycle(parent.subRectA);
++                    parent.subRectA = undefined;
++                }
++                if (parent.subRectB) {
++                    const i = parent.subRectB.cacheIndex;
++                    if (i !== -1) {
++                        this.removeFreeRect(i);
++                    }
++                    Rect.recycle(parent.subRectB);
++                    parent.subRectB = undefined;
++                }
++                if (parent.subRectC) {
++                    const i = parent.subRectC.cacheIndex;
++                    if (i !== -1) {
++                        this.removeFreeRect(i);
++                    }
++                    Rect.recycle(parent.subRectC);
++                    parent.subRectC = undefined;
++                }
++                old = parent;
++                parent = parent.parentRect;
++            } else {
++                if (old) {
++                    if (old.width > Atlas.ignoreRectSize && old.height > Atlas.ignoreRectSize) {
++                        this.pushFreeRect(old);
++                    }
++                }
++                old = parent;
++                parent = undefined;
++            }
++        }
++
++        if (old === this.rootRect && old.used === 0) {
++            this.pushFreeRect(old);
++        }
++    }
++
++
++    /**
++     * 是否未使用
++     */
++    isEmpty() {
++        return this._count <= 0;
++    }
++
++
++    /**
++     * 清空
++     */
++    reset() {
++        const rects = cc.dynamicAtlasManager.rects;
++        for (const key in rects) {
++            const rect: Rect = rects[key];
++            if (rect.atlas === this) {
++                delete rects[key];
++                for (const spriteFrame of rect.spriteFrames) {
++                    if (spriteFrame.isValid) {
++                        spriteFrame._resetDynamicAtlasFrame();
++                    }
++                }
++                Rect.recycle(rect);
++            }
++        }
++
++        for (const rect of this.freeRects) {
++            Rect.recycle(rect);
++        }
++
++        this.freeRects.length = 0;
++        this._count = 0;
++
++        this.rootRect = Rect.reuse(
++            this,
++            this.width + this.padding - this.border * 2,
++            this.height + this.padding - this.border * 2,
++            this.border,
++            this.border,
++        );
++        this.pushFreeRect(this.rootRect)
++    }
++
++
++    /**
++     * 销毁
++     */
++    destroy() {
++        this.reset();
++        this._texture.destroy();
++    }
++
++}
+diff --git a/engine/cocos2d/core/renderer/utils/label/ttf.js b/engine/cocos2d/core/renderer/utils/label/ttf.js
+index 9d85e3f..49d90fa 100644
+--- a/engine/cocos2d/core/renderer/utils/label/ttf.js
++++ b/engine/cocos2d/core/renderer/utils/label/ttf.js
+@@ -353,6 +353,34 @@ export default class TTFAssembler extends Assembler2D {
+         return this.packDynamicAtlasAndCheckMaterial(comp, frame);
+     }
+ 
++    packDynamicAtlasAndCheckMaterial(comp, frame) {
++        const allowDynamicAtlas = comp.allowDynamicAtlas;
++        if ((cc.sp.allowDynamicAtlas && allowDynamicAtlas === 0) || allowDynamicAtlas === 1) {
++            frame._texture._uuid = _fontDesc
++                + _overflow
++                + (_premultiply ? 'P' : 'NP')
++                + (_enableUnderline ? 'UL' : 'NUL')
++                + _string;
++
++            if (_outlineComp) {
++                frame._texture._uuid += _outlineComp.color.toHEX()
++                    + ','
++                    + _outlineComp.width
++                    + ',';
++            }
++
++            if (_shadowComp) {
++                frame._texture._uuid += _shadowComp.color.toHEX()
++                    + _shadowComp.offset.x
++                    + ','
++                    + _shadowComp.offset.y
++                    + ','
++                    + _shadowComp.blur;
++            }
++        }
++        return super.packDynamicAtlasAndCheckMaterial(comp, frame);
++    }
++
+     _updateLabelDimensions () {
+         _canvasSize.width = Math.min(_canvasSize.width, MAX_SIZE);
+         _canvasSize.height = Math.min(_canvasSize.height, MAX_SIZE);
+-- 
+2.32.0 (Apple Git-132)
+

@@ -1,0 +1,111 @@
+From 5adb675810523f2c136f1e157bbdaf28d8bd3dfc Mon Sep 17 00:00:00 2001
+From: SmallMain <smallmain@outlook.com>
+Date: Tue, 21 Jun 2022 10:17:09 +0800
+Subject: [PATCH 03/15] =?UTF-8?q?=E4=BF=AE=E5=A4=8D=20Effect=20=E4=BF=AE?=
+ =?UTF-8?q?=E6=94=B9=E5=90=8E=EF=BC=8C=E5=85=B6=E5=8F=98=E4=BD=93=20hash?=
+ =?UTF-8?q?=20=E5=80=BC=E4=B8=8D=E4=BC=9A=E5=88=B7=E6=96=B0=E7=9A=84?=
+ =?UTF-8?q?=E9=97=AE=E9=A2=98?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ engine/cocos2d/core/assets/material/effect-base.ts    | 7 +++++++
+ engine/cocos2d/core/assets/material/effect-variant.ts | 8 +++++---
+ 2 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/engine/cocos2d/core/assets/material/effect-base.ts b/engine/cocos2d/core/assets/material/effect-base.ts
+index 578f27d..69c98fa 100644
+--- a/engine/cocos2d/core/assets/material/effect-base.ts
++++ b/engine/cocos2d/core/assets/material/effect-base.ts
+@@ -4,6 +4,7 @@ const gfx = cc.gfx;
+ 
+ export default class EffectBase {
+     _dirty = true;
++    _dirtyCode = 0;
+ 
+     _name = '';
+     get name () {
+@@ -54,6 +55,7 @@ export default class EffectBase {
+         }
+ 
+         this._dirty = true;
++        this._dirtyCode++;
+         return Pass.prototype.setProperty.call(pass, name, value, directly);
+     }
+ 
+@@ -132,6 +134,7 @@ export default class EffectBase {
+             passes[i].setCullMode(cullMode);
+         }
+         this._dirty = true;
++        this._dirtyCode++;
+     }
+ 
+     setDepth (depthTest, depthWrite, depthFunc, passIdx) {
+@@ -144,6 +147,7 @@ export default class EffectBase {
+             passes[i].setDepth(depthTest, depthWrite, depthFunc);
+         }
+         this._dirty = true;
++        this._dirtyCode++;
+     }
+ 
+     setBlend (enabled, blendEq, blendSrc, blendDst, blendAlphaEq, blendSrcAlpha, blendDstAlpha, blendColor, passIdx) {
+@@ -162,6 +166,7 @@ export default class EffectBase {
+             );
+         }
+         this._dirty = true;
++        this._dirtyCode++;
+     }
+ 
+     setStencilEnabled (stencilTest = gfx.STENCIL_INHERIT, passIdx) {
+@@ -174,6 +179,7 @@ export default class EffectBase {
+             passes[i].setStencilEnabled(stencilTest);
+         }
+         this._dirty = true;
++        this._dirtyCode++;
+     }
+ 
+     setStencil (enabled, stencilFunc, stencilRef, stencilMask, stencilFailOp, stencilZFailOp, stencilZPassOp, stencilWriteMask, passIdx) {
+@@ -188,6 +194,7 @@ export default class EffectBase {
+             pass.setStencilBack(enabled, stencilFunc, stencilRef, stencilMask, stencilFailOp, stencilZFailOp, stencilZPassOp, stencilWriteMask);
+         }
+         this._dirty = true;
++        this._dirtyCode++;
+     }
+ }
+ 
+diff --git a/engine/cocos2d/core/assets/material/effect-variant.ts b/engine/cocos2d/core/assets/material/effect-variant.ts
+index 5623ed1..1b4b134 100644
+--- a/engine/cocos2d/core/assets/material/effect-variant.ts
++++ b/engine/cocos2d/core/assets/material/effect-variant.ts
+@@ -11,6 +11,7 @@ export default class EffectVariant extends EffectBase {
+     _passes: Pass[] = [];
+     _stagePasses = {};
+     _hash = 0;
++    _effectDirtyCode = 0;
+ 
+     get effect () {
+         return this._effect;
+@@ -66,15 +67,16 @@ export default class EffectVariant extends EffectBase {
+ 
+     }
+ 
+-    getHash () {
+-        if (!this._dirty) return this._hash;
++    getHash() {
++        let effect = this._effect;
++        if (!this._dirty && (!effect || this._effectDirtyCode === effect._dirtyCode)) return this._hash;
+         this._dirty = false;
+ 
+         let hash = '';
+         hash += utils.serializePasses(this._passes);
+ 
+-        let effect = this._effect;
+         if (effect) {
++            this._effectDirtyCode = effect._dirtyCode;
+             hash += utils.serializePasses(effect.passes);
+         }
+ 
+-- 
+2.32.0 (Apple Git-132)
+
