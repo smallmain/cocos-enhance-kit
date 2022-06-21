@@ -1104,7 +1104,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 32,
+      "width": 64,
       "height": 40
     },
     "_anchorPoint": {
@@ -1154,8 +1154,8 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_string": "首页",
-    "_N$string": "首页",
+    "_string": "压力测试",
+    "_N$string": "压力测试",
     "_fontSize": 16,
     "_lineHeight": 40,
     "_enableWrapText": true,

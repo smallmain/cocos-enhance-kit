@@ -31,8 +31,8 @@ export default class SpineSkin extends cc.Component {
         this.addBoyBtn.on('click', () => {
             const newBoy = cc.instantiate(this.boy);
             const newBoySpine = newBoy.getComponentInChildren(sp.Skeleton);
-            boySpine.skeletonData = newBoySpine.skeletonData.clone();
-            boySpine.animation = 'attack';
+            newBoySpine.skeletonData = boySpine.skeletonData.clone();
+            newBoySpine.animation = 'attack';
 
             this.boy.parent.addChild(newBoy);
             newBoy.setPosition(this.boys[this.boys.length - 1].position);
