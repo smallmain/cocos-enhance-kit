@@ -1,0 +1,39 @@
+From fcca26d142f2ccab5330dc079fad45aa3f92fec9 Mon Sep 17 00:00:00 2001
+From: SmallMain <smallmain@outlook.com>
+Date: Wed, 22 Jun 2022 00:54:12 +0800
+Subject: [PATCH 16/16] =?UTF-8?q?=E4=BF=AE=E5=A4=8D=20Spine=20=E6=B2=A1?=
+ =?UTF-8?q?=E6=9C=89=20assembler=20=E6=97=B6=E6=8A=A5=E9=94=99=E7=9A=84?=
+ =?UTF-8?q?=E9=97=AE=E9=A2=98?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ engine/extensions/spine/Skeleton.js | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/engine/extensions/spine/Skeleton.js b/engine/extensions/spine/Skeleton.js
+index b1eda9c..49a7605 100644
+--- a/engine/extensions/spine/Skeleton.js
++++ b/engine/extensions/spine/Skeleton.js
+@@ -702,7 +702,7 @@ sp.Skeleton = cc.Class({
+ 
+         if (this.isAnimationCached()) {
+ 
+-            this._assembler.handleDynamicAtlasAndSwitchMaterial(this);
++            if (this._assembler) this._assembler.handleDynamicAtlasAndSwitchMaterial(this);
+ 
+             // Cache mode and has animation queue.
+             if (this._isAniComplete) {
+@@ -1088,7 +1088,7 @@ sp.Skeleton = cc.Class({
+                 if (this.attachUtil._hasAttachedNode()) {
+                     this._frameCache.enableCacheAttachedInfo();
+                 }
+-                this._assembler.handleDynamicAtlasAndSwitchMaterial(this);
++                if (this._assembler) this._assembler.handleDynamicAtlasAndSwitchMaterial(this);
+                 this._frameCache.updateToFrame(0);
+                 this._curFrame = this._frameCache.frames[0];
+             }
+-- 
+2.32.0 (Apple Git-132)
+
