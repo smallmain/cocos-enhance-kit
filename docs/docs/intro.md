@@ -40,9 +40,9 @@ Service Pack 暂时只适配 Cocos Creator 2.x 版本，Cocos Creator 3.x 正在
 
 ## 功能演示
 
-[Web Desktop 演示项目](https://smallmain.github.io/cocos-service-pack/demo/web-desktop/index.html)
+[Web Desktop 演示项目](https://smallmain.github.io/cocos-service-pack/demo/v1.0.0-alpha/web-desktop/index.html)
 
-[Web Mobile 演示项目](https://smallmain.github.io/cocos-service-pack/demo/web-mobile/index.html)
+[Web Mobile 演示项目](https://smallmain.github.io/cocos-service-pack/demo/v1.0.0-alpha/web-mobile/index.html)
 
 ## 使用方法
 

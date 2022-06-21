@@ -49,7 +49,7 @@ function HomepageHeader() {
               </Link>
               <Link
                 className="button button--outline button--primary button--lg"
-                href='https://smallmain.github.io/cocos-service-pack/demo/web-desktop/index.html'
+                href='https://smallmain.github.io/cocos-service-pack/demo/v1.0.0-alpha/web-desktop/index.html'
                 style={{ marginRight: 20 }}
               >
                 查看演示

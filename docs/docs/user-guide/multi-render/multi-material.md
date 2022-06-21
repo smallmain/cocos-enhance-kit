@@ -55,7 +55,7 @@ Spine 组件使用多纹理材质时会强制勾选 `enableBatch`，因为不开
 
 除了直接在内置着色器的基础上修改之外，任何着色器中如果存在一个宏 `USE_MULTI_TEXTURE = true`，则会被认为是多纹理材质。
 
-[演示项目](https://smallmain.github.io/cocos-service-pack/demo/web-desktop/index.html) 中有自定义材质的示范代码。
+[演示项目](https://smallmain.github.io/cocos-service-pack/demo/v1.0.0-alpha/web-desktop/index.html) 中有自定义材质的示范代码。
 
 :::tip 提示
 
