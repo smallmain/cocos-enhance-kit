@@ -73,6 +73,7 @@ export default class LeftArea extends cc.Component {
         ]);
 
         this.initBtns();
+        this.switchPage(this.map.get(this.home));
     }
 
 
@@ -80,22 +81,29 @@ export default class LeftArea extends cc.Component {
         for (const [node, route] of this.map) {
             node.on('toggle', (toggle: cc.Toggle) => {
                 if (toggle.isChecked) {
-                    const cur = ++this.tick;
+                    this.switchPage(route);
+                }
+            });
+        }
+    }
 
-                    this.mainArea.destroyAllChildren();
 
-                    if (route) {
-                        cc.assetManager.loadBundle(route.bundle, (err, bundle) => {
-                            if (!err) {
-                                bundle.load(route.path, cc.Prefab, (err, prefab: cc.Prefab) => {
-                                    if (!err && cur === this.tick) {
-                                        this.mainArea.addChild(cc.instantiate(prefab));
-                                    }
-                                });
+    switchPage(route: { bundle: string, path: string }) {
+        const cur = ++this.tick;
+
+        this.mainArea.destroyAllChildren();
+
+        if (route) {
+            cc.assetManager.loadBundle('common', () => {
+                cc.assetManager.loadBundle(route.bundle, (err, bundle) => {
+                    if (!err) {
+                        bundle.load(route.path, cc.Prefab, (err, prefab: cc.Prefab) => {
+                            if (!err && cur === this.tick) {
+                                this.mainArea.addChild(cc.instantiate(prefab));
                             }
                         });
                     }
-                }
+                });
             });
         }
     }

@@ -1,0 +1,98 @@
+{
+    "paths": {
+        "76ZjeTsCNJMYn7/rwRXCpD": [
+            "batch/spine-batch",
+            "cc.Prefab"
+        ],
+        "03EprhmOVCZKUbb5XyPXQq": [
+            "skin/spine-skin",
+            "cc.Prefab"
+        ]
+    },
+    "uuids": [
+        "76ZjeTsCNJMYn7/rwRXCpD",
+        "03EprhmOVCZKUbb5XyPXQq",
+        "ecpdLyjvZBwrvm+cedCcQy",
+        "a7ZscqX+JCIZRS157bMyhq",
+        "7a/QZLET9IDreTiBfRn2PD",
+        "93dM6KrkZCf5dgNpQwf7T6",
+        "85yTK+9shIo7RQfQ1TDEUi",
+        "09o3P/9gBP/Yc7AnxUBZ+Q",
+        "5cO7kybDxGj4ipyMYdRYZB",
+        "5f5dyqtRNNxaFmVzYns6FZ",
+        "a2MjXRFdtLlYQ5ouAFv/+R",
+        "f0BIwQ8D5Ml7nTNQbh1YlS",
+        "e97GVMl6JHh5Ml5qEDdSGa",
+        "29FYIk+N1GYaeWH/q1NxQO",
+        "70VXjGE0JMUqGli0jmCmTF",
+        "87/8ZHBEVIkKeNxmalrn9r",
+        "d0Bu8c2MBCKJc+mKBWzjsJ",
+        "e8Ueib+qJEhL6mXAHdnwbi",
+        "71VhFCTINJM6/Ky3oX9nBT",
+        "b4P/PCArtIdIH38t6mlw8Y"
+    ],
+    "scenes": {},
+    "redirect": [
+        "ecpdLyjvZBwrvm+cedCcQy",
+        0,
+        "a7ZscqX+JCIZRS157bMyhq",
+        1,
+        "7a/QZLET9IDreTiBfRn2PD",
+        0,
+        "93dM6KrkZCf5dgNpQwf7T6",
+        1,
+        "85yTK+9shIo7RQfQ1TDEUi",
+        1,
+        "09o3P/9gBP/Yc7AnxUBZ+Q",
+        1,
+        "5cO7kybDxGj4ipyMYdRYZB",
+        2,
+        "5f5dyqtRNNxaFmVzYns6FZ",
+        2,
+        "a2MjXRFdtLlYQ5ouAFv/+R",
+        2,
+        "70VXjGE0JMUqGli0jmCmTF",
+        1,
+        "87/8ZHBEVIkKeNxmalrn9r",
+        1,
+        "d0Bu8c2MBCKJc+mKBWzjsJ",
+        1
+    ],
+    "deps": [
+        "internal",
+        "common",
+        "main"
+    ],
+    "packs": {
+        "05fa2ad10": [
+            "03EprhmOVCZKUbb5XyPXQq",
+            "29FYIk+N1GYaeWH/q1NxQO",
+            "71VhFCTINJM6/Ky3oX9nBT",
+            "76ZjeTsCNJMYn7/rwRXCpD",
+            "b4P/PCArtIdIH38t6mlw8Y",
+            "e8Ueib+qJEhL6mXAHdnwbi",
+            "e97GVMl6JHh5Ml5qEDdSGa",
+            "f0BIwQ8D5Ml7nTNQbh1YlS"
+        ]
+    },
+    "name": "spine",
+    "importBase": "import",
+    "nativeBase": "native",
+    "debug": true,
+    "isZip": false,
+    "encrypted": false,
+    "versions": {
+        "import": [
+            "05fa2ad10",
+            "ef553"
+        ],
+        "native": [
+            "71VhFCTINJM6/Ky3oX9nBT",
+            "c06a9",
+            "b4P/PCArtIdIH38t6mlw8Y",
+            "83fcc",
+            "e8Ueib+qJEhL6mXAHdnwbi",
+            "90cf4"
+        ]
+    }
+}

@@ -29,7 +29,6 @@
 }
 
 .navbar__link {
-  color: var(--ifm-navbar-link-color);
   font-weight: var(--ifm-font-weight-normal);
 }
 

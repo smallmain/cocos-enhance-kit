@@ -37,6 +37,9 @@ export default class Home extends cc.Component {
             this.multiRenderUpdate();
         });
 
+        this.objectNumSlider.progress = 0.02;
+        const offset = (this.nums[1] - this.nums[0]) * this.objectNumSlider.progress;
+        this.num = this.nums[0] + Math.ceil(offset);
         this.numUpdate();
         this.multiRenderUpdate();
     }
@@ -86,7 +89,7 @@ export default class Home extends cc.Component {
         this.objects.addChild(node);
 
         node.position = cc.v3(Math.floor(Math.random() * this.objects.width), Math.floor(Math.random() * this.objects.height));
-        cc.tween(node).by(1, { angle: 360 }).repeatForever().start();
+        cc.tween(node).by(3, { angle: 360 }).repeatForever().start();
     }
 
 }
