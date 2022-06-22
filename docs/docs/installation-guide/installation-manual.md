@@ -12,10 +12,7 @@ description: "需掌握一定的自定义引擎知识。"
 ---
 ## 标准安装
 
-请确保您的项目符合以下条件，否则请使用 [补丁安装](#补丁安装)。：
-
-- **项目所使用的引擎版本与服务包适配的引擎版本一致**
-- **项目未使用自定义引擎**
+**请确保您的项目所使用的引擎版本与服务包适配的引擎版本一致，否则请使用 [补丁安装](#补丁安装)。**
 
 :::tip 提示
 
@@ -29,12 +26,11 @@ description: "需掌握一定的自定义引擎知识。"
 
 下载服务包后，解压压缩包可以看到压缩包内的 `engine` `cocos2d-x` `jsb-adapter` 这三个目录分别是已经整理好的 **JavaScript 引擎**、**Cocos2d-x 引擎** 和 **jsb-adpater**。
 
-打开 Cocos Creator 菜单的 **项目 - 项目设置 - 自定义引擎**。
+接着打开 Cocos Creator 菜单的 **项目 - 项目设置 - 自定义引擎**。
 
 分别填写 **JavaScript 引擎路径**（对应 `engine` 目录）和 **Cocos2d-x 引擎路径**（对应 `cocos2d-x` 目录）。
 
 ![custom-engine](./assets/custom-engine.png)
-
 
 然后点击 Cocos Creator 主界面右上角的 **编辑器** 按钮，进入到编辑器的资源目录。
 
@@ -46,7 +42,7 @@ description: "需掌握一定的自定义引擎知识。"
 
 如果你的项目不需要在原生平台上运行，则只定制 JavaScript 引擎即可。
 
-如果你的项目需要在原生模拟器中预览，可能需要重新编译模拟器，更多详情可阅读官方的 [自定义引擎](https://docs.cocos.com/creator/2.4/manual/zh/advanced-topics/engine-customization.html) 文档。
+如果你的项目需要在原生模拟器中预览，可能需要编译模拟器，更多详情可阅读官方的 [自定义引擎](https://docs.cocos.com/creator/2.4/manual/zh/advanced-topics/engine-customization.html) 文档。
 
 :::
 

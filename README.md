@@ -2,27 +2,23 @@
 
 ![logo](/docs/static/img/logo2.png)
 
-> 该项目当前为内部预览版，还在完善中，还未适配原生平台（cocos2d-x、jsb-adapter）
+> 该项目当前为内部预览版，只提供未适配原生平台（cocos2d-x、jsb-adapter）的 Cocos Creator v2.4.5 版本
 
-这是一个对 Cocos Creator 引擎进行特性增强、修复与优化的**开源非官方服务包（Service Pack）**。
+这是一个提供 Cocos Creator 引擎特性增强、修复与优化的**开源非官方服务包**。
 
-该项目尽量以最符合原始架构设计的方式为引擎加入新的特性、修复已知问题以及优化性能。
+该项目使用自定义引擎的方式在符合原始引擎架构设计的基础上为 Cocos Creator 引擎加入新的特性、修复已知问题以及性能优化。
 
-正因为如此，大部分项目使用这个服务包就像升级引擎版本一样简单。
+正因为如此，服务包中的大部分特性能像升级引擎版本一样无需改动项目代码即可生效。
 
 <br>
 
 > 项目的起源
 > 
->2021 年 2 月，Cocos 发布 Cocos Creator 3.0，并在 3.x 发布之后不会再继续开发 2.x 版本的新特性，所有维护工作也会在 2023 年完全停止。
+>2021 年 2 月，Cocos 发布 Cocos Creator 3.0，之后不会再开发 2.x 版本的新特性，但 2.x 在一些方面还并不完善，所以这个非官方的引擎“魔改”合集应运而生。
 >
->但是 2.x 在一些方面还并不完善，所以这个非官方的引擎“魔改”合集的开源项目应运而生。
+>给项目取名的时候想到相似的事情发生在 2014 年 4 月，官方停止了对 Windows XP 的维护，之后 Harkaz 发布了一个非官方服务包 Service Pack 4 (SP4)。
 >
->相似的事情发生在 2014 年 4 月，官方停止了对 Windows XP 的维护，之后 Harkaz 发布了一个非官方服务包 Service Pack 4 (SP4)。
->
->受到 Windows XP 命名的启发，这个非官方的引擎“魔改”合集取名为 Service Pack。
->
->Service Pack 暂时只适配 Cocos Creator 2.x 版本，Cocos Creator 3.x 正在蒸蒸日上，其引擎架构还在不断地迭代（不稳定），若对其进行修改，之后的维护工作会非常大。
+>受到这个命名的启发，遂项目取名为 Service Pack。
 
 <br>
 
@@ -38,6 +34,7 @@
 - [贡献指南](#贡献指南)
 - [常见问题](#常见问题)
   - [为什么要直接修改引擎？](#为什么要直接修改引擎)
+  - [启动 Cocos Creator 报 Error: Can not parse this input:undefined 错误](#启动-cocos-creator-报-error-can-not-parse-this-inputundefined-错误)
 
 <!-- /code_chunk_output -->
 
@@ -49,22 +46,17 @@
 - **重构 Label 组件的 CHAR 缓存模式**（支持自动多纹理合批、多图集、复用废弃空间等特性）
 - **Spine 组件支持与其它组件合批、合入动态图集与 SpriteFrame 换装**
 
-> 服务包对引擎的所有改动都是开源的，并且每个改动都会附上一篇原理说明的文档，当你发现问题时请进行反馈，或者直接默默地帅气地提交一个 PR，帮助我们一起完善这个项目。
+> 服务包对引擎的改动完全开源，每个改动会带有原理说明文档，当你发现问题时请与我们进行反馈，如果你有兴致，可以默默帅气地提交一个 PR，帮助我们一起完善这个项目。
 
 ## 功能演示
 
 [Web Desktop 演示项目](https://smallmain.github.io/cocos-service-pack/demo/v1.0.0-alpha/web-desktop/index.html)
 
-[Web Mobile 演示项目](https://smallmain.github.io/cocos-service-pack/demo/v1.0.0-alpha/web-mobile/index.html)
+[Web Mobile 演示项目](https://smallmain.github.io/cocos-service-pack/demo/v1.0.0-alpha/web-mobile/index.html)（请将设备横屏）
 
 ## 使用方法
 
-服务包通过自定义引擎的方式来修改引擎代码，你可以：
-
-- 通过我们发布的引擎扩展一键安装
-- 下载源码包进行手动安装
-
-具体教程可以参考 [安装指南](https://smallmain.github.io/cocos-service-pack/docs/installation-guide/installation-intro)。
+请阅读文档的 [安装指南](https://smallmain.github.io/cocos-service-pack/docs/installation-guide/installation-intro) 与 [入门教程](https://smallmain.github.io/cocos-service-pack/docs/start-guide/start-guide-intro)。
 
 ## 更新日志
 
@@ -81,40 +73,36 @@
 - [修复] CHAR 缓存模式 hash 计算可能会有重复的问题
 - [调整] 默认禁用 Label 原生 TTF 渲染器
 
-所有更新日志请移步 [此处](https://smallmain.github.io/cocos-service-pack/docs/update-log)。
+[点此](https://smallmain.github.io/cocos-service-pack/docs/update-log) 查看所有的更新日志。
 
 ## 贡献指南
 
-非常欢迎你能和我们一起来完善这个项目，所有的一切都通过 Github 进行：
+非常欢迎你能和我们一起来完善这个项目，请通过 Github 进行：
 
-- 如果你有问题或者好的想法，请建立 `Issues` 或进入 `Discussions` 。
-- 如果你有新的代码提交，请建立 `Pull requests`。
+- 如果你发现了问题请建立 `Issues`
+- 如果你有好的想法，请进入 `Discussions`
+- 如果你有新的代码提交，请建立 `Pull requests`
 
-原则上允许对引擎的任何增强与修改，但是**任何修改都必须兼容引擎原有的特性，不允许删除引擎原有的特性**，并且请认真思考代码设计。
+**原则上你提交的任何修改都不能影响引擎原有功能，不允许删除引擎原有的特性，请认真思考代码设计。**
 
 ## 常见问题
 
 ### 为什么要直接修改引擎？
 
-直接修改引擎可能是大部分人认为的下下策，比如我们常听到的一些声音：
+直接修改引擎可能是大部分人认为的下下策，比如我们常听到的：
 
-- 通过 “修改对象的原型” 等一些编程技巧做成一个插件脚本
-- 没接触过自定义引擎，不知道该怎么用，感觉很可怕
-- 我已经修改过引擎的某些部分了，不能直接安装
+- 可以通过 “修改对象原型” 等编程技巧将改动做成一个插件脚本
+- 没接触过自定义引擎，不知道该如何使用
+- 已经修改过引擎了，不能直接进行标准安装，会覆盖原有的修改
 
-以上问题我们都思考过，
+以上问题我们都思考过，首先，现在引擎的 2.x 版本已经停止了更新（仅做一些维护工作），也就是说修改引擎不会遇到在官方新版本发布后需要用大量时间去适配的情况。
 
-首先，现在引擎的 2.x 版本已经停止了更新（仅做一些维护工作），也就是说修改引擎不会遇到在官方新版本发布后需要用大量时间去适配的情况。
+其次，即使服务包的所有改动都能做成一个插件脚本，但无法兼容原生平台，并且一般都需要大量拷贝代码，包体会增大，可维护性会大幅降低。
 
-其次，即使服务包中的所有改动都能做成一个插件脚本，但是无法兼容原生平台，并且一般都需要大量拷贝代码，包体会增大，可维护性可能会大幅降低。
+最后，我们希望它接近 “原生” 的使用体验，就像引擎本来就有的功能一样，对于没有接触过自定义引擎的人，可以通过引擎扩展一键安装。
 
-最后，我们希望它接近 “原生” 的使用体验，就像引擎本来就有的功能一样，对于没有接触过自定义引擎的人，我们提供的引擎扩展可以一键安装。
+对于已经修改过引擎的人，由于服务包提供的是 Git Patch，所以可以让你在原有的基础上轻松应用服务包的改动，你甚至可以只选取你想要的特性进行应用。
 
-对于已经修改过引擎的人，由于服务包提供的是 Git Patch，所以可以让你在已有修改的基础上轻松应用上服务包的改动，甚至你可以只应用你想要的特性。
-
-### Cocos Creator 报 Error: Can not parse this input:undefined 错误
+### 启动 Cocos Creator 报 Error: Can not parse this input:undefined 错误
 
 没有找到服务包的内置资源，请记得安装配套的引擎扩展。
-
----
-**最后的最后，希望这个项目能帮助到你的学习或工作，enjoy！**

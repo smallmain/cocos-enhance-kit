@@ -5,7 +5,7 @@ description: "了解并上手服务包提供的所有其他新特性。"
 
 # 上手其它新特性
 
-除了前面提到的多纹理渲染、新动态图集、新 Label Char 缓存模式等特性之外，还有一些其它也很实用的新特性。
+除了前面提到的多纹理渲染、新动态图集、新 Label Char 缓存模式等特性之外，还有一些其它的也很实用的新特性。
 
 ---
 ## 高 DPI 文本渲染
@@ -54,6 +54,6 @@ this.skel.setRegion('head', 'head', sp.SkeletonData.createRegion(spriteFrame));
 ---
 ## 给 RichText 使用自定义材质
 
-这可能是很少用得到的功能，虽然加上去也简单，但主要还是我们看到几乎所有渲染组件可以自定义材质，这个组件却不可以。
+虽然加上去也简单，但这可能是很少用得到的功能，主要还是我们看到几乎所有渲染组件都可以自定义材质，这个组件却不可以。
 
 可前往 [RichText 自定义材质](../user-guide/text-render/text-richtext.md) 文档了解更多详情。
