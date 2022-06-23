@@ -1,0 +1,4 @@
+include ':libcocos2dx',':instantapp'
+project(':libcocos2dx').projectDir = new File('/Users/smallmain/Documents/Work/cocos-service-pack-src/cocos2d-x/cocos/platform/android/libcocos2dx')
+include ':Cocos-Service-Pack-Demo'
+project(':Cocos-Service-Pack-Demo').projectDir = new File(settingsDir, 'app')

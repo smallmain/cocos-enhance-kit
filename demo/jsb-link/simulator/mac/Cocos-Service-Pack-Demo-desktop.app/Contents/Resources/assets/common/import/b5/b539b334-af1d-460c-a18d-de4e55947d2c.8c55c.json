@@ -1,0 +1,51 @@
+[
+  1,
+  [
+    "80ThG1v09KeKxKhEPnFmvh"
+  ],
+  [
+    "_textureSetter"
+  ],
+  [
+    "cc.SpriteFrame"
+  ],
+  0,
+  [
+    {
+      "name": "huatuo",
+      "rect": [
+        5,
+        0,
+        696,
+        208
+      ],
+      "offset": [
+        2.5,
+        0
+      ],
+      "originalSize": [
+        701,
+        208
+      ],
+      "capInsets": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  [
+    0
+  ],
+  0,
+  [
+    0
+  ],
+  [
+    0
+  ],
+  [
+    0
+  ]
+]

@@ -1,0 +1,51 @@
+[
+  1,
+  [
+    "10Drosz6JPsKWsqV+bRh/A"
+  ],
+  [
+    "_textureSetter"
+  ],
+  [
+    "cc.SpriteFrame"
+  ],
+  0,
+  [
+    {
+      "name": "sheep_jump_2",
+      "rect": [
+        24,
+        24,
+        160,
+        104
+      ],
+      "offset": [
+        -10,
+        3.5
+      ],
+      "originalSize": [
+        228,
+        159
+      ],
+      "capInsets": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  [
+    0
+  ],
+  0,
+  [
+    0
+  ],
+  [
+    0
+  ],
+  [
+    0
+  ]
+]

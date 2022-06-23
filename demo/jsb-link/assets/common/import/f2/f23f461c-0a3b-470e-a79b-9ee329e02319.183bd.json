@@ -1,0 +1,51 @@
+[
+  1,
+  [
+    "d9xFMK7wVFwbAS60aG9McP"
+  ],
+  [
+    "_textureSetter"
+  ],
+  [
+    "cc.SpriteFrame"
+  ],
+  0,
+  [
+    {
+      "name": "spineboy",
+      "rect": [
+        2,
+        2,
+        998,
+        240
+      ],
+      "offset": [
+        -11,
+        6
+      ],
+      "originalSize": [
+        1024,
+        256
+      ],
+      "capInsets": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  [
+    0
+  ],
+  0,
+  [
+    0
+  ],
+  [
+    0
+  ],
+  [
+    0
+  ]
+]

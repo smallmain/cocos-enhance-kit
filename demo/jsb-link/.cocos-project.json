@@ -1,0 +1,7 @@
+{
+  "engine_version": "2.4.9",
+  "has_native": true,
+  "project_type": "js",
+  "projectName": "Cocos-Service-Pack-Demo",
+  "packageName": "org.cocos2d.demo"
+}
