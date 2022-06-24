@@ -34,6 +34,9 @@ import TTF3D from './3d/ttf';
 import Bmfont3D from './3d/bmfont';
 import Letter3D from './3d/letter';
 
+import TTFMulti from './2d-multi/ttf';
+import BmfontMulti from './2d-multi/bmfont';
+
 let NativeTTF = undefined;
 if(CC_JSB) {
     NativeTTF = require("./2d/nativeTTF");
@@ -69,10 +72,13 @@ Label._canvasPool = {
 Assembler.register(cc.Label, {
     getConstructor(label) {
         let is3DNode = label.node.is3DNode;
-        let ctor = is3DNode ? TTF3D : TTF;
+        const material = label.getMaterials()[0];
+        let isMultiMaterial = material && material.material.isMultiSupport();
+
+        let ctor = is3DNode ? TTF3D : (isMultiMaterial ? TTFMulti : TTF);
         
         if (label.font instanceof cc.BitmapFont) {
-            ctor = is3DNode ? Bmfont3D : Bmfont;
+            ctor = is3DNode ? Bmfont3D : (isMultiMaterial ? BmfontMulti : Bmfont);
         } else if (label.cacheMode === Label.CacheMode.CHAR) {
 
             if(CC_JSB && !is3DNode && !!jsb.LabelRenderer && label.font instanceof cc.TTFFont && label._useNativeTTF()){
@@ -94,5 +100,8 @@ Assembler.register(cc.Label, {
     TTF3D,
     Bmfont3D,
     Letter3D,
-    NativeTTF
+    NativeTTF,
+
+    TTFMulti,
+    BmfontMulti
 });

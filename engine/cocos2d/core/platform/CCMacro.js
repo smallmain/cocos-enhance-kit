@@ -384,9 +384,9 @@ cc.macro = {
      * 是否使用原生的文本渲染机制, 布局和编辑器有差异.
      * 
      * @property {Boolean} ENABLE_NATIVE_TTF_RENDERER
-     * @default true
+     * @default false
      */
-    ENABLE_NATIVE_TTF_RENDERER: true
+    ENABLE_NATIVE_TTF_RENDERER: false
 
 };
 

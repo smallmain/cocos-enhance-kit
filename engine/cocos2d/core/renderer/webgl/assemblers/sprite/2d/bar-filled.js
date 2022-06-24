@@ -31,37 +31,40 @@ const FillType = Sprite.FillType;
 export default class BarFilledAssembler extends Assembler2D {
     updateRenderData (sprite) {
         let frame = sprite._spriteFrame;
-        this.packToDynamicAtlas(sprite, frame);
+        const assemblerChanged = this.packDynamicAtlasAndCheckMaterial(sprite, frame);
 
-        if (!sprite._vertsDirty) {
-            return;
+        // 打包到动态图集时可能会切换 Assembler
+        if (!assemblerChanged) {
+            if (sprite._vertsDirty) {
+                let fillStart = sprite._fillStart;
+                let fillRange = sprite._fillRange;
+
+                if (fillRange < 0) {
+                    fillStart += fillRange;
+                    fillRange = -fillRange;
+                }
+
+                fillRange = fillStart + fillRange;
+
+                fillStart = fillStart > 1.0 ? 1.0 : fillStart;
+                fillStart = fillStart < 0.0 ? 0.0 : fillStart;
+
+                fillRange = fillRange > 1.0 ? 1.0 : fillRange;
+                fillRange = fillRange < 0.0 ? 0.0 : fillRange;
+                fillRange = fillRange - fillStart;
+                fillRange = fillRange < 0 ? 0 : fillRange;
+
+                let fillEnd = fillStart + fillRange;
+                fillEnd = fillEnd > 1 ? 1 : fillEnd;
+
+                this.updateUVs(sprite, fillStart, fillEnd);
+                this.updateVerts(sprite, fillStart, fillEnd);
+
+                sprite._vertsDirty = false;
+            }
         }
 
-        let fillStart = sprite._fillStart;
-        let fillRange = sprite._fillRange;
-
-        if (fillRange < 0) {
-            fillStart += fillRange;
-            fillRange = -fillRange;
-        }
-
-        fillRange = fillStart + fillRange;
-
-        fillStart = fillStart > 1.0 ? 1.0 : fillStart;
-        fillStart = fillStart < 0.0 ? 0.0 : fillStart;
-
-        fillRange = fillRange > 1.0 ? 1.0 : fillRange;
-        fillRange = fillRange < 0.0 ? 0.0 : fillRange;
-        fillRange = fillRange - fillStart;
-        fillRange = fillRange < 0 ? 0 : fillRange;
-
-        let fillEnd = fillStart + fillRange;
-        fillEnd = fillEnd > 1 ? 1 : fillEnd;
-
-        this.updateUVs(sprite, fillStart, fillEnd);
-        this.updateVerts(sprite, fillStart, fillEnd);
-
-        sprite._vertsDirty = false;
+        return assemblerChanged;
     }
 
     updateUVs (sprite, fillStart, fillEnd) {

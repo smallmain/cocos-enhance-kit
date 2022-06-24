@@ -34,6 +34,32 @@ const Material = require('../assets/material/CCMaterial');
 let _temp_color = new Color();
 
 /**
+ * !#en enable type
+ * !#zh 启用类型
+ * @enum RenderComponent.EnableType
+ */
+var EnableType = cc.Enum({
+    /**
+     * !#en Global.
+     * !#zh 使用全局值
+     * @property {Number} GLOBAL
+     */
+    GLOBAL: 0,
+    /**
+     * !#en Enable.
+     * !#zh 开启
+     * @property {Number} ENABLE
+     */
+    ENABLE: 1,
+    /**
+     * !#en Disable.
+     * !#zh 关闭
+     * @property {Number} DISABLE
+     */
+    DISABLE: 2,
+});
+
+/**
  * !#en
  * Base class for components which supports rendering features.
  * !#zh
@@ -49,6 +75,10 @@ let RenderComponent = cc.Class({
     editor: CC_EDITOR && {
         executeInEditMode: true,
         disallowMultiple: true
+    },
+
+    statics: {
+        EnableType: EnableType,
     },
 
     properties: {
@@ -78,12 +108,16 @@ let RenderComponent = cc.Class({
 
     ctor () {
         this._vertsDirty = true;
+        this._texIdDirty = true;
+        this._texId = 0;
         this._assembler = null;
     },
 
     _resetAssembler () {
         Assembler.init(this);
         this._updateColor();
+        // 切换 Assembler 时，texId 与 vDatas 数据不同步
+        this._texId = 0;
         this.setVertsDirty();
     },
 
@@ -252,7 +286,43 @@ let RenderComponent = cc.Class({
             renderer.material = material;
             renderer.cullingMask = cullingMask;
         }
-    }
+    },
+
+    _updateMultiTexId(material, texture) {
+        const multi = material.material.getMultiHandler();
+
+        const spTexture = texture;
+        const nSpTexture = spTexture.getImpl();
+
+        // 快速检查插槽上的贴图是否相同
+        // 如果是当作普通材质使用，multi.getTexture(this._texId) !== nSpTexture 会一直为 true
+        const same = this._texId === 0
+            ? material.getProperty('texture') !== nSpTexture
+            : multi.getTexture(this._texId) !== nSpTexture;
+
+        if (same) {
+            // 如果材质变体被修改了，则直接跳过位置检查
+            const isChanged = Object.prototype.hasOwnProperty.call(material._effect._passes['0']._properties, 'texture');
+            const texId = isChanged ? -1 : multi.getIndex(nSpTexture);
+
+            if (texId !== -1) {
+                // 插槽位置不对，则更新位置
+                this._texId = texId;
+                this._texIdDirty = true;
+            } else {
+                // 插槽根本没有该纹理，则修改变体的 texture
+                material.setProperty('texture', spTexture);
+                if (this._texId !== 0) {
+                    this._texId = 0;
+                    this._texIdDirty = true;
+                }
+                // cc.warn('renderComponent use multi-material but not has valid property.');
+            }
+        } else {
+            this._texIdDirty = false;
+        }
+    },
+
 });
 
 cc.RenderComponent = module.exports = RenderComponent;

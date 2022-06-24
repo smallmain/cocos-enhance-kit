@@ -100,14 +100,23 @@ export default class TTFAssembler extends Assembler2D {
     updateRenderData (comp) {
         super.updateRenderData(comp);
         
-        if (!comp._vertsDirty) return;
+        if (!comp._vertsDirty) return false;
 
         this._updateProperties(comp);
         this._calculateLabelFont();
         this._updateLabelDimensions();
         this._updateTexture(comp);
-        this._calDynamicAtlas(comp);
+        const assemblerChanged = this._calDynamicAtlas(comp);
 
+        // 打包到动态图集时可能会切换 Assembler
+        if (!assemblerChanged) {
+            this._aftUpdateRenderData(comp);
+        }
+
+        return assemblerChanged;
+    }
+
+    _aftUpdateRenderData(comp) {
         comp._actualFontSize = _fontSize;
         comp.node.setContentSize(_nodeContentSize);
 
@@ -336,14 +345,14 @@ export default class TTFAssembler extends Assembler2D {
     }
 
     _calDynamicAtlas (comp) {
-        if(comp.cacheMode !== Label.CacheMode.BITMAP) return;
+        if(comp.cacheMode !== Label.CacheMode.BITMAP) return false;
         let frame = comp._frame;
         // Delete cache in atlas.
         deleteFromDynamicAtlas(comp, frame);
         if (!frame._original) {
             frame.setRect(cc.rect(0, 0, _canvas.width, _canvas.height));
         }
-        this.packToDynamicAtlas(comp, frame);
+        return this.packDynamicAtlasAndCheckMaterial(comp, frame);
     }
 
     _updateLabelDimensions () {

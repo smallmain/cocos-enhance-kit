@@ -179,7 +179,18 @@ export default class RadialFilledAssembler extends Assembler2D {
         super.updateRenderData(sprite);
 
         let frame = sprite.spriteFrame;
-        this.packToDynamicAtlas(sprite, frame);
+        const assemblerChanged = this.packDynamicAtlasAndCheckMaterial(sprite, frame);
+
+        // 打包到动态图集时可能会切换 Assembler
+        if (!assemblerChanged) {
+            this._aftUpdateRenderData(sprite);
+        }
+
+        return assemblerChanged;
+    }
+
+    _aftUpdateRenderData(sprite) {
+        let frame = sprite.spriteFrame;
 
         if (sprite._vertsDirty) {
             let fillStart = sprite._fillStart;

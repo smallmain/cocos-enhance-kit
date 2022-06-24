@@ -161,6 +161,10 @@ var MotionStreak = cc.Class({
                 if (this._texture === value) return;
 
                 this._texture = value;
+
+                // 自动切换材质
+                this._checkSwitchMaterial();
+
                 this._updateMaterial();
             },
             type: cc.Texture2D,
@@ -210,6 +214,25 @@ var MotionStreak = cc.Class({
             },
             animatable: false,
             tooltip: CC_DEV && 'i18n:COMPONENT.motionStreak.fastMode'
+        },
+
+        autoSwitchMaterial: {
+            type: RenderComponent.EnableType,
+            default: RenderComponent.EnableType.GLOBAL,
+        },
+    },
+
+    __preload() {
+        this._super();
+        this._checkSwitchMaterial();
+    },
+
+    _checkSwitchMaterial() {
+        if (this._assembler) {
+            const material = this._materials[0];
+            if (!material) return;
+            if (!this._texture) return;
+            this._assembler.checkAndSwitchMaterial(this, this._texture, material);
         }
     },
 
@@ -220,7 +243,32 @@ var MotionStreak = cc.Class({
 
     _updateMaterial () {
         let material = this.getMaterial(0);
-        material && material.setProperty('texture', this._texture);
+
+        // 根据材质更新 uniform
+        const isMultiMaterial = material.material.isMultiSupport();
+        if (isMultiMaterial) {
+            if (!this._texture) return;
+            this._updateMultiTexId(material, this._texture);
+        } else {
+            const textureImpl = this._texture && this._texture.getImpl();
+            if (material.getProperty('texture') !== textureImpl) {
+                material.setProperty('texture', this._texture);
+            }
+        }
+
+        // 根据材质更新 assembler
+        if (this._assembler) {
+            if ((isMultiMaterial && !this._assembler.isMulti) || !isMultiMaterial && this._assembler.isMulti) {
+                this._resetAssembler();
+            }
+        }
+
+        // texId
+        if (isMultiMaterial && this._texIdDirty && this._assembler) {
+            if (!this._texture) return;
+            this._assembler.updateTexId(this);
+            this._texIdDirty = false;
+        }
 
         BlendFunc.prototype._updateMaterial.call(this);
     },

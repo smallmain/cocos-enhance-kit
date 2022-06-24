@@ -192,7 +192,7 @@ let Label = cc.Class({
     editor: CC_EDITOR && {
         menu: 'i18n:MAIN_MENU.component.renderers/Label',
         help: 'i18n:COMPONENT.help_url.label',
-        inspector: 'packages://inspector/inspectors/comps/label.js',
+        inspector: 'packages://service-pack/inspectors/comps/label.js',
     },
 
     properties: {
@@ -578,6 +578,11 @@ let Label = cc.Class({
             },
             tooltip: CC_DEV && 'i18n:COMPONENT.label.underline_height',
         },
+
+        autoSwitchMaterial: {
+            type: RenderComponent.EnableType,
+            default: RenderComponent.EnableType.GLOBAL,
+        },
     },
 
     statics: {
@@ -782,7 +787,25 @@ let Label = cc.Class({
         }
 
         if (!this._frame) return;
-        material && material.setProperty('texture', this._frame._texture);
+
+        if (material) {
+            // 根据材质更新 uniform
+            const isMultiMaterial = material.material.isMultiSupport();
+            if (isMultiMaterial) {
+                // 贴图在 updateRenderData 才确定下来
+                // if (texture) this._updateMultiTexId(material, texture);
+                this._texIdDirty = true;
+            } else {
+                material.setProperty('texture', this._frame._texture);
+            }
+
+            // 根据材质更新 assembler
+            if (this._assembler) {
+                if ((isMultiMaterial && !this._assembler.isMulti) || !isMultiMaterial && this._assembler.isMulti) {
+                    RenderComponent.prototype._resetAssembler.call(this);
+                }
+            }
+        }
 
         BlendFunc.prototype._updateMaterial.call(this);
     },

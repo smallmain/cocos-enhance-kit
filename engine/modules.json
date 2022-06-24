@@ -164,7 +164,8 @@
     "name": "MotionStreak",
     "entries": [
       "./cocos2d/core/components/CCMotionStreak.js",
-      "./cocos2d/core/renderer/webgl/assemblers/motion-streak.js"
+      "./cocos2d/core/renderer/webgl/assemblers/motion-streak.js",
+      "./cocos2d/core/renderer/webgl/assemblers/motion-streak-multi.js"
     ],
     "dependencies": ["WebGL Renderer"]
   },

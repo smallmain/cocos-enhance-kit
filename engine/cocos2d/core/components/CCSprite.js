@@ -160,7 +160,7 @@ var Sprite = cc.Class({
     editor: CC_EDITOR && {
         menu: 'i18n:MAIN_MENU.component.renderers/Sprite',
         help: 'i18n:COMPONENT.help_url.sprite',
-        inspector: 'packages://inspector/inspectors/comps/sprite.js',
+        inspector: 'packages://service-pack/inspectors/comps/sprite.js',
     },
 
     properties: {
@@ -386,7 +386,12 @@ var Sprite = cc.Class({
             animatable: false,
             type: SizeMode,
             tooltip: CC_DEV && 'i18n:COMPONENT.sprite.size_mode'
-        }
+        },
+
+        autoSwitchMaterial: {
+            type: RenderComponent.EnableType,
+            default: RenderComponent.EnableType.GLOBAL,
+        },
     },
 
     statics: {
@@ -465,9 +470,25 @@ var Sprite = cc.Class({
             if (oldDefine !== undefined && !oldDefine) {
                 material.define('USE_TEXTURE', true);
             }
-            let textureImpl = texture && texture.getImpl();
-            if (material.getProperty('texture') !== textureImpl) {
-                material.setProperty('texture', texture);
+
+            // 根据材质更新 uniform
+            const isMultiMaterial = material.material.isMultiSupport();
+            if (isMultiMaterial) {
+                // 在 assembler 中进行更新性能会更好，不需要每次 setSpriteFrame 都更新，并且动态图集会导致两次触发
+                // if (texture) this._updateMultiTexId(material, texture);
+                this._texIdDirty = true;
+            } else {
+                const textureImpl = texture && texture.getImpl();
+                if (material.getProperty('texture') !== textureImpl) {
+                    material.setProperty('texture', texture);
+                }
+            }
+
+            // 根据材质更新 assembler
+            if (this._assembler) {
+                if ((isMultiMaterial && !this._assembler.isMulti) || !isMultiMaterial && this._assembler.isMulti) {
+                    this._resetAssembler();
+                }
             }
         }
 

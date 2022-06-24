@@ -178,6 +178,7 @@ export const enums = {
   ATTR_TEX_COORD6: 'a_texCoord6',
   ATTR_TEX_COORD7: 'a_texCoord7',
   ATTR_TEX_COORD8: 'a_texCoord8',
+  ATTR_TEX_ID: 'a_texId',
 
 
   // vertex attribute type

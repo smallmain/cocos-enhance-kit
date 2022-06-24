@@ -24,9 +24,10 @@
  ****************************************************************************/
 
 cc.assemblers = {};
- 
+
 require('./sprite');
 require('./mask-assembler');
 require('./graphics');
 require('./label');
 require('./motion-streak');
+require('./motion-streak-multi');

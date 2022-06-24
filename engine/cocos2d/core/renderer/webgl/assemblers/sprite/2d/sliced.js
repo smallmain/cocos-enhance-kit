@@ -52,13 +52,18 @@ export default class SlicedAssembler extends Assembler2D {
 
     updateRenderData (sprite) {
         let frame = sprite._spriteFrame;
-        this.packToDynamicAtlas(sprite, frame);
+        const assemblerChanged = this.packDynamicAtlasAndCheckMaterial(sprite, frame);
 
-        if (sprite._vertsDirty) {
-            this.updateUVs(sprite);
-            this.updateVerts(sprite);
-            sprite._vertsDirty = false;
+        // 打包到动态图集时可能会切换 Assembler
+        if (!assemblerChanged) {
+            if (sprite._vertsDirty) {
+                this.updateUVs(sprite);
+                this.updateVerts(sprite);
+                sprite._vertsDirty = false;
+            }
         }
+
+        return assemblerChanged;
     }
 
     updateVerts (sprite) {

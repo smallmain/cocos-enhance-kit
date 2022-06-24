@@ -31,33 +31,39 @@ export default class MeshSpriteAssembler extends Assembler2D {
     }
     
     updateRenderData (sprite) {
-        this.packToDynamicAtlas(sprite, sprite._spriteFrame);
-
         let frame = sprite.spriteFrame;
-        if (frame) {
-            let vertices = frame.vertices;
-            if (vertices) {
-                this.verticesCount = vertices.x.length;
-                this.indicesCount = vertices.triangles.length;
 
-                let renderData = this._renderData;
-                let flexBuffer = renderData._flexBuffer;
-                if (flexBuffer.reserve(this.verticesCount, this.indicesCount)) {
-                    this.updateColor(sprite);
-                    sprite._vertsDirty = true;
-                }
-                flexBuffer.used(this.verticesCount, this.indicesCount);
+        const assemblerChanged = this.packDynamicAtlasAndCheckMaterial(sprite, frame);
 
-                this.updateIndices(vertices.triangles);
+        // 打包到动态图集时可能会切换 Assembler
+        if (!assemblerChanged) {
+            if (frame) {
+                let vertices = frame.vertices;
+                if (vertices) {
+                    this.verticesCount = vertices.x.length;
+                    this.indicesCount = vertices.triangles.length;
 
-                if (sprite._vertsDirty) {
-                    this.updateUVs(sprite);
-                    this.updateVerts(sprite);
-                    this.updateWorldVerts(sprite);
-                    sprite._vertsDirty = false;
+                    let renderData = this._renderData;
+                    let flexBuffer = renderData._flexBuffer;
+                    if (flexBuffer.reserve(this.verticesCount, this.indicesCount)) {
+                        this.updateColor(sprite);
+                        sprite._vertsDirty = true;
+                    }
+                    flexBuffer.used(this.verticesCount, this.indicesCount);
+
+                    this.updateIndices(vertices.triangles);
+
+                    if (sprite._vertsDirty) {
+                        this.updateUVs(sprite);
+                        this.updateVerts(sprite);
+                        this.updateWorldVerts(sprite);
+                        sprite._vertsDirty = false;
+                    }
                 }
             }
         }
+
+        return assemblerChanged;
     }
 
     updateIndices (triangles) {

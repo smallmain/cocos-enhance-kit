@@ -84,12 +84,34 @@ export default class BmfontAssembler extends Assembler2D {
         _comp = comp;
         
         this._reserveQuads(comp, comp.string.toString().length);
-        this._updateFontFamily(comp);
+
+        const assemblerChanged = this._updateFontFamily(comp);
+
+        // 打包到动态图集时可能会切换 Assembler
+        if (!assemblerChanged) {
+            this._aftUpdateRenderData(comp);
+        }
+
+        return assemblerChanged;
+    }
+
+    _preUpdateRenderData(comp) {
+        _comp = comp;
+
+        this._reserveQuads(comp, comp.string.toString().length);
+
+        let fontAsset = comp.font;
+        _spriteFrame = fontAsset.spriteFrame;
+        _fntConfig = fontAsset._fntConfig;
+        shareLabelInfo.fontAtlas = fontAsset._fontDefDictionary;
+    }
+
+    _aftUpdateRenderData(comp) {
         this._updateProperties(comp);
         this._updateLabelInfo(comp);
         this._updateContent();
         this.updateWorldVerts(comp);
-        
+
         _comp._actualFontSize = _fontSize;
         _comp.node.setContentSize(_contentSize);
 
@@ -108,7 +130,7 @@ export default class BmfontAssembler extends Assembler2D {
         _fntConfig = fontAsset._fntConfig;
         shareLabelInfo.fontAtlas = fontAsset._fontDefDictionary;
 
-        this.packToDynamicAtlas(comp, _spriteFrame);
+        return this.packDynamicAtlasAndCheckMaterial(comp, _spriteFrame);
     }
 
     _updateLabelInfo() {

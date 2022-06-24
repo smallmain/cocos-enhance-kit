@@ -59,42 +59,47 @@ export default class TiledAssembler extends Assembler2D {
 
     updateRenderData (sprite) {
         let frame = sprite._spriteFrame;
-        this.packToDynamicAtlas(sprite, frame);
+        const assemblerChanged = this.packDynamicAtlasAndCheckMaterial(sprite, frame);
 
-        let node = sprite.node;
+        // 打包到动态图集时可能会切换 Assembler
+        if (!assemblerChanged) {
+            let node = sprite.node;
 
-        let contentWidth = this.contentWidth = Math.abs(node.width);
-        let contentHeight = this.contentHeight = Math.abs(node.height);
-        let rect = frame._rect;
-        let leftWidth = frame.insetLeft, rightWidth = frame.insetRight, centerWidth = rect.width - leftWidth - rightWidth,
-            topHeight = frame.insetTop, bottomHeight = frame.insetBottom, centerHeight = rect.height - topHeight - bottomHeight;
-        this.sizableWidth = contentWidth - leftWidth - rightWidth;
-        this.sizableHeight = contentHeight - topHeight - bottomHeight;
-        this.sizableWidth = this.sizableWidth > 0 ? this.sizableWidth : 0;
-        this.sizableHeight = this.sizableHeight > 0 ? this.sizableHeight : 0;
-        let hRepeat = this.hRepeat = centerWidth === 0 ? this.sizableWidth : this.sizableWidth / centerWidth;
-        let vRepeat = this.vRepeat = centerHeight === 0 ? this.sizableHeight : this.sizableHeight / centerHeight;
-        let row = this.row = Math.ceil(vRepeat + 2);
-        let col = this.col = Math.ceil(hRepeat + 2);
+            let contentWidth = this.contentWidth = Math.abs(node.width);
+            let contentHeight = this.contentHeight = Math.abs(node.height);
+            let rect = frame._rect;
+            let leftWidth = frame.insetLeft, rightWidth = frame.insetRight, centerWidth = rect.width - leftWidth - rightWidth,
+                topHeight = frame.insetTop, bottomHeight = frame.insetBottom, centerHeight = rect.height - topHeight - bottomHeight;
+            this.sizableWidth = contentWidth - leftWidth - rightWidth;
+            this.sizableHeight = contentHeight - topHeight - bottomHeight;
+            this.sizableWidth = this.sizableWidth > 0 ? this.sizableWidth : 0;
+            this.sizableHeight = this.sizableHeight > 0 ? this.sizableHeight : 0;
+            let hRepeat = this.hRepeat = centerWidth === 0 ? this.sizableWidth : this.sizableWidth / centerWidth;
+            let vRepeat = this.vRepeat = centerHeight === 0 ? this.sizableHeight : this.sizableHeight / centerHeight;
+            let row = this.row = Math.ceil(vRepeat + 2);
+            let col = this.col = Math.ceil(hRepeat + 2);
 
-        // update data property
-        let count = row * col;
-        this.verticesCount = count * 4;
-        this.indicesCount = count * 6;
+            // update data property
+            let count = row * col;
+            this.verticesCount = count * 4;
+            this.indicesCount = count * 6;
 
-        let renderData = this._renderData;
-        let flexBuffer = renderData._flexBuffer;
-        if (flexBuffer.reserve(this.verticesCount, this.indicesCount)) {
-            this._updateIndices();
-            this.updateColor(sprite);
+            let renderData = this._renderData;
+            let flexBuffer = renderData._flexBuffer;
+            if (flexBuffer.reserve(this.verticesCount, this.indicesCount)) {
+                this._updateIndices();
+                this.updateColor(sprite);
+            }
+            flexBuffer.used(this.verticesCount, this.indicesCount);
+
+            if (sprite._vertsDirty) {
+                this.updateUVs(sprite);
+                this.updateVerts(sprite);
+                sprite._vertsDirty = false;
+            }
         }
-        flexBuffer.used(this.verticesCount, this.indicesCount);
 
-        if (sprite._vertsDirty) {
-            this.updateUVs(sprite);
-            this.updateVerts(sprite);
-            sprite._vertsDirty = false;
-        }
+        return assemblerChanged;
     }
 
     updateVerts (sprite) {

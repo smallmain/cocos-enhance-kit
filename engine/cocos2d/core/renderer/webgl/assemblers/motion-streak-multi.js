@@ -23,8 +23,9 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-import Assembler2D from '../../assembler-2d';
-
+import MotionStreakAssembler from "./motion-streak";
+import { vfmtPosUvColorTexId } from '../../webgl/vertex-format';
+const MotionStreak = require('../../../components/CCMotionStreak');
 const RenderFlow = require('../../render-flow');
 
 function Point (point, dir) {
@@ -44,8 +45,6 @@ Point.prototype.setDir = function (x, y) {
     this.dir.y = y;
 };
 
-let _tangent = cc.v2();
-let _miter = cc.v2();
 let _normal = cc.v2();
 let _vec2 = cc.v2();
 
@@ -56,33 +55,17 @@ function normal (out, dir) {
     return out
 }
 
-function computeMiter (miter, lineA, lineB, halfThick, maxMultiple) {
-    //get tangent line
-    lineA.add(lineB, _tangent);
-    _tangent.normalizeSelf();
-
-    //get miter as a unit vector
-    miter.x = -_tangent.y;
-    miter.y = _tangent.x;
-    _vec2.x = -lineA.y; 
-    _vec2.y = lineA.x;
-
-    //get the necessary length of our miter
-    let multiple = 1 / miter.dot(_vec2);
-    if (maxMultiple) {
-        multiple = Math.min(multiple, maxMultiple);
-    }
-    return halfThick * multiple;
-}
-
-export default class MotionStreakAssembler extends Assembler2D {
-    constructor () {
-        super();
-        this._tailShortenTime = 0;
+export default class MultiMotionStreakAssembler extends MotionStreakAssembler {
+    initData() {
+        this._renderData.createFlexData(0, 16, (16 - 2) * 3, this.getVfmt());
     }
 
-    initData () {
-        this._renderData.createFlexData(0, 16, (16 - 2) * 3);
+    getVfmt() {
+        return vfmtPosUvColorTexId;
+    }
+
+    getBuffer() {
+        return cc.renderer._handle.getBuffer("mesh", this.getVfmt());
     }
 
     update (comp, dt) {
@@ -159,7 +142,7 @@ export default class MotionStreakAssembler extends Assembler2D {
         flexBuffer.reserve(points.length*2, (points.length-1)*6);
         let vData = flexBuffer.vData;
         let uintVData = flexBuffer.uintVData;
-        let vertsOffset = 5;
+        let vertsOffset = 6;
 
         for (let i = points.length - 1; i >=0 ; i--) {
             let p = points[i];
@@ -211,6 +194,7 @@ export default class MotionStreakAssembler extends Assembler2D {
             vData[offset + 2] = 1;
             vData[offset + 3] = progress;
             uintVData[offset + 4] = c;
+            vData[offset + 5] = comp._texId;
             
             offset += vertsOffset;
 
@@ -219,6 +203,7 @@ export default class MotionStreakAssembler extends Assembler2D {
             vData[offset + 2] = 0;
             vData[offset + 3] = progress;
             uintVData[offset + 4] = c;
+            vData[offset + 5] = comp._texId;
             
             verticesCount += 2;
         }
@@ -231,7 +216,7 @@ export default class MotionStreakAssembler extends Assembler2D {
     fillBuffers (comp, renderer) {
         let { vData, usedVertices, usedIndices, usedVerticesFloats } = this._renderData._flexBuffer;
 
-        let buffer = renderer._meshBuffer;
+        let buffer = this.getBuffer(renderer);
         let offsetInfo = buffer.request(usedVertices, usedIndices);
 
         // buffer data may be realloc, need get reference after request.
@@ -265,4 +250,20 @@ export default class MotionStreakAssembler extends Assembler2D {
 
         comp.node._renderFlag |= RenderFlow.FLAG_UPDATE_RENDER_DATA;
     }
+
 }
+
+MotionStreakAssembler.register(MotionStreak, {
+    getConstructor(comp) {
+        const material = comp.getMaterials()[0];
+        let isMultiMaterial = material && material.material.isMultiSupport();
+        return isMultiMaterial ? MultiMotionStreakAssembler : MotionStreakAssembler;
+    },
+
+    MotionStreakAssembler,
+    MultiMotionStreakAssembler
+});
+
+MultiMotionStreakAssembler.prototype.floatsPerVert = 6;
+MultiMotionStreakAssembler.prototype.texIdOffset = 5;
+MultiMotionStreakAssembler.prototype.isMulti = true;
