@@ -219,7 +219,19 @@ var MotionStreak = cc.Class({
         autoSwitchMaterial: {
             type: RenderComponent.EnableType,
             default: RenderComponent.EnableType.GLOBAL,
+            notify(oldValue) {
+                if (this.autoSwitchMaterial === oldValue) return;
+                this.setVertsDirty();
+            },
         },
+    },
+
+    setVertsDirty() {
+        // 自动切换材质
+        this._checkSwitchMaterial();
+
+        this._updateMaterial();
+        this._super();
     },
 
     __preload() {

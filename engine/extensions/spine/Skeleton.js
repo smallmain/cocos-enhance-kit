@@ -435,10 +435,18 @@ sp.Skeleton = cc.Class({
         autoSwitchMaterial: {
             type: RenderComponent.EnableType,
             default: RenderComponent.EnableType.GLOBAL,
+            notify(oldValue) {
+                if (this.autoSwitchMaterial === oldValue) return;
+                this.setVertsDirty();
+            },
         },
         allowDynamicAtlas: {
             type: RenderComponent.EnableType,
             default: RenderComponent.EnableType.GLOBAL,
+            notify(oldValue) {
+                if (this.allowDynamicAtlas === oldValue) return;
+                this.setVertsDirty();
+            },
         },
     },
 
@@ -456,6 +464,13 @@ sp.Skeleton = cc.Class({
         this._endEntry = {animation : {name : ""}, trackIndex : 0};
         this.attachUtil = new AttachUtil();
         this._dataDirty = true;
+    },
+
+    setVertsDirty() {
+        this._dataDirty = true;
+        this.invalidAnimationCache();
+        this._materialCache = {};
+        this._super();
     },
 
     // override base class _getDefaultMaterial to modify default material
@@ -1010,8 +1025,7 @@ sp.Skeleton = cc.Class({
                 attachment.setRegion(region);
                 attachment.updateOffset();
             }
-            this._dataDirty = true;
-            this.invalidAnimationCache();
+            this.setVertsDirty();
             return true;
         }
         return false;

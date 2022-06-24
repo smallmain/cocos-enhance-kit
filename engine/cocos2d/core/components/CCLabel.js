@@ -586,15 +586,24 @@ let Label = cc.Class({
         autoSwitchMaterial: {
             type: RenderComponent.EnableType,
             default: RenderComponent.EnableType.GLOBAL,
+            notify(oldValue) {
+                if (this.autoSwitchMaterial === oldValue) return;
+                this.setVertsDirty();
+            },
         },
         allowDynamicAtlas: {
             type: RenderComponent.EnableType,
             default: RenderComponent.EnableType.GLOBAL,
+            notify(oldValue) {
+                if (this.allowDynamicAtlas === oldValue) return;
+                this.setVertsDirty();
+            },
         },
         enableRetina: {
             type: RenderComponent.EnableType,
             default: RenderComponent.EnableType.GLOBAL,
             notify(oldValue) {
+                if (this.enableRetina === oldValue) return;
                 this.setVertsDirty();
             }
         },
