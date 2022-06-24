@@ -1,0 +1,14 @@
+{
+    "copy_resources": [
+        {
+            "from": "../../../src",
+            "to": "src"
+        },
+        {		
+            "from": "../Classes/ide-support/lang",		
+            "to": ""		
+        }
+    ],
+    "must_copy_resources": [
+    ]
+}

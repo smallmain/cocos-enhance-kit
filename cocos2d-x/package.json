@@ -1,0 +1,27 @@
+{
+  "name": "cocos2d-x-lite",
+  "version": "2.4.9",
+  "description": "Cocos2d-x, compact version",
+  "main": "gulpfile.js",
+  "devDependencies": {
+    "async": "^2.6.1",
+    "chalk": "^2.4.1",
+    "download": "^6.2.5",
+    "fs-extra": "0.30.0",
+    "ftp": "0.3.10",
+    "gulp": "3.9.1",
+    "gulp-sequence": "0.4.5",
+    "gulp-zip": "3.2.0",
+    "tree-kill": "^1.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cocos-creator/cocos2d-x-lite.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cocos-creator/cocos2d-x-lite/issues"
+  },
+  "homepage": "https://github.com/cocos-creator/cocos2d-x-lite#readme"
+}
