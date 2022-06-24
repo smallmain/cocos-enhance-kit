@@ -483,6 +483,10 @@ let Label = cc.Class({
 
                 if (oldValue === CacheMode.CHAR) {
                     this._ttfTexture = null;
+                    const material = this._materials[0];
+                    if (material && material.material && cc.Label._shareAtlas.material === material.material) {
+                        this.setMaterial(0, this._getDefaultMaterial());
+                    }
                 }
 
                 if (!this.enabledInHierarchy) return;

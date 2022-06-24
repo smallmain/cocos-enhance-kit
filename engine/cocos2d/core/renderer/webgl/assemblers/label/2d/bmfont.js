@@ -65,7 +65,7 @@ export default class WebglBmfontAssembler extends BmfontAssembler {
         return comp.node._color._val;
     }
 
-    appendQuad (comp, texture, rect, rotated, x, y, scale) {
+    appendQuad(comp, texture, rect, rotated, x, y, scale, letter) {
         let renderData = this._renderData;
         let verts = renderData.vDatas[0],
             uintVerts = renderData.uintVDatas[0];
@@ -131,7 +131,7 @@ export default class WebglBmfontAssembler extends BmfontAssembler {
         b = y - rectHeight * scale;
         t = y;
 
-        this.appendVerts(comp, _dataOffset, l, r, b, t);
+        this.appendVerts(comp, _dataOffset, l, r, b, t, letter);
 
         // colors
         let colorOffset = _dataOffset + this.colorOffset;
@@ -143,7 +143,7 @@ export default class WebglBmfontAssembler extends BmfontAssembler {
         _dataOffset += this.floatsPerVert * 4;
     }
 
-    appendVerts (comp, offset, l, r, b, t) {
+    appendVerts(comp, offset, l, r, b, t, letter) {
         let local = this._local;
         let floatsPerVert = this.floatsPerVert;
 

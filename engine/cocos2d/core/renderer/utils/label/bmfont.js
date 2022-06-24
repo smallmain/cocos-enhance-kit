@@ -339,6 +339,8 @@ export default class BmfontAssembler extends Assembler2D {
             index += tokenLen;
         } //end of for loop
 
+        this._finishMultilineTextWrap();
+
         _linesWidth.push(letterRight);
 
         _numberOfLines = lineIndex + 1;
@@ -638,7 +640,7 @@ export default class BmfontAssembler extends Assembler2D {
             if (_tmpRect.height > 0 && _tmpRect.width > 0) {
                 let isRotated = this._determineRect(_tmpRect);
                 let letterPositionX = letterInfo.x + _linesOffsetX[letterInfo.line];
-                this.appendQuad(_comp, texture, _tmpRect, isRotated, letterPositionX - appx, py - appy, _bmfontScale);
+                this.appendQuad(_comp, texture, _tmpRect, isRotated, letterPositionX - appx, py - appy, _bmfontScale, letterDef);
             }
         }
         this._quadsUpdated(_comp);
@@ -727,8 +729,9 @@ export default class BmfontAssembler extends Assembler2D {
 
     updateWorldVerts() {}
 
-    appendQuad (comp, texture, rect, rotated, x, y, scale) {}
+    appendQuad(comp, texture, rect, rotated, x, y, scale, letter) {}
     _quadsUpdated (comp) {}
 
     _reserveQuads () {}
+    _finishMultilineTextWrap() { }
 }

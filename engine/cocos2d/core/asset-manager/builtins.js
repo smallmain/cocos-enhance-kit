@@ -95,7 +95,7 @@ var builtins = {
             effect.addRef();
             cc.sp.inited = true;
             cc.sp.multiBatcher.init();
-            if (cc.dynamicAtlasManager.maxAtlasCount === -1) cc.dynamicAtlasManager.maxAtlasCount = cc.sp.MAX_MULTITEXTURE_NUM;
+            if (cc.dynamicAtlasManager.maxAtlasCount === -1) cc.dynamicAtlasManager.maxAtlasCount = Math.max(0, cc.sp.MAX_MULTITEXTURE_NUM - cc.sp.charAtlasAutoBatchCount);
             cb();
         });
     },
