@@ -7,6 +7,8 @@ export default class Effect extends EffectBase {
 
     _techniques: Technique[] = [];
     _asset = null;
+    static id = 0;
+    _id = '';
     
     get technique () {
         return this._technique;
@@ -22,6 +24,7 @@ export default class Effect extends EffectBase {
     constructor (name, techniques, techniqueIndex, asset) {
         super();
         this.init(name, techniques, techniqueIndex, asset, true);
+        this._id = '|' + Effect.id++;
     }
 
     init (name, techniques, techniqueIndex, asset, createNative) {

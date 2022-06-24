@@ -75,7 +75,7 @@ export default class EffectVariant extends EffectBase {
 
         let effect = this._effect;
         if (effect) {
-            hash += utils.serializePasses(effect.passes);
+            hash += effect._id;
         }
 
         this._hash = murmurhash2(hash, 666);

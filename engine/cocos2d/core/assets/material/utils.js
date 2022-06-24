@@ -18,12 +18,14 @@ import enums from '../../../renderer/enums';
 const hashArray = [];
 
 function serializeDefines (defines, names) {
-    const len = names.length;
-    for (let i = 0; i < len; i++) {
-        const name = names[i];
-        hashArray[i] = name + defines[name];
+    let i = 0;
+    for (const name in defines) {
+        if (Object.hasOwnProperty.call(defines, name)) {
+            hashArray[i] = name + defines[name];
+            i++;
+        }
     }
-    hashArray.length = len;
+    hashArray.length = i;
     return hashArray.join('');
 }
 
@@ -63,21 +65,23 @@ function serializePasses (passes) {
 
 function serializeUniforms (uniforms, names) {
     let index = 0;
-    for (let i = 0, len = names.length; i < len; i++) {
-        let param = uniforms[names[i]];
-        let prop = param.value;
+    for (const name in uniforms) {
+        if (Object.hasOwnProperty.call(uniforms, name)) {
+            const param = uniforms[name];
+            let prop = param.value;
 
-        if (!prop) {
-            continue;
-        }
+            if (!prop) {
+                continue;
+            }
 
-        if (param.type === enums.PARAM_TEXTURE_2D || param.type === enums.PARAM_TEXTURE_CUBE) {
-            hashArray[index] = prop._id;
+            if (param.type === enums.PARAM_TEXTURE_2D || param.type === enums.PARAM_TEXTURE_CUBE) {
+                hashArray[index] = prop._id;
+            }
+            else {
+                hashArray[index] = prop.toString();
+            }
+            index++;
         }
-        else {
-            hashArray[index] = prop.toString();
-        }
-        index++
     }
     hashArray.length = index;
     return hashArray.join(';');
