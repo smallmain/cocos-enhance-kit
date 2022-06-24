@@ -352,6 +352,46 @@ let RichText = cc.Class({
             }
         },
 
+        /**
+         * 自定义内部使用的材质
+         */
+        customMaterial: {
+            default: null,
+            type: cc.Material,
+            notify: function (oldValue) {
+                if (this.customMaterial === oldValue) return;
+                const material = this.customMaterial == null ? this._getDefaultMaterial() : this.customMaterial;
+                for (let i = 0; i < this._labelSegments.length; i++) {
+                    const labelComponent = this._labelSegments[i].getComponent(cc.Label);
+                    if (labelComponent) {
+                        if (labelComponent._materials.length === 0) {
+                            labelComponent._materials[0] = MaterialVariant.create(material, labelComponent);
+                        } else {
+                            labelComponent.setMaterial(0, material);
+                        }
+                    }
+                    const spriteComponent = this._labelSegments[i].getComponent(cc.Sprite);
+                    if (spriteComponent) {
+                        if (spriteComponent._materials.length === 0) {
+                            spriteComponent._materials[0] = MaterialVariant.create(material, spriteComponent);
+                        } else {
+                            spriteComponent.setMaterial(0, material);
+                        }
+                    }
+                }
+                for (let i = 0; i < this._labelSegmentsCache.length; i++) {
+                    const labelComponent = this._labelSegmentsCache[i].getComponent(cc.Label);
+                    if (labelComponent) {
+                        if (labelComponent._materials.length === 0) {
+                            labelComponent._materials[0] = MaterialVariant.create(material, labelComponent);
+                        } else {
+                            labelComponent.setMaterial(0, material);
+                        }
+                    }
+                }
+            }
+        },
+
         autoSwitchMaterial: {
             type: RenderComponent.EnableType,
             default: RenderComponent.EnableType.GLOBAL,
@@ -708,6 +748,17 @@ let RichText = cc.Class({
             spriteComponent.autoSwitchMaterial = this.autoSwitchMaterial;
             spriteComponent.allowDynamicAtlas = this.allowDynamicAtlas;
 
+            // 更新材质
+            if (this.customMaterial) {
+                if (spriteComponent._materials.length === 0) {
+                    spriteComponent._materials[0] = MaterialVariant.create(this.customMaterial, spriteComponent);
+                } else {
+                    if (spriteComponent._materials[0].material !== this.customMaterial) {
+                        spriteComponent.setMaterial(0, this.customMaterial);
+                    }
+                }
+            }
+
             switch (richTextElement.style.imageAlign)
             {
                 case 'top':
@@ -1002,6 +1053,17 @@ let RichText = cc.Class({
 
         labelComponent.autoSwitchMaterial = this.autoSwitchMaterial;
         labelComponent.allowDynamicAtlas = this.allowDynamicAtlas;
+
+        // 更新材质
+        if (this.customMaterial) {
+            if (labelComponent._materials.length === 0) {
+                labelComponent._materials[0] = MaterialVariant.create(this.customMaterial, labelComponent);
+            } else {
+                if (labelComponent._materials[0].material !== this.customMaterial) {
+                    labelComponent.setMaterial(0, this.customMaterial);
+                }
+            }
+        }
 
         let isAsset = this.font instanceof cc.Font;
         if (isAsset && !this._isSystemFontUsed) {
