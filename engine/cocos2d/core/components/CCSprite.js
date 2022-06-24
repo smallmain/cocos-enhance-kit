@@ -392,6 +392,10 @@ var Sprite = cc.Class({
             type: RenderComponent.EnableType,
             default: RenderComponent.EnableType.GLOBAL,
         },
+        allowDynamicAtlas: {
+            type: RenderComponent.EnableType,
+            default: RenderComponent.EnableType.GLOBAL,
+        },
     },
 
     statics: {

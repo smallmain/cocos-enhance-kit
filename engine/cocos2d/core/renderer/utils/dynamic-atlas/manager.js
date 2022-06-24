@@ -1,12 +1,15 @@
-const Atlas = require('./atlas');
+// const Atlas = require('./atlas');
+import { Atlas, Rect } from './reusable-atlas';
 
 let _atlases = [];
 let _atlasIndex = -1;
 
-let _maxAtlasCount = 5;
+let _maxAtlasCount = -1;
 let _textureSize = 2048;
 let _maxFrameSize = 512;
 let _textureBleeding = true;
+let _autoMultiBatch = true;
+let _autoResetBeforeSceneLoad = true;
 
 let _debugNode = null;
 
@@ -15,12 +18,15 @@ function newAtlas () {
     if (!atlas) {
         atlas = new Atlas(_textureSize, _textureSize);
         _atlases.push(atlas);
+        if (dynamicAtlasManager.autoMultiBatch) cc.sp.multiBatcher.requsetMaterial(atlas._texture);
     }
     return atlas;
 }
 
-function beforeSceneLoad () {
-    dynamicAtlasManager.reset();
+function beforeSceneLoad() {
+    if (_autoResetBeforeSceneLoad) {
+        dynamicAtlasManager.reset();
+    }
 }
 
 let _enabled = false;
@@ -32,6 +38,7 @@ let _enabled = false;
  */
 let dynamicAtlasManager = {
     Atlas: Atlas,
+    Rect: Rect,
 
     /**
      * !#en Enable or disable the dynamic atlas, see [Dynamic Atlas](https://docs.cocos.com/creator/manual/en/advanced-topics/dynamic-atlas.html) for details.
@@ -39,10 +46,10 @@ let dynamicAtlasManager = {
      * @property enabled
      * @type {Boolean}
      */
-    get enabled () {
+    get enabled() {
         return _enabled;
     },
-    set enabled (value) {
+    set enabled(value) {
         if (_enabled === value) return;
 
         if (value) {
@@ -62,10 +69,10 @@ let dynamicAtlasManager = {
      * @property maxAtlasCount
      * @type {Number}
      */
-    get maxAtlasCount () {
+    get maxAtlasCount() {
         return _maxAtlasCount;
     },
-    set maxAtlasCount (value) {
+    set maxAtlasCount(value) {
         _maxAtlasCount = value;
     },
 
@@ -75,7 +82,7 @@ let dynamicAtlasManager = {
      * @property atlasCount
      * @type {Number}
      */
-    get atlasCount () {
+    get atlasCount() {
         return _atlases.length;
     },
 
@@ -85,11 +92,11 @@ let dynamicAtlasManager = {
      * @property textureBleeding
      * @type {Boolean}
      */
-    get textureBleeding () {
+    get textureBleeding() {
         return _textureBleeding;
     },
 
-    set textureBleeding (enable) {
+    set textureBleeding(enable) {
         _textureBleeding = enable;
     },
 
@@ -99,10 +106,10 @@ let dynamicAtlasManager = {
      * @property textureSize
      * @type {Number}
      */
-    get textureSize () {
+    get textureSize() {
         return _textureSize;
     },
-    set textureSize (value) {
+    set textureSize(value) {
         _textureSize = value;
     },
 
@@ -112,12 +119,64 @@ let dynamicAtlasManager = {
      * @property maxFrameSize
      * @type {Number}
      */
-    get maxFrameSize () {
+    get maxFrameSize() {
         return _maxFrameSize;
     },
-    set maxFrameSize (value) {
+    set maxFrameSize(value) {
         _maxFrameSize = value;
     },
+
+    /**
+     * !#en Is enable autoMultiBatch.
+     * !#zh 是否开启自动多纹理合批
+     * @property autoMultiBatch
+     * @type {Boolean}
+     */
+    get autoMultiBatch() {
+        return _autoMultiBatch;
+    },
+
+    set autoMultiBatch(enable) {
+        if (_autoMultiBatch === enable) return;
+
+        if (enable) {
+            for (let i = 0, l = _atlases.length; i < l; i++) {
+                cc.sp.multiBatcher.requsetMaterial(_atlases[i]._texture);
+            }
+        }
+
+        _autoMultiBatch = enable;
+    },
+
+    /**
+     * !#en Is enable autoResetBeforeSceneLoad.
+     * !#zh 是否在场景切换时清空所有图集
+     * @property autoResetBeforeSceneLoad
+     * @type {Boolean}
+     */
+    get autoResetBeforeSceneLoad() {
+        return _autoResetBeforeSceneLoad;
+    },
+
+    set autoResetBeforeSceneLoad(enable) {
+        if (_autoResetBeforeSceneLoad === enable) return;
+        _autoResetBeforeSceneLoad = enable;
+    },
+
+    /**
+     * !#en atlases
+     * !#zh 图集数组
+     * @property atlases
+     * @type {Atlas}
+     */
+    get atlases() {
+        return _atlases;
+    },
+
+    /**
+     * 已用空间集合
+     */
+    rects: Object.create(null),
 
     /**
      * !#en The minimum size of the picture that can be added to the atlas.
@@ -133,24 +192,75 @@ let dynamicAtlasManager = {
      * @method insertSpriteFrame
      * @param {SpriteFrame} spriteFrame
      */
-    insertSpriteFrame (spriteFrame) {
+    insertSpriteFrame(spriteFrame) {
         if (CC_EDITOR) return null;
-        if (!_enabled || _atlasIndex === _maxAtlasCount ||
-            !spriteFrame || spriteFrame._original) return null;
+        if (!_enabled || !spriteFrame || spriteFrame._original) return null;
 
-        if (!spriteFrame._texture.packable) return null;
+        let atlas, frame;
 
-        let atlas = _atlases[_atlasIndex];
-        if (!atlas) {
-            atlas = newAtlas();
+        // 是否贴图已经在图集中
+        let rect = spriteFrame._rect,
+            texture = spriteFrame._texture,
+            info = this.rects[texture._uuid];
+
+        let sx = rect.x, sy = rect.y;
+
+        if (info) {
+            sx += info.x;
+            sy += info.y;
+
+            info.spriteFrames.push(spriteFrame);
+
+            frame = {
+                x: sx,
+                y: sy,
+                texture: info.atlas._texture,
+            };
+
+            return frame;
         }
 
-        let frame = atlas.insertSpriteFrame(spriteFrame);
-        if (!frame && _atlasIndex !== _maxAtlasCount) {
+        // 尝试加入已有图集
+        for (let i = 0; i <= _atlasIndex; i++) {
+            atlas = _atlases[i];
+            frame = atlas.insertSpriteFrame(spriteFrame);
+            if (frame) {
+                return frame;
+            }
+        }
+
+        // 创建新图集尝试加入
+        if (_atlasIndex + 1 < _maxAtlasCount) {
             atlas = newAtlas();
             return atlas.insertSpriteFrame(spriteFrame);
         }
+
         return frame;
+    },
+
+    /**
+     * !#en Delete a sprite frame from the dynamic atlas.
+     * !#zh 使精灵帧取消使用动态图集
+     * @method deleteSpriteFrame
+     * @param {SpriteFrame} spriteFrame
+     */
+    deleteSpriteFrame(spriteFrame) {
+        if (spriteFrame && !CC_TEST) {
+            if (spriteFrame._original) {
+                this.deleteAtlasSpriteFrame(spriteFrame);
+                spriteFrame._resetDynamicAtlasFrame();
+            }
+        }
+    },
+
+    /**
+     * !#en Delete a texture from the dynamic atlas.
+     * !#zh 从动态图集删除该贴图，使用该贴图的精灵帧会被还原
+     * @method deleteTexture
+     * @param {Texture2D} texture
+     */
+    deleteTexture(texture) {
+        this.deleteAtlasTexture(texture);
     },
 
     /**
@@ -170,18 +280,18 @@ let dynamicAtlasManager = {
         if (!spriteFrame._original) return;
 
         let texture = spriteFrame._original._texture;
-        this.deleteAtlasTexture(texture);
+        for (let i = _atlases.length - 1; i >= 0; i--) {
+            if (_atlases[i].deleteSpriteFrame(texture, spriteFrame)) {
+                return;
+            }
+        }
     },
 
     deleteAtlasTexture (texture) {
         if (texture) {
             for (let i = _atlases.length - 1; i >= 0; i--) {
-                _atlases[i].deleteInnerTexture(texture);
-
-                if (_atlases[i].isEmpty()) {
-                    _atlases[i].destroy();
-                    _atlases.splice(i, 1);
-                    _atlasIndex--;
+                if (_atlases[i].deleteInnerTexture(texture, true)) {
+                    return;
                 }
             }
         }

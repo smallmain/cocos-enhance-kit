@@ -27,12 +27,15 @@ export default class Assembler {
     packDynamicAtlasAndCheckMaterial(comp, frame) {
         if (CC_TEST) return false;
 
+        const allowDynamicAtlas = comp.allowDynamicAtlas;
+        if ((cc.sp.allowDynamicAtlas && allowDynamicAtlas === 0) || allowDynamicAtlas === 1) {
             if (!frame._original && dynamicAtlasManager && frame._texture.packable && frame._texture.loaded) {
                 let packedFrame = dynamicAtlasManager.insertSpriteFrame(frame);
                 if (packedFrame) {
                     frame._setDynamicAtlasFrame(packedFrame);
                 }
             }
+        }
 
         const material = comp._materials[0];
         if (!material) return false;

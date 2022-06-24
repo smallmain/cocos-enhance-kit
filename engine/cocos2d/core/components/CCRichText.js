@@ -374,7 +374,31 @@ let RichText = cc.Class({
                     }
                 }
             }
-        }
+        },
+
+        allowDynamicAtlas: {
+            type: RenderComponent.EnableType,
+            default: RenderComponent.EnableType.GLOBAL,
+            notify: function (oldValue) {
+                if (this.allowDynamicAtlas === oldValue) return;
+                for (let i = 0; i < this._labelSegments.length; i++) {
+                    const labelComponent = this._labelSegments[i].getComponent(cc.Label);
+                    if (labelComponent) {
+                        labelComponent.allowDynamicAtlas = this.allowDynamicAtlas;
+                    }
+                    const spriteComponent = this._labelSegments[i].getComponent(cc.Sprite);
+                    if (spriteComponent) {
+                        spriteComponent.allowDynamicAtlas = this.allowDynamicAtlas;
+                    }
+                }
+                for (let i = 0; i < this._labelSegmentsCache.length; i++) {
+                    const labelComponent = this._labelSegmentsCache[i].getComponent(cc.Label);
+                    if (labelComponent) {
+                        labelComponent.allowDynamicAtlas = this.allowDynamicAtlas;
+                    }
+                }
+            }
+        },
     },
 
     statics: {
@@ -682,6 +706,8 @@ let RichText = cc.Class({
             let spriteComponent = spriteNode.addComponent(cc.Sprite);
 
             spriteComponent.autoSwitchMaterial = this.autoSwitchMaterial;
+            spriteComponent.allowDynamicAtlas = this.allowDynamicAtlas;
+
             switch (richTextElement.style.imageAlign)
             {
                 case 'top':
@@ -975,6 +1001,8 @@ let RichText = cc.Class({
         labelComponent.cacheMode = this.cacheMode;
 
         labelComponent.autoSwitchMaterial = this.autoSwitchMaterial;
+        labelComponent.allowDynamicAtlas = this.allowDynamicAtlas;
+
         let isAsset = this.font instanceof cc.Font;
         if (isAsset && !this._isSystemFontUsed) {
             labelComponent.font = this.font;

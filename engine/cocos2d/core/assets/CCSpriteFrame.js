@@ -828,6 +828,11 @@ let SpriteFrame = cc.Class(/** @lends cc.SpriteFrame# */{
                 handle.result.push(this, '_textureSetter', textureUuid);
             }
         }
+    },
+
+    destroy() {
+        cc.dynamicAtlasManager && cc.dynamicAtlasManager.deleteSpriteFrame(this);
+        this._super();
     }
 });
 

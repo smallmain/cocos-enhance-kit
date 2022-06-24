@@ -478,7 +478,7 @@ let Label = cc.Class({
                 if (this.cacheMode === oldValue) return;
                 
                 if (oldValue === CacheMode.BITMAP && !(this.font instanceof cc.BitmapFont)) {
-                    this._frame && this._frame._resetDynamicAtlasFrame();
+                    deleteFromDynamicAtlas(this, this._frame);
                 }
 
                 if (oldValue === CacheMode.CHAR) {
@@ -583,6 +583,10 @@ let Label = cc.Class({
             type: RenderComponent.EnableType,
             default: RenderComponent.EnableType.GLOBAL,
         },
+        allowDynamicAtlas: {
+            type: RenderComponent.EnableType,
+            default: RenderComponent.EnableType.GLOBAL,
+        },
     },
 
     statics: {
@@ -641,9 +645,12 @@ let Label = cc.Class({
         this._assemblerData = null;
         this._letterTexture = null;
         if (this._ttfTexture) {
+            // HACK 由于会出现多个 uuid 一样的情况，销毁时会将动态图集中的区域直接销毁，导致其它使用该区域的 Label 显示错误，所以先将 packable = false，不走销毁逻辑，在下方走 frame 的回收逻辑
+            this._ttfTexture._packable = false;
             this._ttfTexture.destroy();
             this._ttfTexture = null;
         }
+        this._resetFrame();
         this._super();
     },
 
@@ -760,7 +767,7 @@ let Label = cc.Class({
                 } 
 
                 if (this.cacheMode !== CacheMode.CHAR) {
-                    this._frame._resetDynamicAtlasFrame();
+                    deleteFromDynamicAtlas(this, this._frame);
                     this._frame._refreshTexture(this._ttfTexture);
                     if (this._srcBlendFactor === cc.macro.BlendFactor.ONE && !CC_NATIVERENDERER) {
                         this._ttfTexture.setPremultiplyAlpha(true);
