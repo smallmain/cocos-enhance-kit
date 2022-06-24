@@ -139,6 +139,74 @@ let SkeletonData = cc.Class({
 
     statics: {
         preventDeferredLoadDependents: true,
+
+        createRegion(spriteFrame, original = undefined) {
+            const region = new sp.spine.TextureAtlasRegion();
+
+            const texture = spriteFrame.getTexture();
+            const rect = spriteFrame.getRect();
+            const origSize = spriteFrame.getOriginalSize();
+            const _offset = spriteFrame.getOffset();
+            const rotate = spriteFrame.isRotated();
+            const offset = cc.v2(
+                (origSize.width - rect.width) * 0.5 + _offset.x,
+                (origSize.height - rect.height) * 0.5 + _offset.y,
+            );
+            const degrees = rotate ? 270 : 0;
+
+            if (original) {
+                region.name = original.name;
+                region.page = original.page;
+            }
+
+            region.x = rect.x;
+            region.y = rect.y;
+            region.width = rect.width;
+            region.height = rect.height;
+            region.originalWidth = origSize.width;
+            region.originalHeight = origSize.height;
+            region.offsetX = offset.x;
+            region.offsetY = offset.y;
+            region.rotate = degrees != 0;
+            region.degrees = degrees;
+
+            const skelTex = new sp.SkeletonTexture({
+                width: texture.width,
+                height: texture.height,
+            });
+            skelTex.setRealTexture(texture);
+            region.texture = skelTex;
+
+            this.updateRegionUV(region);
+
+            return region;
+        },
+
+        updateRegionUV(region) {
+            const texture = region.texture._texture;
+            if (region.rotate) {
+                region.u = region.x / texture.width;
+                region.v = region.y / texture.height;
+                region.u2 = (region.x + region.height) / texture.width;
+                region.v2 = (region.y + region.width) / texture.height;
+            } else {
+                region.u = region.x / texture.width;
+                region.v = region.y / texture.height;
+                region.u2 = (region.x + region.width) / texture.width;
+                region.v2 = (region.y + region.height) / texture.height;
+            }
+        },
+
+        createSpriteFrame(region) {
+            const frame = new cc.SpriteFrame(
+                region.texture._texture,
+                cc.rect(region.x, region.y, region.width, region.height),
+                region.rotate,  // 如果 region 不是 0 或 270 则会出现问题
+                cc.v2(region.offsetX - (region.originalWidth - region.width) * 0.5, region.offsetY - (region.originalHeight - region.height) * 0.5),
+                cc.size(region.originalWidth, region.originalHeight),
+            );
+            return frame;
+        },
     },
 
     // PUBLIC
@@ -166,6 +234,7 @@ let SkeletonData = cc.Class({
             this._skinsEnum = null;
             this._animsEnum = null;
         }
+        this._cloneId = 0;
     },
 
     ensureTexturesLoaded (loaded, caller) {
@@ -322,7 +391,50 @@ let SkeletonData = cc.Class({
         return this._atlasCache = new sp.spine.TextureAtlas(this.atlasText, this._getTexture.bind(this));
     },
 
-    destroy () {
+    /**
+     * 克隆 SkeletonData
+     */
+    clone: function () {
+        const cloned = new SkeletonData();
+        cloned._cloneId = this._cloneId + 1;
+        const suffix = '(clone ' + String(cloned._cloneId) + ')';
+        cloned._uuid = this._uuid + suffix;
+        cloned.name = this.name + suffix;
+        cloned.scale = this.scale;
+        cloned.textureNames = this.textureNames;
+        cloned.textures = this.textures;
+        cloned._atlasText = this._atlasText;
+        cloned._skeletonJson = this._skeletonJson;
+        cloned._buffer = this._buffer;
+
+        return cloned;
+    },
+
+    destroy() {
+        // 删除动态图集
+        if (this._atlasCache) {
+            const regions = this._atlasCache.regions;
+            for (const region of regions) {
+                if (region._spriteFrame) {
+                    region._spriteFrame.destroy();
+                    region._spriteFrame = null;
+                }
+            }
+        }
+        if (this._skeletonCache) {
+            const skins = this._skeletonCache.skins;
+            for (const skin of skins) {
+                for (const attachments of skin.attachments) {
+                    for (const key in attachments) {
+                        const region = attachments[key].region;
+                        if (region && region._spriteFrame) {
+                            region._spriteFrame.destroy();
+                            region._spriteFrame = null;
+                        }
+                    }
+                }
+            }
+        }
         SkeletonCache.removeSkeleton(this._uuid);
         this._super();
     },

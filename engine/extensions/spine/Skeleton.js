@@ -430,7 +430,16 @@ sp.Skeleton = cc.Class({
         // Play times
         _playTimes : 0,
         // Is animation complete.
-        _isAniComplete : true,
+        _isAniComplete: true,
+
+        autoSwitchMaterial: {
+            type: RenderComponent.EnableType,
+            default: RenderComponent.EnableType.GLOBAL,
+        },
+        allowDynamicAtlas: {
+            type: RenderComponent.EnableType,
+            default: RenderComponent.EnableType.GLOBAL,
+        },
     },
 
     // CONSTRUCTOR
@@ -446,6 +455,7 @@ sp.Skeleton = cc.Class({
         this._startEntry = {animation : {name : ""}, trackIndex : 0};
         this._endEntry = {animation : {name : ""}, trackIndex : 0};
         this.attachUtil = new AttachUtil();
+        this._dataDirty = true;
     },
 
     // override base class _getDefaultMaterial to modify default material
@@ -458,9 +468,12 @@ sp.Skeleton = cc.Class({
         let useTint = this.useTint || (this.isAnimationCached() && !CC_NATIVERENDERER);
         let baseMaterial = this.getMaterial(0);
         if (baseMaterial) {
-            baseMaterial.define('USE_TINT', useTint);
-            baseMaterial.define('CC_USE_MODEL', !this.enableBatch);
-
+            const isMultiSupport = baseMaterial.material.isMultiSupport();
+            if (!isMultiSupport) {
+                baseMaterial.define('USE_TINT', useTint);
+                baseMaterial.define('CC_USE_MODEL', !this.enableBatch);
+            }
+            
             let srcBlendFactor = this.premultipliedAlpha ? cc.gfx.BLEND_ONE : cc.gfx.BLEND_SRC_ALPHA;
             let dstBlendFactor = cc.gfx.BLEND_ONE_MINUS_SRC_ALPHA;
 
@@ -471,6 +484,11 @@ sp.Skeleton = cc.Class({
                 cc.gfx.BLEND_FUNC_ADD,
                 dstBlendFactor, dstBlendFactor
             );
+
+            if (isMultiSupport) {
+                if (this.useTint) this.useTint = false;
+                if (!this.enableBatch) this.enableBatch = true;
+            }
         }
         this._materialCache = {};
     },
@@ -496,7 +514,11 @@ sp.Skeleton = cc.Class({
         let baseMaterial = this.getMaterial(0);
         if (baseMaterial) {
             let useTint = this.useTint || (this.isAnimationCached() && !CC_NATIVERENDERER);
-            baseMaterial.define('USE_TINT', useTint);
+            if (!baseMaterial.material.isMultiSupport()) {
+                baseMaterial.define('USE_TINT', useTint);
+            } else {
+                if (this.useTint) this.useTint = false;
+            }
         }
         this._materialCache = {};
     },
@@ -505,7 +527,11 @@ sp.Skeleton = cc.Class({
     _updateBatch () {
         let baseMaterial = this.getMaterial(0);
         if (baseMaterial) {
-            baseMaterial.define('CC_USE_MODEL', !this.enableBatch);
+            if (!baseMaterial.material.isMultiSupport()) {
+                baseMaterial.define('CC_USE_MODEL', !this.enableBatch);
+            } else {
+                if (!this.enableBatch) this.enableBatch = true;
+            }
         }
         this._materialCache = {};
     },
@@ -663,6 +689,8 @@ sp.Skeleton = cc.Class({
         dt *= this.timeScale * sp.timeScale;
 
         if (this.isAnimationCached()) {
+
+            if (this._assembler) this._assembler.handleDynamicAtlasAndSwitchMaterial(this);
 
             // Cache mode and has animation queue.
             if (this._isAniComplete) {
@@ -959,6 +987,37 @@ sp.Skeleton = cc.Class({
     },
 
     /**
+     * 获取 attachment 的 region
+     */
+    getRegion(slotName, attachmentName) {
+        const attachment = this.getAttachment(slotName, attachmentName);
+        if (attachment) {
+            return attachment.region;
+        }
+        return null;
+    },
+
+    /**
+     * 修改 attachment 的 region
+     */
+    setRegion(slotName, attachmentName, region) {
+        const attachment = this.getAttachment(slotName, attachmentName);
+        if (attachment) {
+            attachment.region = region;
+            if (attachment instanceof sp.spine.MeshAttachment) {
+                attachment.updateUVs();
+            } else if (attachment instanceof sp.spine.RegionAttachment) {
+                attachment.setRegion(region);
+                attachment.updateOffset();
+            }
+            this._dataDirty = true;
+            this.invalidAnimationCache();
+            return true;
+        }
+        return false;
+    },
+
+    /**
     * Return the renderer of attachment.
     * @method getTextureAtlas
     * @param {sp.spine.RegionAttachment|spine.BoundingBoxAttachment} regionAttachment
@@ -1018,6 +1077,7 @@ sp.Skeleton = cc.Class({
                 if (this.attachUtil._hasAttachedNode()) {
                     this._frameCache.enableCacheAttachedInfo();
                 }
+                if (this._assembler) this._assembler.handleDynamicAtlasAndSwitchMaterial(this);
                 this._frameCache.updateToFrame(0);
                 this._curFrame = this._frameCache.frames[0];
             }
@@ -1330,7 +1390,9 @@ sp.Skeleton = cc.Class({
         }
     },
 
-    _updateSkeletonData () {
+    _updateSkeletonData() {
+        this._dataDirty = true;
+        
         if (!this.skeletonData) {
             this.disableRender();
             return;

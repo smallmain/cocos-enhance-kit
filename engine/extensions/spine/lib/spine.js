@@ -8004,7 +8004,7 @@ var spine;
         RegionAttachment.prototype.setRegion = function (region) {
             this.region = region;
             var uvs = this.uvs;
-            if (region.rotate) {
+            if (region.degrees === 90) {
                 uvs[2] = region.u;
                 uvs[3] = region.v2;
                 uvs[4] = region.u;
@@ -8013,8 +8013,16 @@ var spine;
                 uvs[7] = region.v;
                 uvs[0] = region.u2;
                 uvs[1] = region.v2;
-            }
-            else {
+            } else if (region.degrees === 270) {
+                uvs[6] = region.u;
+                uvs[7] = region.v2;
+                uvs[0] = region.u;
+                uvs[1] = region.v;
+                uvs[2] = region.u2;
+                uvs[3] = region.v;
+                uvs[4] = region.u2;
+                uvs[5] = region.v2;
+            } else {
                 uvs[0] = region.u;
                 uvs[1] = region.v2;
                 uvs[2] = region.u;
