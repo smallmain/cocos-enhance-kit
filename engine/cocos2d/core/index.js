@@ -40,6 +40,8 @@ if (!CC_EDITOR || !Editor.isMainProcess) {
     require('./physics');
     require('./camera/CCCamera');
     require('./geom-utils');
+
+    require('./sp');
 }
 
 require('./mesh');

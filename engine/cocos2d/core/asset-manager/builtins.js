@@ -80,8 +80,50 @@ var builtins = {
         }
 
         this._loadBuiltins('effect', () => {
-            this._loadBuiltins('material', cb);
+            this._loadBuiltins('material', () => {
+                this._loadBuiltinsSP(cb);
+            });
         });
+    },
+
+    _loadBuiltinsSP(cb) {
+        cc.sp.MAX_MULTITEXTURE_NUM = 8;
+        // cc.renderer.device.caps.maxTextureUnits
+
+        this._loadMultiEffect('multi-2d-sprite', (effect) => {
+            cc.sp.multi2dSpriteEffectAsset = effect;
+            effect.addRef();
+            cc.sp.inited = true;
+            cc.sp.multiBatcher.init();
+
+            cb();
+        });
+    },
+
+    _loadMultiEffect(name, cb) {
+        if (CC_EDITOR) {
+            cc.assetManager.loadAny(Editor.assetdb.remote.urlToUuid('db://service-pack-resources/sp/effects/' + name + '.effect'), function (err, effect) {
+                if (err) {
+                    return Editor.error(err);
+                } else {
+                    cb(effect);
+                }
+            });
+        } else {
+            cc.assetManager.loadBundle('sp', (err, bundle) => {
+                if (err) {
+                    cc.error(err);
+                } else {
+                    bundle.load('effects/' + name, cc.EffectAsset, (err, effect) => {
+                        if (err) {
+                            cc.error(err);
+                        } else {
+                            cb(effect);
+                        }
+                    });
+                }
+            });
+        }
     },
 
     /**

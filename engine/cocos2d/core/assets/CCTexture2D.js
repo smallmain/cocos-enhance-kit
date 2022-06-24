@@ -470,6 +470,9 @@ var Texture2D = cc.Class({
         if (CC_EDITOR) {
             this._exportedExts = null;
         }
+
+        // multi batcher
+        this._multiMaterial = null;
     },
 
     /**
@@ -687,6 +690,8 @@ var Texture2D = cc.Class({
             this._image.close && this._image.close();
         }
         this._packable && cc.dynamicAtlasManager && cc.dynamicAtlasManager.deleteAtlasTexture(this);
+
+        this.unlinkMaterial();
 
         this._image = null;
         this._texture && this._texture.destroy();
@@ -1054,7 +1059,43 @@ var Texture2D = cc.Class({
         else {
             cb();
         }
-    }
+    },
+
+    linkMaterial(material, index) {
+        const handler = material.getMultiHandler();
+        if (handler) {
+            if (index == null) {
+                if (handler.autoSetTexture(this) === -1) {
+                    return false;
+                }
+            } else {
+                handler.setTexture(index, this);
+            }
+            this.unlinkMaterial();
+            this._multiMaterial = material;
+            return true;
+        } else {
+            return false;
+        }
+    },
+
+    unlinkMaterial() {
+        if (this._multiMaterial) {
+            const handler = this._multiMaterial.getMultiHandler();
+            const _texture = this.getImpl();
+            handler.removeTexture(_texture);
+            this._multiMaterial = null;
+        }
+    },
+
+    getLinkedMaterial() {
+        return this._multiMaterial;
+    },
+
+    hasLinkedMaterial() {
+        return !!this._multiMaterial;
+    },
+
 });
 
 /**

@@ -72,6 +72,7 @@ let Material = cc.Class({
         this._manualHash = false;
         this._dirty = true;
         this._effect = null;
+        this._multiHandler = null;
     },
 
     properties: {
@@ -124,6 +125,8 @@ let Material = cc.Class({
                 }
 
                 this._effect = this._effectAsset.getInstantiatedEffect();
+
+                this.updateMultiSupport();
             }
         },
 
@@ -140,6 +143,7 @@ let Material = cc.Class({
             set (v) {
                 this._techniqueIndex = v;
                 this._effect.switchTechnique(v);
+                this.updateMultiSupport();
             }
         }
     },
@@ -401,7 +405,39 @@ let Material = cc.Class({
             }
         }
 
+        this.updateMultiSupport();
+        if (this._multiHandler) this._multiHandler.syncTextures();
     },
+
+    updateMultiSupport() {
+        const passes = this._effect.technique.passes;
+        if (passes.length > 0 && passes[0].getDefine("USE_MULTI_TEXTURE")) {
+            this.setMultiSupport(true);
+        } else {
+            this.setMultiSupport(false);
+        }
+    },
+
+    isMultiSupport() {
+        return !!this._multiHandler;
+    },
+
+    setMultiSupport(bool) {
+        if (bool) {
+            if (this._multiHandler) {
+                this._multiHandler.syncTextures();
+            } else {
+                this._multiHandler = new cc.sp.MultiHandler(this);
+            }
+        } else if (!bool) {
+            this._multiHandler = null;
+        }
+    },
+
+    getMultiHandler() {
+        return this._multiHandler;
+    },
+
 });
 
 export default Material;
