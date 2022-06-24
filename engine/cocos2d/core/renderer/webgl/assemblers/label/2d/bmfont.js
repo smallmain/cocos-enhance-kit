@@ -121,6 +121,11 @@ export default class WebglBmfontAssembler extends BmfontAssembler {
 
 
         // positions
+        const retinaScale = this.getTTFTextureSizeScale();
+        x /= retinaScale;
+        y /= retinaScale;
+        rectWidth /= retinaScale;
+        rectHeight /= retinaScale;
         l = x;
         r = x + rectWidth * scale;
         b = y - rectHeight * scale;

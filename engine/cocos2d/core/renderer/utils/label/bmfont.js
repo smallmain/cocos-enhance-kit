@@ -75,6 +75,8 @@ let _isWrapText = false;
 let _labelWidth = 0;
 let _labelHeight = 0;
 let _maxLineWidth = 0;
+let _isRetina = false;
+let _retinaScale = 1;
 
 export default class BmfontAssembler extends Assembler2D {
     updateRenderData (comp) {
@@ -112,6 +114,12 @@ export default class BmfontAssembler extends Assembler2D {
         this._updateContent();
         this.updateWorldVerts(comp);
 
+        if (_isRetina) {
+            _contentSize.width /= _retinaScale;
+            _contentSize.height /= _retinaScale;
+            _fontSize /= _retinaScale;
+        }
+
         _comp._actualFontSize = _fontSize;
         _comp.node.setContentSize(_contentSize);
 
@@ -139,8 +147,14 @@ export default class BmfontAssembler extends Assembler2D {
         shareLabelInfo.margin = 0;
     }
 
+    getTTFTextureSizeScale() {
+        return _isRetina ? _retinaScale : 1;
+    }
+
     _updateProperties (comp) {
         _string = comp.string.toString();
+        _isRetina = !(comp.font instanceof cc.BitmapFont) && (cc.sp.enableLabelRetina && comp.enableRetina === 0) || comp.enableRetina === 1;
+        _retinaScale = cc.sp.labelRetinaScale;
         _fontSize = comp.fontSize;
         _originFontSize = _fntConfig ? _fntConfig.fontSize : comp.fontSize;
         _hAlign = comp.horizontalAlign;
@@ -151,6 +165,15 @@ export default class BmfontAssembler extends Assembler2D {
         
         _contentSize.width = comp.node.width;
         _contentSize.height = comp.node.height;
+
+        if (_isRetina) {
+            _fontSize *= _retinaScale;
+            if (!_fntConfig) _originFontSize *= _retinaScale;
+            _contentSize.width *= _retinaScale;
+            _contentSize.height *= _retinaScale;
+            _lineHeight *= _retinaScale;
+            shareLabelInfo.margin *= _retinaScale;
+        }
 
         // should wrap text
         if (_overflow === Overflow.NONE) {

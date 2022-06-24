@@ -55,6 +55,8 @@ let _fontFamily = '';
 let _overflow = Overflow.NONE;
 let _isWrapText = false;
 let _premultiply = false;
+let _isRetina = false;
+let _retinaScale = 1;
 
 // outline
 let _outlineComp = null;
@@ -117,6 +119,11 @@ export default class TTFAssembler extends Assembler2D {
     }
 
     _aftUpdateRenderData(comp) {
+        if (_isRetina) {
+            _fontSize /= _retinaScale;
+            _nodeContentSize.width /= _retinaScale;
+            _nodeContentSize.height /= _retinaScale;
+        }
         comp._actualFontSize = _fontSize;
         comp.node.setContentSize(_nodeContentSize);
 
@@ -129,6 +136,10 @@ export default class TTFAssembler extends Assembler2D {
         _texture = null;
     }
 
+    getTTFTextureSizeScale() {
+        return _isRetina ? _retinaScale : 1;
+    }
+
     updateVerts () {
     }
 
@@ -138,6 +149,9 @@ export default class TTFAssembler extends Assembler2D {
         _contentSizeExtend.width = _contentSizeExtend.height = 0;
         if (_outlineComp) {
             outlineWidth = _outlineComp.width;
+            if (_isRetina) {
+                outlineWidth *= _retinaScale;
+            }
             top = bottom = left = right = outlineWidth;
             _contentSizeExtend.width = _contentSizeExtend.height = outlineWidth * 2;
         }
@@ -166,15 +180,27 @@ export default class TTFAssembler extends Assembler2D {
         _canvas = assemblerData.canvas;
         _texture = comp._frame._original ? comp._frame._original._texture : comp._frame._texture;
 
+        _isRetina = (cc.sp.enableLabelRetina && comp.enableRetina === 0) || comp.enableRetina === 1;
+        _retinaScale = cc.sp.labelRetinaScale;
         _string = comp.string.toString();
         _fontSize = comp._fontSize;
-        _drawFontSize = _fontSize;
-        _underlineThickness = comp.underlineHeight || _drawFontSize / 8;
-        _overflow = comp.overflow;
-        _canvasSize.width = comp.node.width;
-        _canvasSize.height = comp.node.height;
         _nodeContentSize = comp.node.getContentSize();
         _lineHeight = comp._lineHeight;
+        _drawFontSize = _fontSize;
+        _underlineThickness = comp.underlineHeight || _drawFontSize / 8;
+
+        if (_isRetina) {
+            _fontSize *= _retinaScale;
+            _nodeContentSize.width *= _retinaScale;
+            _nodeContentSize.height *= _retinaScale;
+            _lineHeight *= _retinaScale;
+            if (comp.underlineHeight) _underlineThickness *= _retinaScale;
+            _drawFontSize = _fontSize;
+        }
+
+        _overflow = comp.overflow;
+        _canvasSize.width = _nodeContentSize.width;
+        _canvasSize.height = _nodeContentSize.height;
         _hAlign = comp.horizontalAlign;
         _vAlign = comp.verticalAlign;
         _color = comp.node.color;
@@ -250,14 +276,14 @@ export default class TTFAssembler extends Assembler2D {
 
     _setupOutline () {
         _context.strokeStyle = `rgba(${_outlineColor.r}, ${_outlineColor.g}, ${_outlineColor.b}, ${_outlineColor.a / 255})`;
-        _context.lineWidth = _outlineComp.width * 2;
+        _context.lineWidth = _outlineComp.width * 2 * (_isRetina ? _retinaScale : 1);
     }
 
     _setupShadow () {
         _context.shadowColor = `rgba(${_shadowColor.r}, ${_shadowColor.g}, ${_shadowColor.b}, ${_shadowColor.a / 255})`;
-        _context.shadowBlur = _shadowComp.blur;
-        _context.shadowOffsetX = _shadowComp.offset.x;
-        _context.shadowOffsetY = -_shadowComp.offset.y;
+        _context.shadowBlur = _shadowComp.blur * (_isRetina ? _retinaScale : 1);
+        _context.shadowOffsetX = _shadowComp.offset.x * (_isRetina ? _retinaScale : 1);
+        _context.shadowOffsetY = -_shadowComp.offset.y * (_isRetina ? _retinaScale : 1);
     }
 
     _drawTextEffect (startPosition, lineHeight) {

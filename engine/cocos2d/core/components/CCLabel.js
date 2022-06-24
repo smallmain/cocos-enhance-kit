@@ -587,6 +587,13 @@ let Label = cc.Class({
             type: RenderComponent.EnableType,
             default: RenderComponent.EnableType.GLOBAL,
         },
+        enableRetina: {
+            type: RenderComponent.EnableType,
+            default: RenderComponent.EnableType.GLOBAL,
+            notify(oldValue) {
+                this.setVertsDirty();
+            }
+        },
     },
 
     statics: {

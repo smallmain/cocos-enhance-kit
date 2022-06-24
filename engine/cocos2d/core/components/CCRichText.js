@@ -439,6 +439,26 @@ let RichText = cc.Class({
                 }
             }
         },
+
+        enableRetina: {
+            type: RenderComponent.EnableType,
+            default: RenderComponent.EnableType.GLOBAL,
+            notify: function (oldValue) {
+                if (this.enableRetina === oldValue) return;
+                for (let i = 0; i < this._labelSegments.length; i++) {
+                    const labelComponent = this._labelSegments[i].getComponent(cc.Label);
+                    if (labelComponent) {
+                        labelComponent.enableRetina = this.enableRetina;
+                    }
+                }
+                for (let i = 0; i < this._labelSegmentsCache.length; i++) {
+                    const labelComponent = this._labelSegmentsCache[i].getComponent(cc.Label);
+                    if (labelComponent) {
+                        labelComponent.enableRetina = this.enableRetina;
+                    }
+                }
+            }
+        },
     },
 
     statics: {
@@ -1053,6 +1073,7 @@ let RichText = cc.Class({
 
         labelComponent.autoSwitchMaterial = this.autoSwitchMaterial;
         labelComponent.allowDynamicAtlas = this.allowDynamicAtlas;
+        labelComponent.enableRetina = this.enableRetina;
 
         // 更新材质
         if (this.customMaterial) {

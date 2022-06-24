@@ -49,10 +49,11 @@ export default class WebglTTFAssembler extends TTFAssembler {
         super.updateColor(comp, color);
     }
 
-    updateVerts (comp) {
+    updateVerts(comp) {
+        const scale = this.getTTFTextureSizeScale();
         let node = comp.node,
-            canvasWidth = comp._ttfTexture.width,
-            canvasHeight = comp._ttfTexture.height,
+            canvasWidth = comp._ttfTexture.width / scale,
+            canvasHeight = comp._ttfTexture.height / scale,
             appx = node.anchorX * node.width,
             appy = node.anchorY * node.height;
 
