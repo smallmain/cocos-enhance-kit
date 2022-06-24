@@ -68,8 +68,12 @@ let Assembler = {
 
     _updateRenderData () {
         if (!this._renderComp || !this._renderComp.isValid) return;
-        this.updateRenderData(this._renderComp);
+        if (!this.updateRenderData(this._renderComp)) {
+            this._aftUpdateRenderDataForNative();
+        }
+    },
 
+    _aftUpdateRenderDataForNative() {
         let materials = this._renderComp._materials;
         for (let i = 0; i < materials.length; i++) {
             let m = materials[i];

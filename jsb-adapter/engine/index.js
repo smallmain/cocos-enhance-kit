@@ -58,6 +58,7 @@ if (CC_NATIVERENDERER) {
         require('./assemblers/mask-assembler.js');
         require('./assemblers/graphics-assembler.js');
         require('./assemblers/motion-streak.js');
+        require('./assemblers/motion-streak-multi.js');
         require('./assemblers/mesh-renderer.js');
         require('./assemblers/particle-3d-assembler.js');
 
