@@ -37,6 +37,7 @@ Thumbs.db
 /gulpfile.js
 /package.json
 /README.md
+/VERSION.md
 
 # Ignore files build by Visual Studio
 win32-msvc-vs201*-x86
