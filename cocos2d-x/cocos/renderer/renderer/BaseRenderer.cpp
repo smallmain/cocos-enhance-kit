@@ -57,6 +57,8 @@ const size_t BaseRenderer::cc_matViewProj = std::hash<std::string>{}("cc_matView
 const size_t BaseRenderer::cc_cameraPos = std::hash<std::string>{}("cc_cameraPos");
 const size_t BaseRenderer::cc_time = std::hash<std::string>{}("cc_time");
 
+Effect::Property* BaseRenderer::defaultTextureProperty = nullptr;
+
 const size_t BaseRenderer::cc_shadow_map[4] = {
     std::hash<std::string>{}("cc_shadow_map_0"),
     std::hash<std::string>{}("cc_shadow_map_1"),
@@ -212,11 +214,14 @@ void BaseRenderer::setProperty (const Effect::Property* prop)
   
     if (nullptr == prop->getValue())
     {
-        Effect::Property tmp(propName, propType);
-        prop = &tmp;
-        if (Effect::Property::Type::TEXTURE_2D == propType)
+        if (Effect::Property::Type::TEXTURE_2D == propType) 
         {
-            tmp.setTexture(_defaultTexture);
+            if (defaultTextureProperty == nullptr)
+            {
+                defaultTextureProperty = new Effect::Property(propName, propType);
+                defaultTextureProperty->setTexture(_defaultTexture);
+            }
+            prop = defaultTextureProperty;
         }
     }
     

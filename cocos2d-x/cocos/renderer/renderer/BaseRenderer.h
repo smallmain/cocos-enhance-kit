@@ -152,7 +152,9 @@ protected:
     static const size_t cc_matViewProj;
     static const size_t cc_cameraPos;
     static const size_t cc_time;
-    
+
+    static Effect::Property* defaultTextureProperty;
+
     static std::vector<const OrderedValueMap*> __tmp_defines__;
 };
 
