@@ -1,9 +1,10 @@
 /lib
-/bin
+/bin/.cache
 /web.config
 .idea
 .DS_Store
 build
+!/cocos2d/renderer/build
 aspnet_client
 node_modules
 /tools/jsdoc_toolkit-2.4.0
