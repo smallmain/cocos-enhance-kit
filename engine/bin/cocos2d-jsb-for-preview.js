@@ -21121,7 +21121,7 @@
       },
       _loadBuiltinsSP: function _loadBuiltinsSP(cb) {
         cc.sp.MAX_MULTITEXTURE_NUM = 8;
-        this._loadMultiEffect("multi-2d-sprite", (function(effect) {
+        this._loadMultiEffect("multi-2d-universal", (function(effect) {
           cc.sp.multi2dSpriteEffectAsset = effect;
           effect.addRef();
           cc.sp.inited = true;
@@ -56542,6 +56542,31 @@
     } ]);
     vfmtPosUvTwoColor.name = "vfmtPosUvTwoColor";
     _gfx["default"].VertexFormat.XY_UV_Two_Color = vfmtPosUvTwoColor;
+    var vfmtPosUvTwoColorTexId = new _gfx["default"].VertexFormat([ {
+      name: _gfx["default"].ATTR_POSITION,
+      type: _gfx["default"].ATTR_TYPE_FLOAT32,
+      num: 2
+    }, {
+      name: _gfx["default"].ATTR_UV0,
+      type: _gfx["default"].ATTR_TYPE_FLOAT32,
+      num: 2
+    }, {
+      name: _gfx["default"].ATTR_COLOR,
+      type: _gfx["default"].ATTR_TYPE_UINT8,
+      num: 4,
+      normalize: true
+    }, {
+      name: _gfx["default"].ATTR_COLOR0,
+      type: _gfx["default"].ATTR_TYPE_UINT8,
+      num: 4,
+      normalize: true
+    }, {
+      name: _gfx["default"].ATTR_TEX_ID,
+      type: _gfx["default"].ATTR_TYPE_FLOAT32,
+      num: 1
+    } ]);
+    vfmtPosUvTwoColorTexId.name = "vfmtPosUvTwoColorTexId";
+    _gfx["default"].VertexFormat.XY_UV_Two_Color_TexId = vfmtPosUvTwoColorTexId;
     var vfmtPosUv = new _gfx["default"].VertexFormat([ {
       name: _gfx["default"].ATTR_POSITION,
       type: _gfx["default"].ATTR_TYPE_FLOAT32,
@@ -56579,7 +56604,8 @@
       vfmtPosUv: vfmtPosUv,
       vfmtPosColor: vfmtPosColor,
       vfmtPos: vfmtPos,
-      vfmtPosUvColorTexId: vfmtPosUvColorTexId
+      vfmtPosUvColorTexId: vfmtPosUvColorTexId,
+      vfmtPosUvTwoColorTexId: vfmtPosUvTwoColorTexId
     };
   }), {
     "../../../renderer/gfx": 427
@@ -56688,7 +56714,7 @@
         this.hasEmptySlot = false;
         if (material) this.material = material; else {
           this.material = cc.Material.create(cc.sp.multi2dSpriteEffectAsset);
-          this.material.name = "multi-2d-sprite";
+          this.material.name = "multi-2d-universal";
           this.material.define("USE_TEXTURE", true);
           this.material.define("USE_MULTI_TEXTURE", true);
         }
@@ -73553,21 +73579,18 @@
         return cc.Material.getBuiltinMaterial("2d-spine");
       },
       _updateMaterial: function _updateMaterial() {
-        var useTint = this.useTint || this.isAnimationCached() && false;
+        var useTint = this.useTint;
         var baseMaterial = this.getMaterial(0);
         if (baseMaterial) {
           var isMultiSupport = baseMaterial.material.isMultiSupport();
-          if (!isMultiSupport) {
+          if (isMultiSupport) this._defineMaterialTint(baseMaterial, useTint); else {
             baseMaterial.define("USE_TINT", useTint);
             baseMaterial.define("CC_USE_MODEL", !this.enableBatch);
           }
           var srcBlendFactor = this.premultipliedAlpha ? cc.gfx.BLEND_ONE : cc.gfx.BLEND_SRC_ALPHA;
           var dstBlendFactor = cc.gfx.BLEND_ONE_MINUS_SRC_ALPHA;
           baseMaterial.setBlend(true, cc.gfx.BLEND_FUNC_ADD, srcBlendFactor, srcBlendFactor, cc.gfx.BLEND_FUNC_ADD, dstBlendFactor, dstBlendFactor);
-          if (isMultiSupport) {
-            this.useTint && (this.useTint = false);
-            this.enableBatch || (this.enableBatch = true);
-          }
+          isMultiSupport && (this.enableBatch || (this.enableBatch = true));
         }
         this._materialCache = {};
       },
@@ -73582,10 +73605,14 @@
       _updateUseTint: function _updateUseTint() {
         var baseMaterial = this.getMaterial(0);
         if (baseMaterial) {
-          var useTint = this.useTint || this.isAnimationCached() && false;
-          baseMaterial.material.isMultiSupport() ? this.useTint && (this.useTint = false) : baseMaterial.define("USE_TINT", useTint);
+          var useTint = this.useTint;
+          baseMaterial.material.isMultiSupport() ? this._defineMaterialTint(baseMaterial, useTint) : baseMaterial.define("USE_TINT", useTint);
         }
         this._materialCache = {};
+      },
+      _defineMaterialTint: function _defineMaterialTint(material, useTint) {
+        var passes = material._effect._passes;
+        passes && passes.length > 0 && passes[0]._defines["USE_TINT"] != useTint && material.define("USE_TINT", useTint);
       },
       _updateBatch: function _updateBatch() {
         var baseMaterial = this.getMaterial(0);
@@ -74386,6 +74413,7 @@
     var VFOneColor = VertexFormat.vfmtPosUvColor;
     var VFOneColorTexId = VertexFormat.vfmtPosUvColorTexId;
     var VFTwoColor = VertexFormat.vfmtPosUvTwoColor;
+    var VFTwoColorTexId = VertexFormat.vfmtPosUvTwoColorTexId;
     var gfx = cc.gfx;
     var FLAG_BATCH = 16;
     var FLAG_TWO_COLOR = 1;
@@ -74448,7 +74476,7 @@
       var baseMaterial = _comp._materials[0];
       if (!baseMaterial) return null;
       if (_useMulti) {
-        var key = tex.getId() + src + dst;
+        var key = tex.getId() + src + dst + _useTint;
         var materialCache = _comp._materialCache;
         var materialInfo = materialCache[key];
         if (!materialInfo) {
@@ -74463,6 +74491,7 @@
             };
             materialCache.baseMaterial = materialInfo;
           }
+          _comp._defineMaterialTint(baseMaterial, _useTint);
           if (-1 === texId) {
             materialInfo.material.setProperty("texture", tex);
             materialInfo.texId = 0;
@@ -74647,7 +74676,10 @@
             vbuf[offset + 2] = _tempUv.x;
             vbuf[offset + 3] = _tempUv.y;
             uintVData[offset + 4] = _spineColorToInt32(_finalColor);
-            _useMulti ? vbuf[offset + 5] = _texId : _useTint && (uintVData[offset + 5] = _spineColorToInt32(_darkColor));
+            if (_useTint) {
+              uintVData[offset + 5] = _spineColorToInt32(_darkColor);
+              _useMulti && (vbuf[offset + 6] = _texId);
+            } else _useMulti && (vbuf[offset + 5] = _texId);
           } else for (var _v3 = 0, _n3 = clippedVertices.length, _offset = _vertexFloatOffset; _v3 < _n3; _v3 += _perClipVertexSize, 
           _offset += _perVertexSize) {
             vbuf[_offset] = clippedVertices[_v3];
@@ -74656,10 +74688,11 @@
             vbuf[_offset + 3] = clippedVertices[_v3 + 7];
             _finalColor32 = (clippedVertices[_v3 + 5] << 24 >>> 0) + (clippedVertices[_v3 + 4] << 16) + (clippedVertices[_v3 + 3] << 8) + clippedVertices[_v3 + 2];
             uintVData[_offset + 4] = _finalColor32;
-            if (_useMulti) vbuf[_offset + 5] = _texId; else if (_useTint) {
+            if (_useTint) {
               _darkColor32 = (clippedVertices[_v3 + 11] << 24 >>> 0) + (clippedVertices[_v3 + 10] << 16) + (clippedVertices[_v3 + 9] << 8) + clippedVertices[_v3 + 8];
               uintVData[_offset + 5] = _darkColor32;
-            }
+              _useMulti && (vbuf[_offset + 6] = _texId);
+            } else _useMulti && (vbuf[_offset + 5] = _texId);
           }
         } else if (_vertexEffect) for (var v = _vertexFloatOffset, n = _vertexFloatOffset + _vertexFloatCount; v < n; v += _perVertexSize) {
           _tempPos.x = vbuf[v];
@@ -74672,13 +74705,19 @@
           vbuf[v + 2] = _tempUv.x;
           vbuf[v + 3] = _tempUv.y;
           uintVData[v + 4] = _spineColorToInt32(_finalColor);
-          _useMulti ? vbuf[v + 5] = _texId : _useTint && (uintVData[v + 5] = _spineColorToInt32(_darkColor));
+          if (_useTint) {
+            uintVData[v + 5] = _spineColorToInt32(_darkColor);
+            _useMulti && (vbuf[v + 6] = _texId);
+          } else _useMulti && (vbuf[v + 5] = _texId);
         } else {
           _finalColor32 = _spineColorToInt32(_finalColor);
           _darkColor32 = _spineColorToInt32(_darkColor);
           for (var _v = _vertexFloatOffset, _n = _vertexFloatOffset + _vertexFloatCount; _v < _n; _v += _perVertexSize) {
             uintVData[_v + 4] = _finalColor32;
-            _useMulti ? vbuf[_v + 5] = _texId : _useTint && (uintVData[_v + 5] = _darkColor32);
+            if (_useTint) {
+              uintVData[_v + 5] = _darkColor32;
+              _useMulti && (vbuf[_v + 6] = _texId);
+            } else _useMulti && (vbuf[_v + 5] = _texId);
           }
         }
       };
@@ -74706,7 +74745,7 @@
           graphics.clear();
           graphics.lineWidth = 2;
         }
-        _perClipVertexSize = _useMulti ? 12 : _useTint ? 12 : 8;
+        _perClipVertexSize = _useTint ? _useMulti ? 16 : 12 : _useMulti ? 12 : 8;
         _vertexFloatCount = 0;
         _vertexFloatOffset = 0;
         _vertexOffset = 0;
@@ -74842,6 +74881,19 @@
           }
         }
       };
+      _proto.cacheVerticesConvertToMulti = function cacheVerticesConvertToMulti(vertices) {
+        var verticesMulti = new Float32Array(vertices.length + vertices.length / 6);
+        for (var i = 0, j = 0; j < vertices.length; ) {
+          verticesMulti[i++] = vertices[j++];
+          verticesMulti[i++] = vertices[j++];
+          verticesMulti[i++] = vertices[j++];
+          verticesMulti[i++] = vertices[j++];
+          verticesMulti[i++] = vertices[j++];
+          verticesMulti[i++] = vertices[j++];
+          verticesMulti[i++] = 0;
+        }
+        return verticesMulti;
+      };
       _proto.cacheTraverse = function cacheTraverse(worldMat) {
         var frame = _comp._curFrame;
         if (!frame) return;
@@ -74853,6 +74905,11 @@
         var vertices = frame.vertices;
         var indices = frame.indices;
         var worldMatm;
+        var useMultiTint = _useMulti && _useTint;
+        if (useMultiTint) {
+          frame.verticesMulti || (frame.verticesMulti = this.cacheVerticesConvertToMulti(frame.vertices));
+          vertices = frame.verticesMulti;
+        }
         var frameVFOffset = 0, frameIndexOffset = 0, segVFCount = 0;
         if (worldMat) {
           worldMatm = worldMat.m;
@@ -74869,7 +74926,7 @@
         var colorOffset = 0;
         var colors = frame.colors;
         var nowColor = colors[colorOffset++];
-        var maxVFOffset = nowColor.vfOffset;
+        var maxVFOffset = useMultiTint ? nowColor.vfOffset + nowColor.vfOffset / 6 : nowColor.vfOffset;
         _handleColor(nowColor);
         for (var i = 0, n = segments.length; i < n; i++) {
           var segInfo = segments[i];
@@ -74891,32 +74948,57 @@
           ibuf = _buffer._iData;
           uintbuf = _buffer._uintVData;
           for (var ii = _indexOffset, il = _indexOffset + _indexCount; ii < il; ii++) ibuf[ii] = _vertexOffset + indices[frameIndexOffset++];
-          segVFCount = segInfo.vfCount;
+          segVFCount = useMultiTint ? segInfo.vfCount + segInfo.vfCount / 6 : segInfo.vfCount;
           vbuf.set(vertices.subarray(frameVFOffset, frameVFOffset + segVFCount), _vfOffset);
           frameVFOffset += segVFCount;
-          if (calcTranslate) for (var _ii4 = _vfOffset, _il = _vfOffset + segVFCount; _ii4 < _il; _ii4 += 6) {
+          if (calcTranslate) for (var _ii4 = _vfOffset, _il = _vfOffset + segVFCount; _ii4 < _il; _ii4 += _perVertexSize) {
             vbuf[_ii4] += _m12;
             vbuf[_ii4 + 1] += _m13;
-          } else if (needBatch) for (var _ii5 = _vfOffset, _il2 = _vfOffset + segVFCount; _ii5 < _il2; _ii5 += 6) {
+          } else if (needBatch) for (var _ii5 = _vfOffset, _il2 = _vfOffset + segVFCount; _ii5 < _il2; _ii5 += _perVertexSize) {
             _x = vbuf[_ii5];
             _y = vbuf[_ii5 + 1];
             vbuf[_ii5] = _x * _m00 + _y * _m04 + _m12;
             vbuf[_ii5 + 1] = _x * _m01 + _y * _m05 + _m13;
           }
           _buffer.adjustForSpine(_vertexCount, _indexCount);
-          if (_needColor) {
+          if (_useMulti) if (_useTint) if (_needColor) {
             var frameColorOffset = frameVFOffset - segVFCount;
-            for (var _ii6 = _vfOffset + 4, _il3 = _vfOffset + 4 + segVFCount; _ii6 < _il3; _ii6 += 6, 
-            frameColorOffset += 6) {
+            for (var _ii6 = _vfOffset + 4, _il3 = _vfOffset + 4 + segVFCount; _ii6 < _il3; _ii6 += _perVertexSize, 
+            frameColorOffset += _perVertexSize) {
               if (frameColorOffset >= maxVFOffset) {
                 nowColor = colors[colorOffset++];
                 _handleColor(nowColor);
-                maxVFOffset = nowColor.vfOffset;
+                maxVFOffset = useMultiTint ? nowColor.vfOffset + nowColor.vfOffset / 6 : nowColor.vfOffset;
               }
               uintbuf[_ii6] = _finalColor32;
-              _useMulti ? vbuf[_ii6 + 1] = _texId : uintbuf[_ii6 + 1] = _darkColor32;
+              uintbuf[_ii6 + 1] = _darkColor32;
+              vbuf[_ii6 + 2] = _texId;
             }
-          } else if (_useMulti) for (var _ii7 = _vfOffset + 4, _il4 = _vfOffset + 4 + segVFCount; _ii7 < _il4; _ii7 += 6) vbuf[_ii7 + 1] = _texId;
+          } else for (var _ii7 = _vfOffset + 4, _il4 = _vfOffset + 4 + segVFCount; _ii7 < _il4; _ii7 += _perVertexSize) vbuf[_ii7 + 2] = _texId; else if (_needColor) {
+            var _frameColorOffset = frameVFOffset - segVFCount;
+            for (var _ii8 = _vfOffset + 4, _il5 = _vfOffset + 4 + segVFCount; _ii8 < _il5; _ii8 += _perVertexSize, 
+            _frameColorOffset += _perVertexSize) {
+              if (_frameColorOffset >= maxVFOffset) {
+                nowColor = colors[colorOffset++];
+                _handleColor(nowColor);
+                maxVFOffset = useMultiTint ? nowColor.vfOffset + nowColor.vfOffset / 6 : nowColor.vfOffset;
+              }
+              uintbuf[_ii8] = _finalColor32;
+              vbuf[_ii8 + 1] = _texId;
+            }
+          } else for (var _ii9 = _vfOffset + 4, _il6 = _vfOffset + 4 + segVFCount; _ii9 < _il6; _ii9 += _perVertexSize) vbuf[_ii9 + 1] = _texId; else if (_needColor) {
+            var _frameColorOffset2 = frameVFOffset - segVFCount;
+            for (var _ii10 = _vfOffset + 4, _il7 = _vfOffset + 4 + segVFCount; _ii10 < _il7; _ii10 += _perVertexSize, 
+            _frameColorOffset2 += _perVertexSize) {
+              if (_frameColorOffset2 >= maxVFOffset) {
+                nowColor = colors[colorOffset++];
+                _handleColor(nowColor);
+                maxVFOffset = useMultiTint ? nowColor.vfOffset + nowColor.vfOffset / 6 : nowColor.vfOffset;
+              }
+              uintbuf[_ii10] = _finalColor32;
+              uintbuf[_ii10 + 1] = _darkColor32;
+            }
+          }
         }
       };
       _proto.fillBuffers = function fillBuffers(comp, renderer) {
@@ -74931,9 +75013,9 @@
         var baseMaterial = comp._materials[0];
         if (!baseMaterial) return;
         _useMulti = baseMaterial.material.isMultiSupport();
-        _useTint = !_useMulti && (comp.useTint || comp.isAnimationCached());
-        _vertexFormat = _useMulti ? VFOneColorTexId : _useTint ? VFTwoColor : VFOneColor;
-        _perVertexSize = _useMulti ? 6 : _useTint ? 6 : 5;
+        _useTint = comp.useTint;
+        _vertexFormat = _useTint ? _useMulti ? VFTwoColorTexId : VFTwoColor : _useMulti ? VFOneColorTexId : comp.isAnimationCached() ? VFTwoColor : VFOneColor;
+        _perVertexSize = _useTint ? _useMulti ? 7 : 6 : _useMulti ? 6 : comp.isAnimationCached() ? 6 : 5;
         _node = comp.node;
         _buffer = renderer.getBuffer("mesh", _vertexFormat);
         _renderer = renderer;
