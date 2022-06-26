@@ -220,6 +220,7 @@ let AnimationCache = cc.Class({
             colors : [],
             boneInfos : [],
             vertices : null,
+            verticesMulti : null,
             uintVert : null,
             indices : null,
         };

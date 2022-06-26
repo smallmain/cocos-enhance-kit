@@ -59,6 +59,16 @@ var vfmtPosUvTwoColor = new gfx.VertexFormat([
 vfmtPosUvTwoColor.name = 'vfmtPosUvTwoColor';
 gfx.VertexFormat.XY_UV_Two_Color = vfmtPosUvTwoColor;
 
+var vfmtPosUvTwoColorTexId = new gfx.VertexFormat([
+    { name: gfx.ATTR_POSITION, type: gfx.ATTR_TYPE_FLOAT32, num: 2 },
+    { name: gfx.ATTR_UV0, type: gfx.ATTR_TYPE_FLOAT32, num: 2 },
+    { name: gfx.ATTR_COLOR, type: gfx.ATTR_TYPE_UINT8, num: 4, normalize: true },
+    { name: gfx.ATTR_COLOR0, type: gfx.ATTR_TYPE_UINT8, num: 4, normalize: true },
+    { name: gfx.ATTR_TEX_ID, type: gfx.ATTR_TYPE_FLOAT32, num: 1 },
+]);
+vfmtPosUvTwoColorTexId.name = 'vfmtPosUvTwoColorTexId';
+gfx.VertexFormat.XY_UV_Two_Color_TexId = vfmtPosUvTwoColorTexId;
+
 var vfmtPosUv = new gfx.VertexFormat([
     { name: gfx.ATTR_POSITION, type: gfx.ATTR_TYPE_FLOAT32, num: 2 },
     { name: gfx.ATTR_UV0, type: gfx.ATTR_TYPE_FLOAT32, num: 2 }
@@ -86,5 +96,6 @@ module.exports = {
     vfmtPosUv,
     vfmtPosColor,
     vfmtPos,
-    vfmtPosUvColorTexId
+    vfmtPosUvColorTexId,
+    vfmtPosUvTwoColorTexId,
 };

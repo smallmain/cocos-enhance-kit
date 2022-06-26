@@ -480,11 +480,13 @@ sp.Skeleton = cc.Class({
 
     // override base class _updateMaterial to set define value and clear material cache
     _updateMaterial () {
-        let useTint = this.useTint || (this.isAnimationCached() && !CC_NATIVERENDERER);
+        let useTint = this.useTint;
         let baseMaterial = this.getMaterial(0);
         if (baseMaterial) {
             const isMultiSupport = baseMaterial.material.isMultiSupport();
-            if (!isMultiSupport) {
+            if (isMultiSupport) {
+                this._defineMaterialTint(baseMaterial, useTint);
+            } else {
                 baseMaterial.define('USE_TINT', useTint);
                 baseMaterial.define('CC_USE_MODEL', !this.enableBatch);
             }
@@ -501,7 +503,6 @@ sp.Skeleton = cc.Class({
             );
 
             if (isMultiSupport) {
-                if (this.useTint) this.useTint = false;
                 if (!this.enableBatch) this.enableBatch = true;
             }
         }
@@ -528,14 +529,23 @@ sp.Skeleton = cc.Class({
     _updateUseTint () {
         let baseMaterial = this.getMaterial(0);
         if (baseMaterial) {
-            let useTint = this.useTint || (this.isAnimationCached() && !CC_NATIVERENDERER);
-            if (!baseMaterial.material.isMultiSupport()) {
-                baseMaterial.define('USE_TINT', useTint);
+            let useTint = this.useTint;
+            if (baseMaterial.material.isMultiSupport()) {
+                this._defineMaterialTint(baseMaterial, useTint);
             } else {
-                if (this.useTint) this.useTint = false;
+                baseMaterial.define('USE_TINT', useTint);
             }
         }
         this._materialCache = {};
+    },
+
+    _defineMaterialTint(material, useTint) {
+        const passes = material._effect._passes;
+        if (passes && passes.length > 0) {
+            if (passes[0]._defines['USE_TINT'] != useTint) {
+                material.define('USE_TINT', useTint);
+            }
+        }
     },
 
     // if change use batch mode, just clear material cache

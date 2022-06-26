@@ -32,6 +32,7 @@ const VertexFormat = require('../../cocos2d/core/renderer/webgl/vertex-format')
 const VFOneColor = VertexFormat.vfmtPosUvColor;
 const VFOneColorTexId = VertexFormat.vfmtPosUvColorTexId;
 const VFTwoColor = VertexFormat.vfmtPosUvTwoColor;
+const VFTwoColorTexId = VertexFormat.vfmtPosUvTwoColorTexId;
 const gfx = cc.gfx;
 
 const FLAG_BATCH = 0x10;
@@ -109,7 +110,7 @@ function _getSlotMaterial (tex, blendMode) {
     if (!baseMaterial) return null;
 
     if (_useMulti) {
-        let key = tex.getId() + src + dst;
+        let key = tex.getId() + src + dst + _useTint;
         let materialCache = _comp._materialCache;
         let materialInfo = materialCache[key];
         if (!materialInfo) {
@@ -120,6 +121,8 @@ function _getSlotMaterial (tex, blendMode) {
             } else {
                 materialInfo = { material: cc.MaterialVariant.create(baseMaterial), texId: texId };
             }
+
+            _comp._defineMaterialTint(baseMaterial, _useTint);
 
             if (texId === -1) {
                 materialInfo.material.setProperty('texture', tex);
@@ -348,10 +351,12 @@ export default class SpineAssembler extends Assembler {
                     vbuf[v + 2] = _tempUv.x;         // u
                     vbuf[v + 3] = _tempUv.y;         // v
                     uintVData[v + 4] = _spineColorToInt32(_finalColor);                  // light color
-                    if (_useMulti) {
-                        vbuf[v + 5] = _texId;
+
+                    if (_useTint) {
+                        uintVData[v + 5] = _spineColorToInt32(_darkColor);
+                        if (_useMulti) vbuf[v + 6] = _texId;
                     } else {
-                        _useTint && (uintVData[v + 5] = _spineColorToInt32(_darkColor));      // dark color
+                        if (_useMulti) vbuf[v + 5] = _texId;
                     }
                 }
             } else {
@@ -360,10 +365,12 @@ export default class SpineAssembler extends Assembler {
                 
                 for (let v = _vertexFloatOffset, n = _vertexFloatOffset + _vertexFloatCount; v < n; v += _perVertexSize) {
                     uintVData[v + 4] = _finalColor32;                   // light color
-                    if (_useMulti) {
-                        vbuf[v + 5] = _texId;
+
+                    if (_useTint) {
+                        uintVData[v + 5] = _darkColor32;
+                        if (_useMulti) vbuf[v + 6] = _texId;
                     } else {
-                        _useTint && (uintVData[v + 5] = _darkColor32);      // dark color
+                        if (_useMulti) vbuf[v + 5] = _texId;
                     }
                 }
             }
@@ -408,12 +415,12 @@ export default class SpineAssembler extends Assembler {
                     vbuf[offset + 2] = _tempUv.x;          // u
                     vbuf[offset + 3] = _tempUv.y;          // v
                     uintVData[offset + 4] = _spineColorToInt32(_finalColor);
-                    if (_useMulti) {
-                        vbuf[offset + 5] = _texId;
+
+                    if (_useTint) {
+                        uintVData[offset + 5] = _spineColorToInt32(_darkColor);
+                        if (_useMulti) vbuf[offset + 6] = _texId;
                     } else {
-                        if (_useTint) {
-                            uintVData[offset + 5] = _spineColorToInt32(_darkColor);
-                        }
+                        if (_useMulti) vbuf[offset + 5] = _texId;
                     }
                 }
             } else {
@@ -425,13 +432,13 @@ export default class SpineAssembler extends Assembler {
 
                     _finalColor32 = ((clippedVertices[v + 5]<<24) >>> 0) + (clippedVertices[v + 4]<<16) + (clippedVertices[v + 3]<<8) + clippedVertices[v + 2];
                     uintVData[offset + 4] = _finalColor32;
-                    if (_useMulti) {
-                        vbuf[offset + 5] = _texId;
+
+                    if (_useTint) {
+                        _darkColor32 = ((clippedVertices[v + 11] << 24) >>> 0) + (clippedVertices[v + 10] << 16) + (clippedVertices[v + 9] << 8) + clippedVertices[v + 8];
+                        uintVData[offset + 5] = _darkColor32;
+                        if (_useMulti) vbuf[offset + 6] = _texId;
                     } else {
-                        if (_useTint) {
-                            _darkColor32 = ((clippedVertices[v + 11] << 24) >>> 0) + (clippedVertices[v + 10] << 16) + (clippedVertices[v + 9] << 8) + clippedVertices[v + 8];
-                            uintVData[offset + 5] = _darkColor32;
-                        }
+                        if (_useMulti) vbuf[offset + 5] = _texId;
                     }
                 }
             }
@@ -467,7 +474,7 @@ export default class SpineAssembler extends Assembler {
         }
     
         // x y u v r1 g1 b1 a1 r2 g2 b2 a2 or x y u v r g b a 
-        _perClipVertexSize = _useMulti ? 12 : (_useTint ? 12 : 8);
+        _perClipVertexSize = _useTint ? (_useMulti ? 16 : 12) : (_useMulti ? 12 : 8);
     
         _vertexFloatCount = 0;
         _vertexFloatOffset = 0;
@@ -673,6 +680,22 @@ export default class SpineAssembler extends Assembler {
         }
     }
 
+    cacheVerticesConvertToMulti(vertices) {
+        const verticesMulti = new Float32Array(vertices.length + (vertices.length / 6));
+
+        for (let i = 0, j = 0; j < vertices.length;) {
+            verticesMulti[i++] = vertices[j++]; // x
+            verticesMulti[i++] = vertices[j++]; // y
+            verticesMulti[i++] = vertices[j++]; // u
+            verticesMulti[i++] = vertices[j++]; // v
+            verticesMulti[i++] = vertices[j++]; // color1
+            verticesMulti[i++] = vertices[j++]; // color2
+            verticesMulti[i++] = 0; // texId
+        }
+
+        return verticesMulti;
+    }
+
     cacheTraverse (worldMat) {
         
         let frame = _comp._curFrame;
@@ -687,6 +710,14 @@ export default class SpineAssembler extends Assembler {
         let vertices = frame.vertices;
         let indices = frame.indices;
         let worldMatm;
+        let useMultiTint = _useMulti && _useTint;
+
+        if (useMultiTint) {
+            if (!frame.verticesMulti) {
+                frame.verticesMulti = this.cacheVerticesConvertToMulti(frame.vertices);
+            }
+            vertices = frame.verticesMulti;
+        }
 
         let frameVFOffset = 0, frameIndexOffset = 0, segVFCount = 0;
         if (worldMat) {
@@ -706,7 +737,7 @@ export default class SpineAssembler extends Assembler {
         let colorOffset = 0;
         let colors = frame.colors;
         let nowColor = colors[colorOffset++];
-        let maxVFOffset = nowColor.vfOffset;
+        let maxVFOffset = useMultiTint ? (nowColor.vfOffset + (nowColor.vfOffset / 6)) : nowColor.vfOffset;
         _handleColor(nowColor);
 
         for (let i = 0, n = segments.length; i < n; i++) {
@@ -736,17 +767,17 @@ export default class SpineAssembler extends Assembler {
                 ibuf[ii] = _vertexOffset + indices[frameIndexOffset++];
             }
 
-            segVFCount = segInfo.vfCount;
+            segVFCount = useMultiTint ? (segInfo.vfCount + (segInfo.vfCount / 6)) : segInfo.vfCount;
             vbuf.set(vertices.subarray(frameVFOffset, frameVFOffset + segVFCount), _vfOffset);
             frameVFOffset += segVFCount;
 
             if (calcTranslate) {
-                for (let ii = _vfOffset, il = _vfOffset + segVFCount; ii < il; ii += 6) {
+                for (let ii = _vfOffset, il = _vfOffset + segVFCount; ii < il; ii += _perVertexSize) {
                     vbuf[ii] += _m12;
                     vbuf[ii + 1] += _m13;
                 }
             } else if (needBatch) {
-                for (let ii = _vfOffset, il = _vfOffset + segVFCount; ii < il; ii += 6) {
+                for (let ii = _vfOffset, il = _vfOffset + segVFCount; ii < il; ii += _perVertexSize) {
                     _x = vbuf[ii];
                     _y = vbuf[ii + 1];
                     vbuf[ii] = _x * _m00 + _y * _m04 + _m12;
@@ -756,25 +787,58 @@ export default class SpineAssembler extends Assembler {
 
             _buffer.adjustForSpine(_vertexCount, _indexCount);
 
-            if (_needColor) {
-                // handle color
-                let frameColorOffset = frameVFOffset - segVFCount;
-                for (let ii = _vfOffset + 4, il = _vfOffset + 4 + segVFCount; ii < il; ii += 6, frameColorOffset += 6) {
-                    if (frameColorOffset >= maxVFOffset) {
-                        nowColor = colors[colorOffset++];
-                        _handleColor(nowColor);
-                        maxVFOffset = nowColor.vfOffset;
-                    }
-                    uintbuf[ii] = _finalColor32;
-                    if (_useMulti) {
-                        vbuf[ii + 1] = _texId;
+            // 使用多纹理材质，不使用 Tint 则用 TexId 在下标 5 覆盖 darkColor，否则在 6 写入 TexId
+            // 不使用多纹理材质，则保持引擎默认的强制 Tint 不用做额外操作
+
+            if (_useMulti) {
+                if (_useTint) {
+                    if (_needColor) {
+                        let frameColorOffset = frameVFOffset - segVFCount;
+                        for (let ii = _vfOffset + 4, il = _vfOffset + 4 + segVFCount; ii < il; ii += _perVertexSize, frameColorOffset += _perVertexSize) {
+                            if (frameColorOffset >= maxVFOffset) {
+                                nowColor = colors[colorOffset++];
+                                _handleColor(nowColor);
+                                maxVFOffset = useMultiTint ? (nowColor.vfOffset + (nowColor.vfOffset / 6)) : nowColor.vfOffset;
+                            }
+                            uintbuf[ii] = _finalColor32;
+                            uintbuf[ii + 1] = _darkColor32;   
+                            vbuf[ii + 2] = _texId;
+                        }
                     } else {
-                        uintbuf[ii + 1] = _darkColor32;   
+                        for (let ii = _vfOffset + 4, il = _vfOffset + 4 + segVFCount; ii < il; ii += _perVertexSize) {
+                            vbuf[ii + 2] = _texId;
+                        }
+                    }
+                } else {
+                    if (_needColor) {
+                        let frameColorOffset = frameVFOffset - segVFCount;
+                        for (let ii = _vfOffset + 4, il = _vfOffset + 4 + segVFCount; ii < il; ii += _perVertexSize, frameColorOffset += _perVertexSize) {
+                            if (frameColorOffset >= maxVFOffset) {
+                                nowColor = colors[colorOffset++];
+                                _handleColor(nowColor);
+                                maxVFOffset = useMultiTint ? (nowColor.vfOffset + (nowColor.vfOffset / 6)) : nowColor.vfOffset;
+                            }
+                            uintbuf[ii] = _finalColor32;
+                            vbuf[ii + 1] = _texId;
+                        }
+                    } else {
+                        for (let ii = _vfOffset + 4, il = _vfOffset + 4 + segVFCount; ii < il; ii += _perVertexSize) {
+                            vbuf[ii + 1] = _texId;
+                        }
                     }
                 }
-            } else if (_useMulti) {
-                for (let ii = _vfOffset + 4, il = _vfOffset + 4 + segVFCount; ii < il; ii += 6) {
-                    vbuf[ii + 1] = _texId;
+            } else {
+                if (_needColor) {
+                    let frameColorOffset = frameVFOffset - segVFCount;
+                    for (let ii = _vfOffset + 4, il = _vfOffset + 4 + segVFCount; ii < il; ii += _perVertexSize, frameColorOffset += _perVertexSize) {
+                        if (frameColorOffset >= maxVFOffset) {
+                            nowColor = colors[colorOffset++];
+                            _handleColor(nowColor);
+                            maxVFOffset = useMultiTint ? (nowColor.vfOffset + (nowColor.vfOffset / 6)) : nowColor.vfOffset;
+                        }
+                        uintbuf[ii] = _finalColor32;
+                        uintbuf[ii + 1] = _darkColor32;
+                    }
                 }
             }
         }
@@ -796,10 +860,10 @@ export default class SpineAssembler extends Assembler {
         if (!baseMaterial) return;
 
         _useMulti = baseMaterial.material.isMultiSupport();
-        _useTint = !_useMulti && (comp.useTint || comp.isAnimationCached());
-        _vertexFormat = _useMulti ? VFOneColorTexId : (_useTint ? VFTwoColor : VFOneColor);
+        _useTint = comp.useTint;
+        _vertexFormat = _useTint ? (_useMulti ? VFTwoColorTexId : VFTwoColor) : (_useMulti ? VFOneColorTexId : (comp.isAnimationCached() ? VFTwoColor : VFOneColor));
         // x y u v color1 color2 or x y u v color
-        _perVertexSize = _useMulti ? 6 :(_useTint ? 6 : 5);
+        _perVertexSize = _useTint ? (_useMulti ? 7 : 6) : (_useMulti ? 6 : (comp.isAnimationCached() ? 6 : 5));
 
         _node = comp.node;
         _buffer = renderer.getBuffer('mesh', _vertexFormat);
