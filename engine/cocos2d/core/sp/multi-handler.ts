@@ -26,7 +26,7 @@ export class MultiHandler {
             this.material = material;
         } else {
             this.material = (cc.Material as any).create(cc.sp.multi2dSpriteEffectAsset);
-            this.material.name = "multi-2d-sprite";
+            this.material.name = "multi-2d-universal";
             this.material.define('USE_TEXTURE', true);
             this.material.define('USE_MULTI_TEXTURE', true);
         }

@@ -90,7 +90,7 @@ var builtins = {
         cc.sp.MAX_MULTITEXTURE_NUM = 8;
         // cc.renderer.device.caps.maxTextureUnits
 
-        this._loadMultiEffect('multi-2d-sprite', (effect) => {
+        this._loadMultiEffect('multi-2d-universal', (effect) => {
             cc.sp.multi2dSpriteEffectAsset = effect;
             effect.addRef();
             cc.sp.inited = true;
