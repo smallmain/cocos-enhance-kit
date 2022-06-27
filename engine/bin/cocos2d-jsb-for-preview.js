@@ -74449,6 +74449,7 @@
     var _x, _y, _m00, _m04, _m12, _m01, _m05, _m13;
     var _r, _g, _b, _fr, _fg, _fb, _fa, _dr, _dg, _db, _da;
     var _comp, _buffer, _renderer, _node, _needColor, _vertexEffect;
+    var _packedRegions = [];
     function _getSlotMaterial(tex, blendMode) {
       var src, dst;
       switch (blendMode) {
@@ -74574,8 +74575,30 @@
           comp._dataDirty = false;
         }
       };
+      _proto.bindPackedRegion = function bindPackedRegion(attachment, region) {
+        var frame = region._spriteFrame;
+        sp.SkeletonData.updateRegionUV(region);
+        if (attachment instanceof sp.spine.MeshAttachment) attachment.updateUVs(); else {
+          attachment.setRegion(region);
+          attachment.updateOffset();
+        }
+        region._original._ref++;
+        frame.once("_resetDynamicAtlasFrame", (function() {
+          region.x = region._original._x;
+          region.y = region._original._y;
+          region.texture = region._original._texture;
+          region._original._ref--;
+          region._original._ref <= 0 && (region._original = null);
+          sp.SkeletonData.updateRegionUV(region);
+          if (attachment instanceof sp.spine.MeshAttachment) attachment.updateUVs(); else {
+            attachment.setRegion(region);
+            attachment.updateOffset();
+          }
+        }));
+      };
       _proto.packDynamicAtlasForSpine = function packDynamicAtlasForSpine(comp) {
         false;
+        _packedRegions.length = 0;
         var allowDynamicAtlas = comp.allowDynamicAtlas;
         if ((cc.sp.allowDynamicAtlas && 0 === allowDynamicAtlas || 1 === allowDynamicAtlas) && cc.dynamicAtlasManager) {
           var skins = comp.skeletonData._skeletonCache.skins;
@@ -74583,10 +74606,10 @@
             var skin = _step3.value;
             for (var _iterator4 = _createForOfIteratorHelperLoose(skin.attachments), _step4; !(_step4 = _iterator4()).done; ) {
               var attachments = _step4.value;
-              var _loop = function _loop(key) {
+              for (var key in attachments) {
                 var attachment = attachments[key];
                 var region = attachment.region;
-                if (region && !region._original && region.texture && region.texture._texture.packable) {
+                if (region) if (region._original) _packedRegions.includes(region) && this.bindPackedRegion(attachment, region); else if (region.texture && region.texture._texture.packable) {
                   if (region._spriteFrame) {
                     region._spriteFrame.destroy();
                     region._spriteFrame = null;
@@ -74598,7 +74621,8 @@
                     region._original = {
                       _texture: region.texture,
                       _x: region.x,
-                      _y: region.y
+                      _y: region.y,
+                      _ref: 0
                     };
                     region.texture = new sp.SkeletonTexture({
                       width: packedFrame.texture.width,
@@ -74607,30 +74631,16 @@
                     region.texture.setRealTexture(packedFrame.texture);
                     region.x = packedFrame.x;
                     region.y = packedFrame.y;
-                    sp.SkeletonData.updateRegionUV(region);
-                    if (attachment instanceof sp.spine.MeshAttachment) attachment.updateUVs(); else {
-                      attachment.setRegion(region);
-                      attachment.updateOffset();
-                    }
-                    frame.once("_resetDynamicAtlasFrame", (function() {
-                      region.x = region._original._x;
-                      region.y = region._original._y;
-                      region.texture = region._original._texture;
-                      region._original = null;
-                      sp.SkeletonData.updateRegionUV(region);
-                      if (attachment instanceof sp.spine.MeshAttachment) attachment.updateUVs(); else {
-                        attachment.setRegion(region);
-                        attachment.updateOffset();
-                      }
-                    }));
                     region._spriteFrame = frame;
+                    this.bindPackedRegion(attachment, region);
+                    _packedRegions.push(region);
                   } else frame.destroy();
                 }
-              };
-              for (var key in attachments) _loop(key);
+              }
             }
           }
         }
+        _packedRegions.length = 0;
       };
       _proto.fillVertices = function fillVertices(skeletonColor, attachmentColor, slotColor, clipper, slot) {
         var vbuf = _buffer._vData, ibuf = _buffer._iData, uintVData = _buffer._uintVData;
