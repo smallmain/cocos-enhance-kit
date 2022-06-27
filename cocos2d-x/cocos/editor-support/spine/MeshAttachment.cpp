@@ -98,8 +98,8 @@ void MeshAttachment::updateUVs() {
 		return;
 	}
 	case 270: {
-		float textureWidth = _regionHeight / (_regionV2 - _regionV);
-		float textureHeight = _regionWidth / (_regionU2 - _regionU);
+		float textureWidth = _regionWidth / (_regionU2 - _regionU);
+		float textureHeight = _regionHeight / (_regionV2 - _regionV);
 		u -= _regionOffsetY / textureWidth;
 		v -= _regionOffsetX / textureHeight;
 		width = _regionOriginalHeight / textureWidth;
