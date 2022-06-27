@@ -83,6 +83,8 @@ let _x, _y, _m00, _m04, _m12, _m01, _m05, _m13;
 let _r, _g, _b, _fr, _fg, _fb, _fa, _dr, _dg, _db, _da;
 let _comp, _buffer, _renderer, _node, _needColor, _vertexEffect;
 
+let _packedRegions = [];
+
 function _getSlotMaterial (tex, blendMode) {
     let src, dst;
     switch (blendMode) {
@@ -238,8 +240,38 @@ export default class SpineAssembler extends Assembler {
         }
     }
 
+    bindPackedRegion(attachment, region) {
+        const frame = region._spriteFrame;
+
+        sp.SkeletonData.updateRegionUV(region);
+        if (attachment instanceof sp.spine.MeshAttachment) {
+            attachment.updateUVs();
+        } else {
+            attachment.setRegion(region);
+            attachment.updateOffset();
+        }
+
+        frame.once("_resetDynamicAtlasFrame", () => {
+            region.x = region._original._x;
+            region.y = region._original._y;
+            region.texture = region._original._texture;
+            region._original = null;
+
+            // update uv
+            sp.SkeletonData.updateRegionUV(region);
+            if (attachment instanceof sp.spine.MeshAttachment) {
+                attachment.updateUVs();
+            } else {
+                attachment.setRegion(region);
+                attachment.updateOffset();
+            }
+        });
+    }
+
     packDynamicAtlasForSpine(comp) {
         if (CC_TEST) return false;
+
+        _packedRegions.length = 0;
 
         const allowDynamicAtlas = comp.allowDynamicAtlas;
         if ((cc.sp.allowDynamicAtlas && allowDynamicAtlas === 0) || allowDynamicAtlas === 1) {
@@ -250,58 +282,46 @@ export default class SpineAssembler extends Assembler {
                         for (const key in attachments) {
                             const attachment = attachments[key];
                             const region = attachment.region;
-                            if (region && !region._original && region.texture && region.texture._texture.packable) {
-                                if (region._spriteFrame) {
-                                    region._spriteFrame.destroy();
-                                    region._spriteFrame = null;
-                                }
-                                const frame = sp.SkeletonData.createSpriteFrame(region);
-                                const packedFrame = cc.dynamicAtlasManager.insertSpriteFrame(frame);
-                                if (packedFrame) {
-                                    frame._setDynamicAtlasFrame(packedFrame);
 
-                                    region._original = {
-                                        _texture: region.texture,
-                                        _x: region.x,
-                                        _y: region.y,
-                                    };
-
-                                    region.texture = new sp.SkeletonTexture({
-                                        width: packedFrame.texture.width,
-                                        height: packedFrame.texture.height,
-                                    });
-                                    region.texture.setRealTexture(packedFrame.texture);
-
-                                    region.x = packedFrame.x;
-                                    region.y = packedFrame.y;
-
-                                    // update uv
-                                    sp.SkeletonData.updateRegionUV(region);
-                                    if (attachment instanceof sp.spine.MeshAttachment) {
-                                        attachment.updateUVs();
-                                    } else {
-                                        attachment.setRegion(region);
-                                        attachment.updateOffset();
+                            if (region) {
+                                if (region._original) {
+                                    // 可能出现多个 attachment 共用同一个 region
+                                    if (_packedRegions.includes(region)) {
+                                        this.bindPackedRegion(attachment, region);
                                     }
+                                } else if (region.texture && region.texture._texture.packable) {
+                                    if (region._spriteFrame) {
+                                        region._spriteFrame.destroy();
+                                        region._spriteFrame = null;
+                                    }
+                                    const frame = sp.SkeletonData.createSpriteFrame(region);
+                                    const packedFrame = cc.dynamicAtlasManager.insertSpriteFrame(frame);
+                                    if (packedFrame) {
+                                        frame._setDynamicAtlasFrame(packedFrame);
 
-                                    frame.once("_resetDynamicAtlasFrame", () => {
-                                        region.x = region._original._x;
-                                        region.y = region._original._y;
-                                        region.texture = region._original._texture;
-                                        region._original = null;
+                                        region._original = {
+                                            _texture: region.texture,
+                                            _x: region.x,
+                                            _y: region.y,
+                                        };
+
+                                        region.texture = new sp.SkeletonTexture({
+                                            width: packedFrame.texture.width,
+                                            height: packedFrame.texture.height,
+                                        });
+                                        region.texture.setRealTexture(packedFrame.texture);
+
+                                        region.x = packedFrame.x;
+                                        region.y = packedFrame.y;
 
                                         // update uv
-                                        sp.SkeletonData.updateRegionUV(region);
-                                        if (attachment instanceof sp.spine.MeshAttachment) {
-                                            attachment.updateUVs();
-                                        } else {
-                                            attachment.setRegion(region);
-                                            attachment.updateOffset();
-                                        }
-                                    });
-                                    region._spriteFrame = frame;
-                                } else {
-                                    frame.destroy();
+                                        region._spriteFrame = frame;
+                                        this.bindPackedRegion(attachment, region);
+
+                                        _packedRegions.push(region);
+                                    } else {
+                                        frame.destroy();
+                                    }
                                 }
                             }
                         }
@@ -309,6 +329,8 @@ export default class SpineAssembler extends Assembler {
                 }
             }
         }
+
+        _packedRegions.length = 0;
     }
 
     fillVertices (skeletonColor, attachmentColor, slotColor, clipper, slot) {
