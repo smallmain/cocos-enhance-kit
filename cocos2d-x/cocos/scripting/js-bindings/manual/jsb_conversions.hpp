@@ -672,32 +672,6 @@ bool seval_to_spine_Vector_T_ptr(const se::Value& v, spine::Vector<T*>* ret)
     return true;
 }
 
-bool spine_skin_attachments_to_seval(std::vector<std::map<std::string, spine::Attachment*>>& v, se::Value* ret) {
-    assert(ret != nullptr);
-    bool ok = true;
-    se::HandleObject arr(se::Object::createArrayObject(v.size()));
-
-    int i = 0;
-    
-    for (const auto &vv : v)
-    {
-        se::HandleObject obj(se::Object::createPlainObject());
-
-        se::Value tmp;
-        for (const auto& e : vv) {
-            native_ptr_to_rooted_seval<spine::Attachment>(e.second, &tmp);
-            obj->setProperty(e.first.c_str(), tmp);
-        }
-
-        arr->setArrayElement(i, se::Value(obj));
-        i++;
-    }
-
-    ret->setObject(arr, true);
-
-    return ok;
-}
-
 bool seval_to_spine_Vector_String(const se::Value& v, spine::Vector<spine::String>* ret);
 bool spine_Vector_String_to_seval(const spine::Vector<spine::String>& v, se::Value* ret);
 #endif

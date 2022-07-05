@@ -235,6 +235,32 @@ static bool js_register_spine_retainSkeletonData(se::State& s)
 }
 SE_BIND_FUNC(js_register_spine_retainSkeletonData)
 
+bool spine_skin_attachments_to_seval(std::vector<std::map<std::string, spine::Attachment*>>& v, se::Value* ret) {
+	assert(ret != nullptr);
+	bool ok = true;
+	se::HandleObject arr(se::Object::createArrayObject(v.size()));
+
+	int i = 0;
+
+	for (const auto &vv : v)
+	{
+		se::HandleObject obj(se::Object::createPlainObject());
+
+		se::Value tmp;
+		for (const auto& e : vv) {
+			native_ptr_to_rooted_seval<spine::Attachment>(e.second, &tmp);
+			obj->setProperty(e.first.c_str(), tmp);
+		}
+
+		arr->setArrayElement(i, se::Value(obj));
+		i++;
+	}
+
+	ret->setObject(arr, true);
+
+	return ok;
+}
+
 static bool js_cocos2dx_spine_Skin_getAttachmentsForJSB(se::State& s) {
     spine::Skin* cobj = (spine::Skin*)s.nativeThisObject();
     SE_PRECONDITION2(
