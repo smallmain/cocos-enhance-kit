@@ -31,19 +31,19 @@ cc.sp.labelRetinaScale = 2;     // 渲染文本时纹理的缩放倍数，默认
 
 官方文档中介绍了替换 attachment 对象进行换装的方法，但如果动画中有切换 attachment 的关键帧，这种方法就失效了。
 
-还有一种方法是替换 attachment 的 region 对象来进行换装，但这种方法引擎没有直接支持，所以服务包对其进行了完善。
+还有一种方法是修改 attachment 的 region 对象来进行换装，但这种方法引擎没有直接支持，所以服务包对其进行了支持。
 
-只需要一句代码即可使用 cc.SpriteFrame 替换指定 attachment 的 region 对象：
+只需要一句代码即可使用 cc.SpriteFrame 的数据修改 attachment 的 region 对象数据：
 
 ```js
-this.skel.setRegion('head', 'head', sp.SkeletonData.createRegion(spriteFrame));
+skeletonComponent.setRegionData('Head', 'Head', new sp.RegionData(spriteFrame));
 ```
 
 ![changespine](./assets/changespine.png)
 
 > 图片中是被换头的小男孩。
 
-这样做是直接替换了 SkeletonData 中的数据，一般情况下所有使用该数据的 Spine 组件都会受到影响，但我们提供了克隆 SkeletonData 数据的接口，可前往 [Spine](../user-guide/spine/spine-intro.mdx) 文档了解更多详情。
+这样做是直接修改了 SkeletonData 的数据，所有使用该数据的 Spine 组件都会受到影响（被换头），但我们提供了克隆 SkeletonData 数据的接口，可前往 [Spine](../user-guide/spine/spine-intro.mdx) 文档了解更多详情。
 
 :::tip 提示
 

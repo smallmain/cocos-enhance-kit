@@ -7,7 +7,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Cocos Service Pack',
-  tagline: '给 Cocos Creator 加点料',
+  tagline: '提供 Cocos Creator 引擎特性增强、修复与优化的开源非官方服务包',
   url: 'https://smallmain.github.io',
   baseUrl: '/cocos-service-pack/',
   onBrokenLinks: 'throw',
@@ -92,51 +92,6 @@ const config = {
             position: 'right',
           },
         ],
-      },
-      footer: {
-        style: 'dark',
-        links: [
-          // {
-          //   title: 'Docs',
-          //   items: [
-          //     {
-          //       label: 'Tutorial',
-          //       to: '/docs/intro',
-          //     },
-          //   ],
-          // },
-          // {
-          //   title: 'Community',
-          //   items: [
-          //     {
-          //       label: 'Stack Overflow',
-          //       href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-          //     },
-          //     {
-          //       label: 'Discord',
-          //       href: 'https://discordapp.com/invite/docusaurus',
-          //     },
-          //     {
-          //       label: 'Twitter',
-          //       href: 'https://twitter.com/docusaurus',
-          //     },
-          //   ],
-          // },
-          // {
-          //   title: 'More',
-          //   items: [
-          //     // {
-          //     //   label: 'Blog',
-          //     //   to: '/blog',
-          //     // },
-          //     {
-          //       label: 'GitHub',
-          //       href: 'https://github.com/facebook/docusaurus',
-          //     },
-          //   ],
-          // },
-        ],
-        copyright: `Copyright © ${new Date().getFullYear()} Cocos Service Pack.`,
       },
       prism: {
         theme: lightCodeTheme,

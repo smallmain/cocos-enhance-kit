@@ -2,8 +2,6 @@
 
 ![logo](/docs/static/img/logo2.png)
 
-> 该项目当前为内部预览版，只提供未适配原生平台（cocos2d-x、jsb-adapter）的 Cocos Creator v2.4.5 版本
-
 这是一个提供 Cocos Creator 引擎特性增强、修复与优化的**开源非官方服务包**。
 
 该项目使用自定义引擎的方式在符合原始引擎架构设计的基础上为 Cocos Creator 引擎加入新的特性、修复已知问题以及性能优化。
@@ -41,18 +39,27 @@
 ## 重要特性
 
 - **支持多纹理渲染**（多纹理材质、多纹理合批）
-- **支持高 DPI 文本渲染**（Label、RichText 组件）
-- **重构动态合图**（支持自动多纹理合批、优化算法、复用废弃空间等特性）
-- **重构 Label 组件的 CHAR 缓存模式**（支持自动多纹理合批、多图集、复用废弃空间等特性）
-- **Spine 组件支持与其它组件合批、合入动态图集与 SpriteFrame 换装**
+  ![demo1](/docs/static/demo-imgs/demo1.png)
 
-> 服务包对引擎的改动完全开源，每个改动会带有原理说明文档，当你发现问题时请与我们进行反馈，如果你有兴致，可以默默帅气地提交一个 PR，帮助我们一起完善这个项目。
+- **支持高 DPI 文本渲染**（Label、RichText 组件）
+  ![demo4](/docs/static/demo-imgs/demo4.png)
+
+- **重构动态合图**（支持自动多纹理合批、优化算法、复用废弃空间等特性）
+  ![demo2](/docs/static/demo-imgs/demo2.png)
+
+- **重构 Label 组件的 CHAR 缓存模式**（支持自动多纹理合批、多图集、复用废弃空间等特性）
+  ![demo3](/docs/static/demo-imgs/demo3.png)
+
+- **Spine 组件支持与其它组件合批、合入动态图集与 SpriteFrame 换装**
+  ![demo5](/docs/static/demo-imgs/demo5.png)
 
 ## 功能演示
 
-[Web Desktop 演示项目](https://smallmain.github.io/cocos-service-pack/demo/v1.0.0-alpha/web-desktop/index.html)
+[Web Desktop 演示项目](https://smallmain.github.io/cocos-service-pack/demo/v1.0.0/web-desktop/index.html)
 
-[Web Mobile 演示项目](https://smallmain.github.io/cocos-service-pack/demo/v1.0.0-alpha/web-mobile/index.html)（请将设备横屏）
+[Web Mobile 演示项目](https://smallmain.github.io/cocos-service-pack/demo/v1.0.0/web-mobile/index.html)（请将设备横屏）
+
+> 服务包对引擎的改动完全开源，每个改动会带有原理说明文档，当你发现问题时请与我们进行反馈，如果你有兴致，可以默默帅气地提交一个 PR，帮助我们一起完善这个项目。
 
 ## 使用方法
 
@@ -105,4 +112,4 @@
 
 ### 启动 Cocos Creator 报 Error: Can not parse this input:undefined 错误
 
-没有找到服务包的内置资源，请记得安装配套的引擎扩展。
+这是你可能忘记安装配套的引擎扩展，所以没有找到服务包的内置资源导致的报错。

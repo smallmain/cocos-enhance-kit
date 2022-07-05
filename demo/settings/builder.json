@@ -16,8 +16,8 @@
   "mainIsRemote": false,
   "optimizeHotUpdate": false,
   "md5Cache": true,
-  "nativeMd5Cache": true,
-  "encryptJs": true,
+  "nativeMd5Cache": false,
+  "encryptJs": false,
   "xxteaKey": "24d00175-09c0-4c",
   "zipCompressJs": true,
   "fb-instant-games": {},
@@ -51,5 +51,6 @@
     "recordPath": ""
   },
   "appBundle": false,
-  "agreements": {}
+  "agreements": {},
+  "includeAnySDK": false
 }

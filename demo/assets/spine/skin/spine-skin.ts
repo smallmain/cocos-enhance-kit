@@ -20,12 +20,15 @@ export default class SpineSkin extends cc.Component {
 
     boys: cc.Node[] = [];
 
+    datas: sp.SkeletonData[] = [];
+
     protected start(): void {
         const boySpine = this.boy.getComponentInChildren(sp.Skeleton);
         const newSkeletonData = boySpine.skeletonData.clone();
         boySpine.skeletonData = newSkeletonData;
         boySpine.animation = 'attack';
 
+        this.datas.push(newSkeletonData);
         this.boys.push(this.boy);
 
         this.addBoyBtn.on('click', () => {
@@ -41,20 +44,29 @@ export default class SpineSkin extends cc.Component {
                 newBoy.getComponentInChildren(sp.Skeleton).setAnimationCacheMode(sp.Skeleton.AnimationCacheMode.PRIVATE_CACHE);
                 newBoy.getComponentInChildren(cc.Label).string = `Spine - Cache`;
             }
+            this.datas.push(newBoySpine.skeletonData);
             this.boys.push(newBoy);
         });
 
         this.removeBoyBtn.on('click', () => {
             if (this.boys.length > 1) {
+                this.datas[this.datas.length - 1].destroy();
                 this.boys[this.boys.length - 1].destroy();
+                this.datas.length -= 1;
                 this.boys.length -= 1;
             }
         });
 
         this.randomChangeBtn.on('click', () => {
             const boy = this.boys[this.boys.length - 1].getComponentInChildren(sp.Skeleton);
-            boy.setRegion('Head', 'Head', sp.SkeletonData.createRegion(this.heads[Math.floor(Math.random() * (this.heads.length))]));
+            boy.setRegionData('Head', 'Head', new sp.RegionData(this.heads[Math.floor(Math.random() * (this.heads.length))]));
         });
+    }
+
+    protected onDestroy(): void {
+        for (const data of this.datas) {
+            data.destroy();
+        }
     }
 
 }

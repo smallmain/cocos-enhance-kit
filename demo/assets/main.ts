@@ -15,4 +15,6 @@ export default class Main extends cc.Component {
 
 
 cc.sp.labelRetinaScale = 2;
+cc.sp.charAtlasAutoBatchCount = 2;
+cc.macro.CLEANUP_IMAGE_CACHE = false;
 cc.dynamicAtlasManager.maxFrameSize = 2048;

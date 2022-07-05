@@ -45,7 +45,7 @@
     "width": 960,
     "height": 640
   },
-  "last-module-event-record-time": 1655460658806,
+  "last-module-event-record-time": 1656689574771,
   "assets-sort-type": "name",
   "facebook": {
     "enable": false,
@@ -58,5 +58,8 @@
     }
   },
   "preview-port": 7456,
-  "clear-simulator-cache": true
+  "clear-simulator-cache": true,
+  "migrate-history": [
+    "cloud-function"
+  ]
 }

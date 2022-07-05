@@ -1,0 +1,28 @@
+{
+    "paths": {
+        "5dz/wYuRNGDqDZXXT0zaEr": [
+            "effects/multi-2d-universal",
+            "cc.EffectAsset"
+        ]
+    },
+    "uuids": [
+        "5dz/wYuRNGDqDZXXT0zaEr"
+    ],
+    "scenes": {},
+    "redirect": [],
+    "deps": [],
+    "packs": {},
+    "name": "sp",
+    "importBase": "import",
+    "nativeBase": "native",
+    "debug": true,
+    "isZip": false,
+    "encrypted": false,
+    "versions": {
+        "import": [
+            "5dz/wYuRNGDqDZXXT0zaEr",
+            "d60ab"
+        ],
+        "native": []
+    }
+}

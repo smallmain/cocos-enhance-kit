@@ -36,7 +36,7 @@ cc.sp.charAtlasAutoResetBeforeSceneLoad = false;
 const material = cc.Label._shareAtlas.material;
 ```
 
-获取或修改该材质。
+获取、修改或替换该材质。
 
 渲染时内部会先判断当前所使用的是否为多纹理材质，是的话判断是否能在材质纹理插槽中找到字符图集纹理，如果有一个判断不满足则会将组件的材质设为内部维护的材质。
 

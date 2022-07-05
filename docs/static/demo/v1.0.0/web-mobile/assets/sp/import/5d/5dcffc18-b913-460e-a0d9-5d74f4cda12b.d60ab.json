@@ -1,0 +1,326 @@
+[
+  1,
+  0,
+  0,
+  [
+    [
+      "cc.EffectAsset",
+      [
+        "_name",
+        "shaders",
+        "techniques"
+      ],
+      0
+    ]
+  ],
+  [
+    [
+      0,
+      0,
+      1,
+      2,
+      4
+    ]
+  ],
+  [
+    [
+      0,
+      "multi-2d-universal",
+      [
+        {
+          "hash": 501441714,
+          "record": null,
+          "name": "multi-2d-universal|vs|fs",
+          "glsl3": {
+            "vert": "\nprecision highp float;\nuniform CCGlobal {\n  mat4 cc_matView;\n  mat4 cc_matViewInv;\n  mat4 cc_matProj;\n  mat4 cc_matProjInv;\n  mat4 cc_matViewProj;\n  mat4 cc_matViewProjInv;\n  vec4 cc_cameraPos;\n  vec4 cc_time;\n  mediump vec4 cc_screenSize;\n  mediump vec4 cc_screenScale;\n};\nuniform CCLocal {\n  mat4 cc_matWorld;\n  mat4 cc_matWorldIT;\n};\nin vec3 a_position;\nin vec4 a_color;\nout vec4 v_color;\n#if USE_TINT\nin vec4 a_color0;\nout vec4 v_color0;\n#endif\n#if USE_TEXTURE\nin vec2 a_uv0;\nout vec2 v_uv0;\n#if USE_MULTI_TEXTURE\nin float a_texId;\nout float v_texId;\n#endif\n#endif\nvoid main () {\n  vec4 pos = vec4(a_position, 1);\n  #if CC_USE_MODEL\n  pos = cc_matViewProj * cc_matWorld * pos;\n  #else\n  pos = cc_matViewProj * pos;\n  #endif\n  #if USE_TEXTURE\n  v_uv0 = a_uv0;\n  #if USE_MULTI_TEXTURE\n  v_texId = a_texId;\n  #endif\n  #endif\n  v_color = a_color;\n  #if USE_TINT\n  v_color0 = a_color0;\n  #endif\n  gl_Position = pos;\n}",
+            "frag": "\nprecision highp float;\n#if USE_ALPHA_TEST\n  uniform ALPHA_TEST {\n    float alphaThreshold;\n  };\n#endif\nvoid ALPHA_TEST (in vec4 color) {\n  #if USE_ALPHA_TEST\n      if (color.a < alphaThreshold) discard;\n  #endif\n}\nvoid ALPHA_TEST (in float alpha) {\n  #if USE_ALPHA_TEST\n      if (alpha < alphaThreshold) discard;\n  #endif\n}\nin vec4 v_color;\n#if USE_TINT\nin vec4 v_color0;\n#endif\n#if USE_TEXTURE\nin vec2 v_uv0;\nuniform sampler2D texture;\n#if USE_MULTI_TEXTURE\nin float v_texId;\nuniform sampler2D texture2;\nuniform sampler2D texture3;\nuniform sampler2D texture4;\nuniform sampler2D texture5;\nuniform sampler2D texture6;\nuniform sampler2D texture7;\nuniform sampler2D texture8;\n#endif\n#endif\nvoid main () {\n  vec4 o = vec4(1, 1, 1, 1);\n  #if USE_TEXTURE\n    #if USE_MULTI_TEXTURE\n      if(v_texId < 1.0){\n  vec4 texture_tmp = texture(texture, v_uv0);\n  #if CC_USE_ALPHA_ATLAS_texture\n      texture_tmp.a *= texture(texture, v_uv0 + vec2(0, 0.5)).r;\n  #endif\n  #if INPUT_IS_GAMMA\n    o.rgb *= (texture_tmp.rgb * texture_tmp.rgb);\n    o.a *= texture_tmp.a;\n  #else\n    o *= texture_tmp;\n  #endif\n      } else if(v_texId < 2.0){\n  vec4 texture2_tmp = texture(texture2, v_uv0);\n  #if CC_USE_ALPHA_ATLAS_texture2\n      texture2_tmp.a *= texture(texture2, v_uv0 + vec2(0, 0.5)).r;\n  #endif\n  #if INPUT_IS_GAMMA\n    o.rgb *= (texture2_tmp.rgb * texture2_tmp.rgb);\n    o.a *= texture2_tmp.a;\n  #else\n    o *= texture2_tmp;\n  #endif\n      } else if(v_texId < 3.0){\n  vec4 texture3_tmp = texture(texture3, v_uv0);\n  #if CC_USE_ALPHA_ATLAS_texture3\n      texture3_tmp.a *= texture(texture3, v_uv0 + vec2(0, 0.5)).r;\n  #endif\n  #if INPUT_IS_GAMMA\n    o.rgb *= (texture3_tmp.rgb * texture3_tmp.rgb);\n    o.a *= texture3_tmp.a;\n  #else\n    o *= texture3_tmp;\n  #endif\n      } else if(v_texId < 4.0){\n  vec4 texture4_tmp = texture(texture4, v_uv0);\n  #if CC_USE_ALPHA_ATLAS_texture4\n      texture4_tmp.a *= texture(texture4, v_uv0 + vec2(0, 0.5)).r;\n  #endif\n  #if INPUT_IS_GAMMA\n    o.rgb *= (texture4_tmp.rgb * texture4_tmp.rgb);\n    o.a *= texture4_tmp.a;\n  #else\n    o *= texture4_tmp;\n  #endif\n      } else if(v_texId < 5.0){\n  vec4 texture5_tmp = texture(texture5, v_uv0);\n  #if CC_USE_ALPHA_ATLAS_texture5\n      texture5_tmp.a *= texture(texture5, v_uv0 + vec2(0, 0.5)).r;\n  #endif\n  #if INPUT_IS_GAMMA\n    o.rgb *= (texture5_tmp.rgb * texture5_tmp.rgb);\n    o.a *= texture5_tmp.a;\n  #else\n    o *= texture5_tmp;\n  #endif\n      } else if(v_texId < 6.0){\n  vec4 texture6_tmp = texture(texture6, v_uv0);\n  #if CC_USE_ALPHA_ATLAS_texture6\n      texture6_tmp.a *= texture(texture6, v_uv0 + vec2(0, 0.5)).r;\n  #endif\n  #if INPUT_IS_GAMMA\n    o.rgb *= (texture6_tmp.rgb * texture6_tmp.rgb);\n    o.a *= texture6_tmp.a;\n  #else\n    o *= texture6_tmp;\n  #endif\n      } else if(v_texId < 7.0){\n  vec4 texture7_tmp = texture(texture7, v_uv0);\n  #if CC_USE_ALPHA_ATLAS_texture7\n      texture7_tmp.a *= texture(texture7, v_uv0 + vec2(0, 0.5)).r;\n  #endif\n  #if INPUT_IS_GAMMA\n    o.rgb *= (texture7_tmp.rgb * texture7_tmp.rgb);\n    o.a *= texture7_tmp.a;\n  #else\n    o *= texture7_tmp;\n  #endif\n      } else {\n  vec4 texture8_tmp = texture(texture8, v_uv0);\n  #if CC_USE_ALPHA_ATLAS_texture8\n      texture8_tmp.a *= texture(texture8, v_uv0 + vec2(0, 0.5)).r;\n  #endif\n  #if INPUT_IS_GAMMA\n    o.rgb *= (texture8_tmp.rgb * texture8_tmp.rgb);\n    o.a *= texture8_tmp.a;\n  #else\n    o *= texture8_tmp;\n  #endif\n      }\n    #else\n  vec4 texture_tmp = texture(texture, v_uv0);\n  #if CC_USE_ALPHA_ATLAS_texture\n      texture_tmp.a *= texture(texture, v_uv0 + vec2(0, 0.5)).r;\n  #endif\n  #if INPUT_IS_GAMMA\n    o.rgb *= (texture_tmp.rgb * texture_tmp.rgb);\n    o.a *= texture_tmp.a;\n  #else\n    o *= texture_tmp;\n  #endif\n    #endif\n  #endif\n  #if USE_TINT\n    vec4 finalColor;\n    finalColor.a = v_color.a * o.a;\n    finalColor.rgb = ((o.a - 1.0) * v_color0.a + 1.0 - o.rgb) * v_color0.rgb + o.rgb * v_color.rgb;\n    ALPHA_TEST(finalColor);\n    gl_FragColor = finalColor;\n  #else\n    o *= v_color;\n    ALPHA_TEST(o);\n    gl_FragColor = o;\n  #endif\n}"
+          },
+          "glsl1": {
+            "vert": "\nprecision highp float;\nuniform mat4 cc_matViewProj;\nuniform mat4 cc_matWorld;\nattribute vec3 a_position;\nattribute vec4 a_color;\nvarying vec4 v_color;\n#if USE_TINT\nattribute vec4 a_color0;\nvarying vec4 v_color0;\n#endif\n#if USE_TEXTURE\nattribute vec2 a_uv0;\nvarying vec2 v_uv0;\n#if USE_MULTI_TEXTURE\nattribute float a_texId;\nvarying float v_texId;\n#endif\n#endif\nvoid main () {\n  vec4 pos = vec4(a_position, 1);\n  #if CC_USE_MODEL\n  pos = cc_matViewProj * cc_matWorld * pos;\n  #else\n  pos = cc_matViewProj * pos;\n  #endif\n  #if USE_TEXTURE\n  v_uv0 = a_uv0;\n  #if USE_MULTI_TEXTURE\n  v_texId = a_texId;\n  #endif\n  #endif\n  v_color = a_color;\n  #if USE_TINT\n  v_color0 = a_color0;\n  #endif\n  gl_Position = pos;\n}",
+            "frag": "\nprecision highp float;\n#if USE_ALPHA_TEST\n  uniform float alphaThreshold;\n#endif\nvoid ALPHA_TEST (in vec4 color) {\n  #if USE_ALPHA_TEST\n      if (color.a < alphaThreshold) discard;\n  #endif\n}\nvoid ALPHA_TEST (in float alpha) {\n  #if USE_ALPHA_TEST\n      if (alpha < alphaThreshold) discard;\n  #endif\n}\nvarying vec4 v_color;\n#if USE_TINT\nvarying vec4 v_color0;\n#endif\n#if USE_TEXTURE\nvarying vec2 v_uv0;\nuniform sampler2D texture;\n#if USE_MULTI_TEXTURE\nvarying float v_texId;\nuniform sampler2D texture2;\nuniform sampler2D texture3;\nuniform sampler2D texture4;\nuniform sampler2D texture5;\nuniform sampler2D texture6;\nuniform sampler2D texture7;\nuniform sampler2D texture8;\n#endif\n#endif\nvoid main () {\n  vec4 o = vec4(1, 1, 1, 1);\n  #if USE_TEXTURE\n    #if USE_MULTI_TEXTURE\n      if(v_texId < 1.0){\n  vec4 texture_tmp = texture2D(texture, v_uv0);\n  #if CC_USE_ALPHA_ATLAS_texture\n      texture_tmp.a *= texture2D(texture, v_uv0 + vec2(0, 0.5)).r;\n  #endif\n  #if INPUT_IS_GAMMA\n    o.rgb *= (texture_tmp.rgb * texture_tmp.rgb);\n    o.a *= texture_tmp.a;\n  #else\n    o *= texture_tmp;\n  #endif\n      } else if(v_texId < 2.0){\n  vec4 texture2_tmp = texture2D(texture2, v_uv0);\n  #if CC_USE_ALPHA_ATLAS_texture2\n      texture2_tmp.a *= texture2D(texture2, v_uv0 + vec2(0, 0.5)).r;\n  #endif\n  #if INPUT_IS_GAMMA\n    o.rgb *= (texture2_tmp.rgb * texture2_tmp.rgb);\n    o.a *= texture2_tmp.a;\n  #else\n    o *= texture2_tmp;\n  #endif\n      } else if(v_texId < 3.0){\n  vec4 texture3_tmp = texture2D(texture3, v_uv0);\n  #if CC_USE_ALPHA_ATLAS_texture3\n      texture3_tmp.a *= texture2D(texture3, v_uv0 + vec2(0, 0.5)).r;\n  #endif\n  #if INPUT_IS_GAMMA\n    o.rgb *= (texture3_tmp.rgb * texture3_tmp.rgb);\n    o.a *= texture3_tmp.a;\n  #else\n    o *= texture3_tmp;\n  #endif\n      } else if(v_texId < 4.0){\n  vec4 texture4_tmp = texture2D(texture4, v_uv0);\n  #if CC_USE_ALPHA_ATLAS_texture4\n      texture4_tmp.a *= texture2D(texture4, v_uv0 + vec2(0, 0.5)).r;\n  #endif\n  #if INPUT_IS_GAMMA\n    o.rgb *= (texture4_tmp.rgb * texture4_tmp.rgb);\n    o.a *= texture4_tmp.a;\n  #else\n    o *= texture4_tmp;\n  #endif\n      } else if(v_texId < 5.0){\n  vec4 texture5_tmp = texture2D(texture5, v_uv0);\n  #if CC_USE_ALPHA_ATLAS_texture5\n      texture5_tmp.a *= texture2D(texture5, v_uv0 + vec2(0, 0.5)).r;\n  #endif\n  #if INPUT_IS_GAMMA\n    o.rgb *= (texture5_tmp.rgb * texture5_tmp.rgb);\n    o.a *= texture5_tmp.a;\n  #else\n    o *= texture5_tmp;\n  #endif\n      } else if(v_texId < 6.0){\n  vec4 texture6_tmp = texture2D(texture6, v_uv0);\n  #if CC_USE_ALPHA_ATLAS_texture6\n      texture6_tmp.a *= texture2D(texture6, v_uv0 + vec2(0, 0.5)).r;\n  #endif\n  #if INPUT_IS_GAMMA\n    o.rgb *= (texture6_tmp.rgb * texture6_tmp.rgb);\n    o.a *= texture6_tmp.a;\n  #else\n    o *= texture6_tmp;\n  #endif\n      } else if(v_texId < 7.0){\n  vec4 texture7_tmp = texture2D(texture7, v_uv0);\n  #if CC_USE_ALPHA_ATLAS_texture7\n      texture7_tmp.a *= texture2D(texture7, v_uv0 + vec2(0, 0.5)).r;\n  #endif\n  #if INPUT_IS_GAMMA\n    o.rgb *= (texture7_tmp.rgb * texture7_tmp.rgb);\n    o.a *= texture7_tmp.a;\n  #else\n    o *= texture7_tmp;\n  #endif\n      } else {\n  vec4 texture8_tmp = texture2D(texture8, v_uv0);\n  #if CC_USE_ALPHA_ATLAS_texture8\n      texture8_tmp.a *= texture2D(texture8, v_uv0 + vec2(0, 0.5)).r;\n  #endif\n  #if INPUT_IS_GAMMA\n    o.rgb *= (texture8_tmp.rgb * texture8_tmp.rgb);\n    o.a *= texture8_tmp.a;\n  #else\n    o *= texture8_tmp;\n  #endif\n      }\n    #else\n  vec4 texture_tmp = texture2D(texture, v_uv0);\n  #if CC_USE_ALPHA_ATLAS_texture\n      texture_tmp.a *= texture2D(texture, v_uv0 + vec2(0, 0.5)).r;\n  #endif\n  #if INPUT_IS_GAMMA\n    o.rgb *= (texture_tmp.rgb * texture_tmp.rgb);\n    o.a *= texture_tmp.a;\n  #else\n    o *= texture_tmp;\n  #endif\n    #endif\n  #endif\n  #if USE_TINT\n    vec4 finalColor;\n    finalColor.a = v_color.a * o.a;\n    finalColor.rgb = ((o.a - 1.0) * v_color0.a + 1.0 - o.rgb) * v_color0.rgb + o.rgb * v_color.rgb;\n    ALPHA_TEST(finalColor);\n    gl_FragColor = finalColor;\n  #else\n    o *= v_color;\n    ALPHA_TEST(o);\n    gl_FragColor = o;\n  #endif\n}"
+          },
+          "builtins": {
+            "globals": {
+              "blocks": [
+                {
+                  "name": "CCGlobal",
+                  "defines": []
+                }
+              ],
+              "samplers": []
+            },
+            "locals": {
+              "blocks": [
+                {
+                  "name": "CCLocal",
+                  "defines": []
+                }
+              ],
+              "samplers": []
+            }
+          },
+          "defines": [
+            {
+              "name": "USE_TINT",
+              "type": "boolean",
+              "defines": []
+            },
+            {
+              "name": "USE_TEXTURE",
+              "type": "boolean",
+              "defines": []
+            },
+            {
+              "name": "USE_MULTI_TEXTURE",
+              "type": "boolean",
+              "defines": [
+                "USE_TEXTURE"
+              ]
+            },
+            {
+              "name": "CC_USE_MODEL",
+              "type": "boolean",
+              "defines": []
+            },
+            {
+              "name": "USE_ALPHA_TEST",
+              "type": "boolean",
+              "defines": []
+            },
+            {
+              "name": "CC_USE_ALPHA_ATLAS_texture",
+              "type": "boolean",
+              "defines": [
+                "USE_TEXTURE"
+              ]
+            },
+            {
+              "name": "INPUT_IS_GAMMA",
+              "type": "boolean",
+              "defines": [
+                "USE_TEXTURE"
+              ]
+            },
+            {
+              "name": "CC_USE_ALPHA_ATLAS_texture2",
+              "type": "boolean",
+              "defines": [
+                "USE_TEXTURE",
+                "USE_MULTI_TEXTURE"
+              ]
+            },
+            {
+              "name": "CC_USE_ALPHA_ATLAS_texture3",
+              "type": "boolean",
+              "defines": [
+                "USE_TEXTURE",
+                "USE_MULTI_TEXTURE"
+              ]
+            },
+            {
+              "name": "CC_USE_ALPHA_ATLAS_texture4",
+              "type": "boolean",
+              "defines": [
+                "USE_TEXTURE",
+                "USE_MULTI_TEXTURE"
+              ]
+            },
+            {
+              "name": "CC_USE_ALPHA_ATLAS_texture5",
+              "type": "boolean",
+              "defines": [
+                "USE_TEXTURE",
+                "USE_MULTI_TEXTURE"
+              ]
+            },
+            {
+              "name": "CC_USE_ALPHA_ATLAS_texture6",
+              "type": "boolean",
+              "defines": [
+                "USE_TEXTURE",
+                "USE_MULTI_TEXTURE"
+              ]
+            },
+            {
+              "name": "CC_USE_ALPHA_ATLAS_texture7",
+              "type": "boolean",
+              "defines": [
+                "USE_TEXTURE",
+                "USE_MULTI_TEXTURE"
+              ]
+            },
+            {
+              "name": "CC_USE_ALPHA_ATLAS_texture8",
+              "type": "boolean",
+              "defines": [
+                "USE_TEXTURE",
+                "USE_MULTI_TEXTURE"
+              ]
+            }
+          ],
+          "blocks": [
+            {
+              "name": "ALPHA_TEST",
+              "binding": 0,
+              "members": [
+                {
+                  "name": "alphaThreshold",
+                  "type": 13,
+                  "count": 1
+                }
+              ],
+              "defines": [
+                "USE_ALPHA_TEST"
+              ]
+            }
+          ],
+          "samplers": [
+            {
+              "name": "texture",
+              "type": 29,
+              "count": 1,
+              "binding": 30,
+              "defines": [
+                "USE_TEXTURE"
+              ]
+            },
+            {
+              "name": "texture2",
+              "type": 29,
+              "count": 1,
+              "binding": 31,
+              "defines": [
+                "USE_TEXTURE",
+                "USE_MULTI_TEXTURE"
+              ]
+            },
+            {
+              "name": "texture3",
+              "type": 29,
+              "count": 1,
+              "binding": 32,
+              "defines": [
+                "USE_TEXTURE",
+                "USE_MULTI_TEXTURE"
+              ]
+            },
+            {
+              "name": "texture4",
+              "type": 29,
+              "count": 1,
+              "binding": 33,
+              "defines": [
+                "USE_TEXTURE",
+                "USE_MULTI_TEXTURE"
+              ]
+            },
+            {
+              "name": "texture5",
+              "type": 29,
+              "count": 1,
+              "binding": 34,
+              "defines": [
+                "USE_TEXTURE",
+                "USE_MULTI_TEXTURE"
+              ]
+            },
+            {
+              "name": "texture6",
+              "type": 29,
+              "count": 1,
+              "binding": 35,
+              "defines": [
+                "USE_TEXTURE",
+                "USE_MULTI_TEXTURE"
+              ]
+            },
+            {
+              "name": "texture7",
+              "type": 29,
+              "count": 1,
+              "binding": 36,
+              "defines": [
+                "USE_TEXTURE",
+                "USE_MULTI_TEXTURE"
+              ]
+            },
+            {
+              "name": "texture8",
+              "type": 29,
+              "count": 1,
+              "binding": 37,
+              "defines": [
+                "USE_TEXTURE",
+                "USE_MULTI_TEXTURE"
+              ]
+            }
+          ]
+        }
+      ],
+      [
+        {
+          "passes": [
+            {
+              "program": "multi-2d-universal|vs|fs",
+              "blendState": {
+                "targets": [
+                  {
+                    "blend": true
+                  }
+                ]
+              },
+              "rasterizerState": {
+                "cullMode": 0
+              },
+              "properties": {
+                "texture": {
+                  "value": "white",
+                  "type": 29
+                },
+                "texture2": {
+                  "value": "white",
+                  "type": 29
+                },
+                "texture3": {
+                  "value": "white",
+                  "type": 29
+                },
+                "texture4": {
+                  "value": "white",
+                  "type": 29
+                },
+                "texture5": {
+                  "value": "white",
+                  "type": 29
+                },
+                "texture6": {
+                  "value": "white",
+                  "type": 29
+                },
+                "texture7": {
+                  "value": "white",
+                  "type": 29
+                },
+                "texture8": {
+                  "value": "white",
+                  "type": 29
+                },
+                "alphaThreshold": {
+                  "type": 13,
+                  "value": [
+                    0.5
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    ]
+  ],
+  0,
+  0,
+  [],
+  [],
+  []
+]

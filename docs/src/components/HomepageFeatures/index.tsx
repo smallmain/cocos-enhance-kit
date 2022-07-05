@@ -10,32 +10,34 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Easy to Use',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    title: '性能提升',
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        众多特性让你无需任何改动即可让项目的性能得到提升，并且能通过手动优化达到更好的效果。
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    title: '完全开源',
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        服务包是完全开源的项目，包括对原生引擎、JavaScript 引擎的改动都附有详细的原理文档。
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    title: '原生体验',
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        所有特性都通过自定义引擎实现，这种深度整合能带来其他方式所没有的 “原生” 的使用体验。
+      </>
+    ),
+  },
+  {
+    title: '增强特性',
+    description: (
+      <>
+        文本高 DPI 渲染、Spine 换装等实用特性的加入，让你的游戏开发更加省时省力省心。
       </>
     ),
   },
@@ -43,10 +45,10 @@ const FeatureList: FeatureItem[] = [
 
 function Feature({title, Svg, description}: FeatureItem) {
   return (
-    <div className={clsx('col col--4')}>
-      <div className="text--center">
+    <div className={clsx('col col--3')}>
+      {/* <div className="text--center">
         <Svg className={styles.featureSvg} role="img" />
-      </div>
+      </div> */}
       <div className="text--center padding-horiz--md">
         <h3>{title}</h3>
         <p>{description}</p>

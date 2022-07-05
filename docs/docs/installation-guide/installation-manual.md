@@ -42,8 +42,6 @@ description: "需掌握一定的自定义引擎知识。"
 
 如果你的项目不需要在原生平台上运行，则只定制 JavaScript 引擎即可。
 
-如果你的项目需要在原生模拟器中预览，可能需要编译模拟器，更多详情可阅读官方的 [自定义引擎](https://docs.cocos.com/creator/2.4/manual/zh/advanced-topics/engine-customization.html) 文档。
-
 :::
 
 ### 2.安装引擎扩展
@@ -60,7 +58,7 @@ description: "需掌握一定的自定义引擎知识。"
 
 服务包需要使用名为 `sp` 的 AssetBundle 存放资源，如果你的项目有使用 AssetBundle，请**确保该名称未被占用**。
 
-没有必要将这个 Asset Bundle 设为远程包或者 Zip 压缩，里面只是一个多纹理 Effect 着色器资源。
+没有必要将这个 Asset Bundle 设为远程包或者 Zip 压缩，里面只有 Effect 着色器资源。
 
 更多详情可阅读官方的 [安装扩展](https://docs.cocos.com/creator/2.4/manual/zh/extension/install-and-share.html) 文档。
 

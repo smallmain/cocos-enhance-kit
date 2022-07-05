@@ -26,6 +26,11 @@ export default class Home extends cc.Component {
         this.prefabs = this.objects.children.concat();
         this.objects.removeAllChildren(false);
 
+        // Native 暂不支持 Spine 组件与其它组件合批
+        if (CC_JSB) {
+            this.prefabs = this.prefabs.filter(v => !v.getComponent(sp.Skeleton));
+        }
+
         this.objectNumSlider.node.on('slide', (slider: cc.Slider) => {
             const offset = (this.nums[1] - this.nums[0]) * slider.progress;
             this.num = this.nums[0] + Math.ceil(offset);
