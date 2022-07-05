@@ -48059,7 +48059,7 @@
           true;
           comp.node._inJsbDirtyList = false;
           if (!this.isMulti) {
-            comp._assembler.updateRenderDataForSwitchMaterial(comp);
+            comp._assembler && comp._assembler.updateRenderDataForSwitchMaterial(comp);
             return true;
           }
         }
@@ -51038,6 +51038,7 @@
       _proto.checkMaterialAndUpdateTexId = function checkMaterialAndUpdateTexId(letter) {
         var atlas = letter.atlas;
         var comp = _assembler._renderComp;
+        if (!_usedMaterial) return;
         if (_needCheckMaterial) {
           _needCheckMaterial = false;
           if (_usedMaterial.material !== _shareAtlas.material) {
@@ -51165,7 +51166,7 @@
         var verts = renderData.vDatas[0];
         var floatsPerVert = this.floatsPerVert;
         var texIdOffset = offset + this.texIdOffset;
-        var id = _usedMaterial.material !== _shareAtlas.material ? letter.atlas._tmpId : letter.atlas._id;
+        var id = _usedMaterial ? _usedMaterial.material !== _shareAtlas.material ? letter.atlas._tmpId : letter.atlas._id : 0;
         verts[texIdOffset] = id;
         texIdOffset += floatsPerVert;
         verts[texIdOffset] = id;
@@ -73591,6 +73592,8 @@
           var dstBlendFactor = cc.gfx.BLEND_ONE_MINUS_SRC_ALPHA;
           baseMaterial.setBlend(true, cc.gfx.BLEND_FUNC_ADD, srcBlendFactor, srcBlendFactor, cc.gfx.BLEND_FUNC_ADD, dstBlendFactor, dstBlendFactor);
           isMultiSupport && (this.enableBatch || (this.enableBatch = true));
+          true;
+          this._nativeSkeleton && this._nativeSkeleton.setUseMulti(isMultiSupport);
         }
         this._materialCache = {};
       },
@@ -73809,19 +73812,15 @@
         this._skeleton && this._skeleton.setAttachment(slotName, attachmentName);
         this.invalidAnimationCache();
       },
-      getRegion: function getRegion(slotName, attachmentName) {
+      getRegionData: function getRegionData(slotName, attachmentName) {
         var attachment = this.getAttachment(slotName, attachmentName);
-        if (attachment) return attachment.region;
+        if (attachment) return new sp.RegionData(attachment);
         return null;
       },
-      setRegion: function setRegion(slotName, attachmentName, region) {
+      setRegionData: function setRegionData(slotName, attachmentName, regionData) {
         var attachment = this.getAttachment(slotName, attachmentName);
         if (attachment) {
-          attachment.region = region;
-          if (attachment instanceof sp.spine.MeshAttachment) attachment.updateUVs(); else if (attachment instanceof sp.spine.RegionAttachment) {
-            attachment.setRegion(region);
-            attachment.updateOffset();
-          }
+          regionData.assignToAttachment(attachment);
           this.setVertsDirty();
           return true;
         }
@@ -74092,6 +74091,128 @@
       return arr2;
     }
     var SkeletonCache = false;
+    var RegionData = (function() {
+      RegionData.updateUV = function updateUV(region) {
+        var texture = region.texture2D;
+        if (region.rotate) {
+          region.u = region.x / texture.width;
+          region.v = region.y / texture.height;
+          region.u2 = (region.x + region.height) / texture.width;
+          region.v2 = (region.y + region.width) / texture.height;
+        } else {
+          region.u = region.x / texture.width;
+          region.v = region.y / texture.height;
+          region.u2 = (region.x + region.width) / texture.width;
+          region.v2 = (region.y + region.height) / texture.height;
+        }
+      };
+      function RegionData(attachmentOrSpriteFrame) {
+        this.x = void 0;
+        this.y = void 0;
+        this.degrees = void 0;
+        this.texture = void 0;
+        this.texture2D = void 0;
+        this.u = void 0;
+        this.v = void 0;
+        this.u2 = void 0;
+        this.v2 = void 0;
+        this.width = void 0;
+        this.height = void 0;
+        this.rotate = void 0;
+        this.offsetX = void 0;
+        this.offsetY = void 0;
+        this.originalWidth = void 0;
+        this.originalHeight = void 0;
+        attachmentOrSpriteFrame instanceof cc.SpriteFrame ? this.initWithSpriteFrame(attachmentOrSpriteFrame) : null != attachmentOrSpriteFrame && this.initWithAttachment(attachmentOrSpriteFrame);
+      }
+      var _proto = RegionData.prototype;
+      _proto.initWithSpriteFrame = function initWithSpriteFrame(spriteFrame) {
+        var texture = spriteFrame.getTexture();
+        var rect = spriteFrame.getRect();
+        var origSize = spriteFrame.getOriginalSize();
+        var _offset = spriteFrame.getOffset();
+        var rotate = spriteFrame.isRotated();
+        var offset = cc.v2(.5 * (origSize.width - rect.width) + _offset.x, .5 * (origSize.height - rect.height) + _offset.y);
+        var degrees = rotate ? 270 : 0;
+        this.x = rect.x;
+        this.y = rect.y;
+        this.width = rect.width;
+        this.height = rect.height;
+        this.originalWidth = origSize.width;
+        this.originalHeight = origSize.height;
+        this.offsetX = offset.x;
+        this.offsetY = offset.y;
+        this.rotate = 0 != degrees;
+        this.degrees = degrees;
+        this.updateWithTexture2D(texture);
+      };
+      _proto.initWithAttachment = function initWithAttachment(attachment) {
+        var region;
+        true;
+        this.x = attachment.regionX;
+        this.y = attachment.regionY;
+        this.width = attachment.regionWidth;
+        this.height = attachment.regionHeight;
+        this.originalWidth = attachment.regionOriginalWidth;
+        this.originalHeight = attachment.regionOriginalHeight;
+        this.offsetX = attachment.regionOffsetX;
+        this.offsetY = attachment.regionOffsetY;
+        this.degrees = attachment.regionDegrees;
+        this.rotate = 0 !== this.degrees;
+        this.texture = attachment.textureForJSB;
+        this.texture2D = attachment.getTexture2D();
+        this.updateUV();
+      };
+      _proto.updateUV = function updateUV() {
+        RegionData.updateUV(this);
+      };
+      _proto.updateWithPackedFrame = function updateWithPackedFrame(packedFrame) {
+        this.x = packedFrame.x;
+        this.y = packedFrame.y;
+        this.updateWithTexture2D(packedFrame.texture);
+      };
+      _proto.updateWithTexture2D = function updateWithTexture2D(texture2d) {
+        true;
+        var spTex = new middleware.Texture2D();
+        spTex.setRealTextureIndex(RegionData.middlewareTextureID--);
+        spTex.setPixelsWide(texture2d.width);
+        spTex.setPixelsHigh(texture2d.height);
+        spTex.setNativeTexture(texture2d.getImpl());
+        this.texture = spTex;
+        this.texture2D = texture2d;
+        this.updateUV();
+      };
+      _proto.toSpriteFrame = function toSpriteFrame(strict) {
+        if (strict && (270 !== this.degrees || 0 !== this.degrees)) return null;
+        var frame = new cc.SpriteFrame(this.texture2D, cc.rect(this.x, this.y, this.width, this.height), this.rotate, cc.v2(this.offsetX - .5 * (this.originalWidth - this.width), this.offsetY - .5 * (this.originalHeight - this.height)), cc.size(this.originalWidth, this.originalHeight));
+        return frame;
+      };
+      _proto.assignToAttachment = function assignToAttachment(attachment, strict, resetDynamicAtlas) {
+        void 0 === strict && (strict = true);
+        void 0 === resetDynamicAtlas && (resetDynamicAtlas = true);
+        var region;
+        var _spriteFrame;
+        true;
+        if (resetDynamicAtlas && attachment && attachment._spriteFrame) {
+          var spriteFrame = attachment._spriteFrame;
+          attachment._spriteFrame = null;
+          spriteFrame.destroy();
+        }
+        attachment._texture2D = this.texture2D;
+        attachment.setRegionForJSB(this.texture, {
+          x: this.x,
+          y: this.y,
+          w: this.width,
+          h: this.height
+        }, cc.size(this.originalWidth, this.originalHeight), cc.v2(this.offsetX, this.offsetY), this.degrees);
+      };
+      _proto.reset = function reset() {
+        this.texture = null;
+        this.texture2D = null;
+      };
+      return RegionData;
+    })();
+    RegionData.middlewareTextureID = -1;
     var SkeletonData = cc.Class({
       name: "sp.SkeletonData",
       extends: cc.Asset,
@@ -74147,64 +74268,13 @@
       },
       statics: {
         preventDeferredLoadDependents: true,
-        createRegion: function createRegion(spriteFrame, original) {
-          void 0 === original && (original = void 0);
-          var region = new sp.spine.TextureAtlasRegion();
-          var texture = spriteFrame.getTexture();
-          var rect = spriteFrame.getRect();
-          var origSize = spriteFrame.getOriginalSize();
-          var _offset = spriteFrame.getOffset();
-          var rotate = spriteFrame.isRotated();
-          var offset = cc.v2(.5 * (origSize.width - rect.width) + _offset.x, .5 * (origSize.height - rect.height) + _offset.y);
-          var degrees = rotate ? 270 : 0;
-          if (original) {
-            region.name = original.name;
-            region.page = original.page;
-          }
-          region.x = rect.x;
-          region.y = rect.y;
-          region.width = rect.width;
-          region.height = rect.height;
-          region.originalWidth = origSize.width;
-          region.originalHeight = origSize.height;
-          region.offsetX = offset.x;
-          region.offsetY = offset.y;
-          region.rotate = 0 != degrees;
-          region.degrees = degrees;
-          var skelTex = new sp.SkeletonTexture({
-            width: texture.width,
-            height: texture.height
-          });
-          skelTex.setRealTexture(texture);
-          region.texture = skelTex;
-          this.updateRegionUV(region);
-          return region;
-        },
-        updateRegionUV: function updateRegionUV(region) {
-          var texture = region.texture._texture;
-          if (region.rotate) {
-            region.u = region.x / texture.width;
-            region.v = region.y / texture.height;
-            region.u2 = (region.x + region.height) / texture.width;
-            region.v2 = (region.y + region.width) / texture.height;
-          } else {
-            region.u = region.x / texture.width;
-            region.v = region.y / texture.height;
-            region.u2 = (region.x + region.width) / texture.width;
-            region.v2 = (region.y + region.height) / texture.height;
-          }
-        },
-        createSpriteFrame: function createSpriteFrame(region) {
-          var frame = new cc.SpriteFrame(region.texture._texture, cc.rect(region.x, region.y, region.width, region.height), region.rotate, cc.v2(region.offsetX - .5 * (region.originalWidth - region.width), region.offsetY - .5 * (region.originalHeight - region.height)), cc.size(region.originalWidth, region.originalHeight));
-          return frame;
-        }
+        cloneId: 0
       },
       createNode: false,
       reset: function reset() {
         this._skeletonCache = null;
         this._atlasCache = null;
         false;
-        this._cloneId = 0;
       },
       ensureTexturesLoaded: function ensureTexturesLoaded(loaded, caller) {
         var textures = this.textures;
@@ -74284,50 +74354,52 @@
       },
       clone: function clone() {
         var cloned = new SkeletonData();
-        cloned._cloneId = this._cloneId + 1;
-        var suffix = "(clone " + String(cloned._cloneId) + ")";
-        cloned._uuid = this._uuid + suffix;
+        SkeletonData.cloneId++;
+        var suffix = "(clone " + String(SkeletonData.cloneId) + ")";
+        cloned._uuid = this._uuid.split("(")[0] + suffix;
         cloned.name = this.name + suffix;
         cloned.scale = this.scale;
-        cloned.textureNames = this.textureNames;
-        cloned.textures = this.textures;
         cloned._atlasText = this._atlasText;
+        cloned.textureNames = this.textureNames;
         cloned._skeletonJson = this._skeletonJson;
-        cloned._buffer = this._buffer;
+        cloned.textures = this.textures;
+        true;
+        var realUuid = cloned._uuid;
+        cloned._uuid = this._uuid;
+        cloned._nativeUrl = this._nativeUrl;
+        cloned._native = this._native;
+        cloned.nativeUrl;
+        cloned._uuid = realUuid;
+        cloned.getRuntimeData();
         return cloned;
       },
-      destroy: function destroy() {
-        if (this._atlasCache) {
-          var regions = this._atlasCache.regions;
-          for (var _iterator = _createForOfIteratorHelperLoose(regions), _step; !(_step = _iterator()).done; ) {
-            var region = _step.value;
-            if (region._spriteFrame) {
-              region._spriteFrame.destroy();
-              region._spriteFrame = null;
-            }
-          }
-        }
+      _destroyFromDynamicAtlas: function _destroyFromDynamicAtlas() {
         if (this._skeletonCache) {
           var skins = this._skeletonCache.skins;
-          for (var _iterator2 = _createForOfIteratorHelperLoose(skins), _step2; !(_step2 = _iterator2()).done; ) {
-            var skin = _step2.value;
-            for (var _iterator3 = _createForOfIteratorHelperLoose(skin.attachments), _step3; !(_step3 = _iterator3()).done; ) {
-              var attachments = _step3.value;
+          for (var _iterator = _createForOfIteratorHelperLoose(skins), _step; !(_step = _iterator()).done; ) {
+            var skin = _step.value;
+            for (var _iterator2 = _createForOfIteratorHelperLoose(skin.attachments), _step2; !(_step2 = _iterator2()).done; ) {
+              var attachments = _step2.value;
               for (var key in attachments) {
-                var _region = attachments[key].region;
-                if (_region && _region._spriteFrame) {
-                  _region._spriteFrame.destroy();
-                  _region._spriteFrame = null;
+                var region = attachments[key];
+                if (region && region._spriteFrame) {
+                  var spriteFrame = region._spriteFrame;
+                  region._spriteFrame = null;
+                  spriteFrame.destroy();
                 }
               }
             }
           }
         }
+      },
+      destroy: function destroy() {
+        this._destroyFromDynamicAtlas();
         SkeletonCache.removeSkeleton(this._uuid);
         this._super();
       }
     });
     sp.SkeletonData = module.exports = SkeletonData;
+    sp.RegionData = RegionData;
   }), {
     "./skeleton-cache": void 0
   } ],
@@ -74450,6 +74522,7 @@
     var _r, _g, _b, _fr, _fg, _fb, _fa, _dr, _dg, _db, _da;
     var _comp, _buffer, _renderer, _node, _needColor, _vertexEffect;
     var _packedRegions = [];
+    var _tmpRegionData = new sp.RegionData();
     function _getSlotMaterial(tex, blendMode) {
       var src, dst;
       switch (blendMode) {
@@ -74561,12 +74634,17 @@
             root: for (var _iterator = _createForOfIteratorHelperLoose(skins), _step; !(_step = _iterator()).done; ) {
               var skin = _step.value;
               for (var _iterator2 = _createForOfIteratorHelperLoose(skin.attachments), _step2; !(_step2 = _iterator2()).done; ) {
-                var attachment = _step2.value;
-                for (var key in attachment) {
-                  var region = attachment[key].region;
-                  if (region && region.texture) {
-                    this.checkAndSwitchMaterial(comp, region.texture._texture, material);
-                    break root;
+                var attachments = _step2.value;
+                for (var key in attachments) {
+                  var region;
+                  true;
+                  var attachment = attachments[key];
+                  if (attachment && attachment.getTexture2D) {
+                    var texture = attachment.getTexture2D(comp.skeletonData);
+                    if (texture) {
+                      this.checkAndSwitchMaterial(comp, texture, material);
+                      break root;
+                    }
                   }
                 }
               }
@@ -74575,25 +74653,22 @@
           comp._dataDirty = false;
         }
       };
-      _proto.bindPackedRegion = function bindPackedRegion(attachment, region) {
+      _proto.updatePackedAttachment = function updatePackedAttachment(attachment, strict) {
+        _tmpRegionData.assignToAttachment(attachment, strict, false);
+        var region = attachment;
         var frame = region._spriteFrame;
-        sp.SkeletonData.updateRegionUV(region);
-        if (attachment instanceof sp.spine.MeshAttachment) attachment.updateUVs(); else {
-          attachment.setRegion(region);
-          attachment.updateOffset();
-        }
         region._original._ref++;
         frame.once("_resetDynamicAtlasFrame", (function() {
-          region.x = region._original._x;
-          region.y = region._original._y;
-          region.texture = region._original._texture;
+          _tmpRegionData.initWithAttachment(attachment);
+          _tmpRegionData.x = region._original._x;
+          _tmpRegionData.y = region._original._y;
+          _tmpRegionData.texture = region._original._texture;
+          true;
+          _tmpRegionData.texture2D = region._original._texture2D;
           region._original._ref--;
           region._original._ref <= 0 && (region._original = null);
-          sp.SkeletonData.updateRegionUV(region);
-          if (attachment instanceof sp.spine.MeshAttachment) attachment.updateUVs(); else {
-            attachment.setRegion(region);
-            attachment.updateOffset();
-          }
+          _tmpRegionData.assignToAttachment(attachment, true, false);
+          _tmpRegionData.reset();
         }));
       };
       _proto.packDynamicAtlasForSpine = function packDynamicAtlasForSpine(comp) {
@@ -74608,38 +74683,45 @@
               var attachments = _step4.value;
               for (var key in attachments) {
                 var attachment = attachments[key];
-                var region = attachment.region;
-                if (region) if (region._original) _packedRegions.includes(region) && this.bindPackedRegion(attachment, region); else if (region.texture && region.texture._texture.packable) {
-                  if (region._spriteFrame) {
-                    region._spriteFrame.destroy();
-                    region._spriteFrame = null;
+                if (attachment) {
+                  var region;
+                  var alreadyInAtlas;
+                  var _spriteFrame;
+                  var _frame;
+                  var _packedFrame;
+                  true;
+                  if (!attachment._original && attachment.getTexture2D) {
+                    var texture = attachment.getTexture2D(comp.skeletonData);
+                    if (texture && texture.packable) {
+                      if (attachment._spriteFrame) {
+                        var spriteFrame = attachment._spriteFrame;
+                        attachment._spriteFrame = null;
+                        spriteFrame.destroy();
+                      }
+                      _tmpRegionData.initWithAttachment(attachment);
+                      var frame = _tmpRegionData.toSpriteFrame();
+                      var packedFrame = cc.dynamicAtlasManager.insertSpriteFrame(frame);
+                      if (packedFrame) {
+                        frame._setDynamicAtlasFrame(packedFrame);
+                        attachment._original = {
+                          _texture2D: texture,
+                          _texture: _tmpRegionData.texture,
+                          _x: attachment.regionX,
+                          _y: attachment.regionY,
+                          _ref: 0
+                        };
+                        attachment._spriteFrame = frame;
+                        _tmpRegionData.updateWithPackedFrame(packedFrame);
+                        this.updatePackedAttachment(attachment);
+                      } else frame.destroy();
+                    }
                   }
-                  var frame = sp.SkeletonData.createSpriteFrame(region);
-                  var packedFrame = cc.dynamicAtlasManager.insertSpriteFrame(frame);
-                  if (packedFrame) {
-                    frame._setDynamicAtlasFrame(packedFrame);
-                    region._original = {
-                      _texture: region.texture,
-                      _x: region.x,
-                      _y: region.y,
-                      _ref: 0
-                    };
-                    region.texture = new sp.SkeletonTexture({
-                      width: packedFrame.texture.width,
-                      height: packedFrame.texture.height
-                    });
-                    region.texture.setRealTexture(packedFrame.texture);
-                    region.x = packedFrame.x;
-                    region.y = packedFrame.y;
-                    region._spriteFrame = frame;
-                    this.bindPackedRegion(attachment, region);
-                    _packedRegions.push(region);
-                  } else frame.destroy();
                 }
               }
             }
           }
         }
+        _tmpRegionData.reset();
         _packedRegions.length = 0;
       };
       _proto.fillVertices = function fillVertices(skeletonColor, attachmentColor, slotColor, clipper, slot) {

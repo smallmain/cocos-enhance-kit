@@ -792,33 +792,87 @@ declare module cc {
 
 declare module sp {
 
+    /**
+     * Spine Attachment 的 Region 数据
+     */
+    class RegionData {
+
+        /**
+         * 根据当前 `x` `y` `width` `height` `texture` 更新 uv 数据
+         */
+        static updateUV(region: RegionData | spine.TextureAtlasRegion): void;
+
+        x: number;
+        y: number;
+        degrees: number;
+        texture2D: cc.Texture2D;
+        texture: any;
+        u: number;
+        v: number;
+        u2: number;
+        v2: number;
+        width: number;
+        height: number;
+        rotate: boolean;
+        offsetX: number;
+        offsetY: number;
+        originalWidth: number;
+        originalHeight: number;
+
+        constructor(attachmentOrSpriteFrame?: spine.Attachment | cc.SpriteFrame);
+
+        /**
+         * 使用 SpriteFrame 的数据初始化 RegionData
+         */
+        initWithSpriteFrame(spriteFrame: cc.SpriteFrame): void;
+
+        /**
+         * 使用 Attachment 的数据初始化 RegionData
+         */
+        initWithAttachment(attachment: spine.Attachment): void;
+
+        /**
+         * 根据当前 `x` `y` `width` `height` `texture` 更新 uv 数据
+         */
+        updateUV(): void;
+
+        /**
+         * 使用 PackedFrame 对象更新 RegionData
+         */
+        updateWithPackedFrame(packedFrame: any): void;
+
+        /**
+         * 使用 Texture2D 对象更新 RegionData
+         */
+        updateWithTexture2D(texture2d: cc.Texture2D): void;
+
+        /**
+         * 转为 SpriteFrame
+         * 
+         * 注意：SpriteFrame 只支持两个旋转角度，如果 region 的旋转角度不是 270 或 0 度，则不能完美转换。
+         * 
+         * @param strict 严格模式，开启时如果无法完美转换则返回 `null`，默认 `false`
+         */
+        toSpriteFrame(strict?: boolean): cc.SpriteFrame;
+
+        /**
+         * 将数据更新到 Attachment
+         * 
+         * @param strict 严格模式，是否确保数据被同步，默认开启
+         * @param resetDynamicAtlas 如果正在使用动态图集，则先还原，默认开启
+         */
+        assignToAttachment(attachment: spine.Attachment, strict?: boolean, resetDynamicAtlas?: boolean): void;
+
+    }
+
     interface SkeletonData {
 
         /**
          * 克隆该 SkeletonData
+         * 
+         * 注意：将会克隆原始数据而不是运行时数据
          */
         clone(): SkeletonData;
-
-    }
-
-    namespace SkeletonData {
-
-        /**
-         * 通过 SpriteFrame 创建 spine.TextureAtlasRegion
-         * 
-         * @param spriteFrame cc.SpriteFrame
-         * @param original 非必需，提供一个 region，将会从中浅拷贝 `name` 和 `page` 属性
-         */
-        function createRegion(spriteFrame: cc.SpriteFrame, original?: spine.TextureRegion): spine.TextureAtlasRegion;
-
-        /**
-         * 通过 spine.TextureAtlasRegion 创建 SpriteFrame
-         * 
-         * 注意：SpriteFrame 只支持两个旋转角度，如果 region 的旋转角度不是 270 或 0 度，则不能完美转换。
-         * 
-         * @param region spine.TextureAtlasRegion
-         */
-        function createSpriteFrame(region: spine.TextureAtlasRegion): cc.SpriteFrame;
 
     }
 
@@ -835,14 +889,14 @@ declare module sp {
         allowDynamicAtlas: cc.RenderComponent.EnableType;
 
         /**
-         * 通过 slot 和 attachment 的名称获取 attachment 上的 region。Skeleton 优先查找它的皮肤，然后才是 Skeleton Data 中默认的皮肤。
+         * 通过 slot 和 attachment 的名称获取 attachment 上的 region 数据。Skeleton 优先查找它的皮肤，然后才是 Skeleton Data 中默认的皮肤。
          */
-        getRegion(slotName: string, attachmentName: string): spine.TextureRegion | null;
+        getRegionData(slotName: string, attachmentName: string): sp.RegionData | null;
 
         /**
-         * 通过 slot 和 attachment 的名称设置 attachment 上的 region。Skeleton 优先查找它的皮肤，然后才是 Skeleton Data 中默认的皮肤。
+         * 通过 slot 和 attachment 的名称设置 attachment 上的 region 数据。Skeleton 优先查找它的皮肤，然后才是 Skeleton Data 中默认的皮肤。
          */
-        setRegion(slotName: string, attachmentName: string, region: spine.TextureRegion): boolean;
+        setRegionData(slotName: string, attachmentName: string, region: sp.RegionData): boolean;
 
         /**
          * 置渲染数据刷新脏标记
