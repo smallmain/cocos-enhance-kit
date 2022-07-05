@@ -66,6 +66,7 @@ const cacheManager = require('./jsb-cache-manager');
     let skeletonCacheMgr = spine.SkeletonCacheMgr.getInstance();
     spine.skeletonCacheMgr = skeletonCacheMgr;
     skeletonDataProto.destroy = function () {
+        this._destroyFromDynamicAtlas();
         this.reset();
         skeletonCacheMgr.removeSkeletonCache(this._uuid);
         cc.Asset.prototype.destroy.call(this);
@@ -325,6 +326,15 @@ const cacheManager = require('./jsb-cache-manager');
         }
     };
 
+    skeleton.setVertsDirty = function () {
+        if (this.skeletonData) {
+            this._dataDirty = true;
+            this.constructor.__assembler__.prototype.handleDynamicAtlasAndSwitchMaterial(this);
+        }
+        this.invalidAnimationCache();
+        cc.RenderComponent.prototype.setVertsDirty.call(this);
+    };
+
     skeleton.setSkeletonData = function (skeletonData) {
         if (null != skeletonData.width && null != skeletonData.height && 0 !== skeletonData.width && 0 !== skeletonData.height) {
             this.node.setContentSize(skeletonData.width, skeletonData.height);
@@ -348,6 +358,9 @@ const cacheManager = require('./jsb-cache-manager');
             this._nativeSkeleton._comp = null;
             this._nativeSkeleton = null;
         }
+
+        this._dataDirty = true;
+        this.constructor.__assembler__.prototype.handleDynamicAtlasAndSwitchMaterial(this);
 
         let nativeSkeleton = null;
         if (this.isAnimationCached()) {
@@ -769,6 +782,27 @@ const cacheManager = require('./jsb-cache-manager');
         this._materialCache = null;
     };
 
+    let regionAttachment = sp.spine.RegionAttachment.prototype;
+
+    regionAttachment.getTexture2D = function (skeletonData) {
+        if (!this._texture2D) {
+            this._texture2D = skeletonData.getTextureByIndex(this.textureForJSB.getRealTextureIndex());
+        }
+        return this._texture2D;
+    };
+
+    let meshAttachment = sp.spine.MeshAttachment.prototype;
+
+    meshAttachment.getTexture2D = function (skeletonData) {
+        if (!this._texture2D) {
+            this._texture2D = skeletonData.getTextureByIndex(this.textureForJSB.getRealTextureIndex());
+        }
+        return this._texture2D;
+    };
+
+    renderer.CustomAssembler.prototype.updateRenderDataForSwitchMaterial = function () {
+        // placeholder
+    };
 
     ////////////////////////////////////////////////////////////
     // adapt attach util
