@@ -166,7 +166,15 @@ public:
      * Gets total byte size of a vertex
      */
     uint32_t getBytes() const { return _bytes; };
-    
+
+    /*
+     * Builtin VertexFormat with 2d position, uv, color, color0, texId attributes
+     */
+    static VertexFormat* XY_UV_Two_Color_TexId;
+    /*
+     * Builtin VertexFormat with 2d position, uv, color, texId attributes
+     */
+    static VertexFormat* XY_UV_Color_TexId;
     /*
      * Builtin VertexFormat with 2d position, uv, color, color0 attributes
      */

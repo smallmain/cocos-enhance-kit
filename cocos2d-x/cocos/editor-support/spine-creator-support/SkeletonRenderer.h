@@ -97,7 +97,9 @@ namespace spine {
         
         /* Enables/disables two color tinting for this instance. May break batching */
         void setUseTint(bool enabled);
-        
+
+        void setUseMulti(bool enabled);
+
         /* Sets the vertex effect to be used, set to 0 to disable vertex effects */
         void setVertexEffectDelegate(VertexEffectDelegate* effectDelegate);
         /* Sets the range of slots that should be rendered. Use -1, -1 to clear the range */
@@ -164,6 +166,7 @@ namespace spine {
         bool                _premultipliedAlpha = false;
         SkeletonClipping*   _clipper = nullptr;
         bool                _useTint = false;
+        bool                _useMulti = false;
         std::string         _uuid = "";
         
         int                 _startSlotIndex = -1;
@@ -172,6 +175,9 @@ namespace spine {
         cocos2d::middleware::IOTypedArray* _debugBuffer = nullptr;
         cocos2d::renderer::NodeProxy* _nodeProxy = nullptr;
         cocos2d::renderer::EffectVariant* _effect = nullptr;
+
+        std::unordered_map<GLuint, float> _effectTextures = std::unordered_map<GLuint, float>();
+
         RealTimeAttachUtil* _attachUtil = nullptr;
     };
 

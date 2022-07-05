@@ -152,6 +152,7 @@ extern const char* ATTRIB_NAME_UV4;
 extern const char* ATTRIB_NAME_UV5;
 extern const char* ATTRIB_NAME_UV6;
 extern const char* ATTRIB_NAME_UV7;
+extern const char* ATTRIB_NAME_TEXID;
 
 extern const size_t ATTRIB_NAME_POSITION_HASH;
 extern const size_t ATTRIB_NAME_NORMAL_HASH;
@@ -171,6 +172,7 @@ extern const size_t ATTRIB_NAME_UV4_HASH;
 extern const size_t ATTRIB_NAME_UV5_HASH;
 extern const size_t ATTRIB_NAME_UV6_HASH;
 extern const size_t ATTRIB_NAME_UV7_HASH;
+extern const size_t ATTRIB_NAME_TEXID_HASH;
 
 // vertex attribute type
 enum class AttribType : uint16_t

@@ -143,6 +143,29 @@ Skin::AttachmentMap::Entries Skin::getAttachments() {
 	return _attachments.getEntries();
 }
 
+std::vector<std::map<std::string, Attachment *>> Skin::getAttachmentsForJSB() {
+    std::vector<std::map<std::string, Attachment *>> vec;
+    
+    Skin::AttachmentMap::Entries entries = _attachments.getEntries();
+    
+    size_t slotIndex = -1;
+    std::map<std::string, Attachment *>* map = nullptr;
+    
+    while (entries.hasNext()) {
+        Skin::AttachmentMap::Entry &entry = entries.next();
+        
+        if (slotIndex != entry._slotIndex){
+            slotIndex = entry._slotIndex;
+            vec.emplace_back();
+            map = &vec.back();
+        }
+        
+        map->insert({ entry._name.buffer(), entry._attachment });
+    }
+    
+    return vec;
+}
+
 void Skin::attachAll(Skeleton &skeleton, Skin &oldSkin) {
 	Vector<Slot *> &slots = skeleton.getSlots();
 	Skin::AttachmentMap::Entries entries = oldSkin.getAttachments();

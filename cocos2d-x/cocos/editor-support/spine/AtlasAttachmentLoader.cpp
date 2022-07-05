@@ -60,9 +60,12 @@ RegionAttachment *AtlasAttachmentLoader::newRegionAttachment(Skin &skin, const S
 
 	RegionAttachment &attachment = *attachmentP;
 	attachment.setRendererObject(regionP);
-	attachment.setUVs(region.u, region.v, region.u2, region.v2, region.rotate);
+	attachment.setUVs(region.u, region.v, region.u2, region.v2, region.degrees);
+	attachment._regionDegrees = region.degrees;
 	attachment._regionOffsetX = region.offsetX;
 	attachment._regionOffsetY = region.offsetY;
+	attachment._regionX = region.x;
+	attachment._regionY = region.y;
 	attachment._regionWidth = (float)region.width;
 	attachment._regionHeight = (float)region.height;
 	attachment._regionOriginalWidth = (float)region.originalWidth;
@@ -90,6 +93,8 @@ MeshAttachment *AtlasAttachmentLoader::newMeshAttachment(Skin &skin, const Strin
 	attachment._regionDegrees = region.degrees;
 	attachment._regionOffsetX = region.offsetX;
 	attachment._regionOffsetY = region.offsetY;
+	attachment._regionX = region.x;
+	attachment._regionY = region.y;
 	attachment._regionWidth = (float)region.width;
 	attachment._regionHeight = (float)region.height;
 	attachment._regionOriginalWidth = (float)region.originalWidth;

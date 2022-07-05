@@ -46,3 +46,6 @@
 
 #define VF_XYUVC 5
 #define VF_XYUVCC 6
+
+#define VF_XYUVCT 7
+#define VF_XYUVCCT 8

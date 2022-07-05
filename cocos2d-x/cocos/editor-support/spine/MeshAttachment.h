@@ -91,6 +91,12 @@ namespace spine {
 		float getRegionOffsetY();
 		void setRegionOffsetY(float inValue);
 
+		float getRegionX();
+		void setRegionX(float inValue);
+
+		float getRegionY();
+		void setRegionY(float inValue);
+
 		float getRegionWidth();
 		void setRegionWidth(float inValue);
 
@@ -120,7 +126,7 @@ namespace spine {
 		MeshAttachment* newLinkedMesh();
 
 	private:
-		float _regionOffsetX, _regionOffsetY, _regionWidth, _regionHeight, _regionOriginalWidth, _regionOriginalHeight;
+		float _regionOffsetX, _regionOffsetY, _regionX, _regionY, _regionWidth, _regionHeight, _regionOriginalWidth, _regionOriginalHeight;
 		MeshAttachment* _parentMesh;
 		Vector<float> _uvs;
 		Vector<float> _regionUVs;

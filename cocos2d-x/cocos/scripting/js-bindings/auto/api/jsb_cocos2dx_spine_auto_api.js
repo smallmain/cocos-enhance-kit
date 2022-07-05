@@ -3938,14 +3938,14 @@ getRegionOriginalWidth : function (
  * @param {float} arg1
  * @param {float} arg2
  * @param {float} arg3
- * @param {bool} arg4
+ * @param {float} arg4
  */
 setUVs : function (
 float, 
 float, 
 float, 
 float, 
-bool 
+float 
 )
 {
 },

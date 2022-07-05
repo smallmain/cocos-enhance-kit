@@ -51,6 +51,8 @@
 #include "cocos/editor-support/spine/spine.h"
 #include "cocos/editor-support/spine-creator-support/spine-cocos2dx.h"
 
+#include "cocos/editor-support/spine-creator-support/AttachmentVertices.h"
+
 using namespace cocos2d;
 
 static spine::Cocos2dTextureLoader textureLoader;
@@ -233,6 +235,252 @@ static bool js_register_spine_retainSkeletonData(se::State& s)
 }
 SE_BIND_FUNC(js_register_spine_retainSkeletonData)
 
+static bool js_cocos2dx_spine_Skin_getAttachmentsForJSB(se::State& s) {
+    spine::Skin* cobj = (spine::Skin*)s.nativeThisObject();
+    SE_PRECONDITION2(
+        cobj, false,
+        "js_cocos2dx_spine_Skin_getAttachmentsForJSB : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 0) {
+        std::vector<std::map<std::string, spine::Attachment*>> result =
+            cobj->getAttachmentsForJSB();
+        ok &= spine_skin_attachments_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false,
+                         "js_cocos2dx_spine_Skin_getAttachmentsForJSB : Error "
+                         "processing arguments");
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d",
+                    (int)argc, 0);
+    return false;
+}
+SE_BIND_FUNC(js_cocos2dx_spine_Skin_getAttachmentsForJSB)
+
+static bool js_cocos2dx_spine_RegionAttachment_getTextureForJSB(se::State& s) {
+    spine::RegionAttachment* cobj =
+        (spine::RegionAttachment*)s.nativeThisObject();
+    SE_PRECONDITION2(
+        cobj, false,
+        "js_cocos2dx_spine_RegionAttachment_getTextureForJSB : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 0) {
+        spine::AttachmentVertices* attachmentVertices = (spine::AttachmentVertices*)cobj->getRendererObject();
+        ok &= native_ptr_to_seval<cocos2d::middleware::Texture2D>((cocos2d::middleware::Texture2D*)attachmentVertices->_texture, &s.rval());
+        SE_PRECONDITION2(ok, false,
+                         "js_cocos2dx_spine_RegionAttachment_getTextureForJSB : Error "
+                         "processing arguments");
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d",
+                    (int)argc, 0);
+    return false;
+}
+SE_BIND_FUNC(js_cocos2dx_spine_RegionAttachment_getTextureForJSB)
+
+static bool js_cocos2dx_spine_RegionAttachment_setRegionForJSB(se::State& s) {
+    spine::RegionAttachment* attachment =
+        (spine::RegionAttachment*)s.nativeThisObject();
+    SE_PRECONDITION2(
+        attachment, false,
+        "js_cocos2dx_spine_RegionAttachment_setRegionForJSB : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    if (argc != 5) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", argc, 5);
+        return false;
+    }
+    bool ok = false;
+
+    if (attachment == nullptr) return false;
+
+    cocos2d::middleware::Texture2D* texture = nullptr;
+    ok = seval_to_native_ptr(args[0], &texture);
+    SE_PRECONDITION2(
+        ok, false,
+        "js_cocos2dx_spine_RegionAttachment_setRegionForJSB: Converting Middleware Texture2D failed!");
+
+    cocos2d::renderer::Rect rect;
+    ok = seval_to_Rect(args[1], &rect);
+    SE_PRECONDITION2(
+        ok, false, "js_cocos2dx_spine_RegionAttachment_setRegionForJSB: Converting Invalid Rect failed!");
+
+    cocos2d::Size originalSize;
+    ok = seval_to_Size(args[2], &originalSize);
+    SE_PRECONDITION2(
+        ok, false, "js_cocos2dx_spine_RegionAttachment_setRegionForJSB: Converting Invalid OriginalSize failed!");
+
+    cocos2d::Vec2 offset;
+    ok = seval_to_Vec2(args[3], &offset);
+    SE_PRECONDITION2(
+        ok, false, "js_cocos2dx_spine_RegionAttachment_setRegionForJSB: Converting Invalid Offset failed!");
+
+    float degrees;
+    ok = seval_to_float(args[4], &degrees);
+    SE_PRECONDITION2(
+        ok, false, "js_cocos2dx_spine_RegionAttachment_setRegionForJSB: Converting Invalid Degrees failed!");
+
+    spine::AttachmentVertices* attachmentVertices = (spine::AttachmentVertices*)attachment->getRendererObject();
+
+    CC_SAFE_RELEASE(attachmentVertices->_texture);
+    attachmentVertices->_texture = texture;
+    CC_SAFE_RETAIN(texture);
+
+    float u, v, u2, v2;
+    float w = texture->getNativeTexture()->getWidth();
+    float h = texture->getNativeTexture()->getHeight();
+    if (degrees != 0) {
+        u = rect.x / w;
+        v = rect.y / h;
+        u2 = (rect.x + rect.h) / w;
+        v2 = (rect.y + rect.w) / h;
+    } else {
+        u = rect.x / w;
+        v = rect.y / h;
+        u2 = (rect.x + rect.w) / w;
+        v2 = (rect.y + rect.h) / h;
+    }
+
+    attachment->setRegionX(rect.x);
+    attachment->setRegionY(rect.y);
+    attachment->setRegionWidth(rect.w);
+    attachment->setRegionHeight(rect.h);
+    attachment->setRegionOriginalWidth(originalSize.width);
+    attachment->setRegionOriginalHeight(originalSize.height);
+    attachment->setRegionOffsetX(offset.x);
+    attachment->setRegionOffsetY(offset.y);
+    attachment->setRegionDegrees(degrees);
+
+    attachment->setUVs(u, v, u2, v2, degrees);
+    attachment->updateOffset();
+
+    cocos2d::middleware::V2F_T2F_C4B* vertices = attachmentVertices->_triangles->verts;
+    for (int i = 0, ii = 0; i < 4; ++i, ii += 2) {
+        vertices[i].texCoord.u = attachment->getUVs()[ii];
+        vertices[i].texCoord.v = attachment->getUVs()[ii + 1];
+    }
+
+    return true;
+}
+SE_BIND_FUNC(js_cocos2dx_spine_RegionAttachment_setRegionForJSB)
+
+static bool js_cocos2dx_spine_MeshAttachment_getTextureForJSB(se::State& s) {
+    spine::MeshAttachment* cobj =
+        (spine::MeshAttachment*)s.nativeThisObject();
+    SE_PRECONDITION2(
+        cobj, false,
+        "js_cocos2dx_spine_MeshAttachment_getTextureForJSB : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 0) {
+        spine::AttachmentVertices* attachmentVertices = (spine::AttachmentVertices*)cobj->getRendererObject();
+        ok &= native_ptr_to_seval<cocos2d::middleware::Texture2D>((cocos2d::middleware::Texture2D*)attachmentVertices->_texture, &s.rval());
+        SE_PRECONDITION2(ok, false,
+                         "js_cocos2dx_spine_MeshAttachment_getTextureForJSB : Error "
+                         "processing arguments");
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d",
+                    (int)argc, 0);
+    return false;
+}
+SE_BIND_FUNC(js_cocos2dx_spine_MeshAttachment_getTextureForJSB)
+
+static bool js_cocos2dx_spine_MeshAttachment_setRegionForJSB(se::State& s) {
+    spine::MeshAttachment* attachment =
+        (spine::MeshAttachment*)s.nativeThisObject();
+    SE_PRECONDITION2(
+        attachment, false,
+        "js_cocos2dx_spine_MeshAttachment_setRegionForJSB : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    if (argc != 5) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", argc, 5);
+        return false;
+    }
+    bool ok = false;
+
+    if (attachment == nullptr) return false;
+
+    cocos2d::middleware::Texture2D* texture = nullptr;
+    ok = seval_to_native_ptr(args[0], &texture);
+    SE_PRECONDITION2(
+        ok, false,
+        "js_cocos2dx_spine_MeshAttachment_setRegionForJSB: Converting Middleware Texture2D failed!");
+
+    cocos2d::renderer::Rect rect;
+    ok = seval_to_Rect(args[1], &rect);
+    SE_PRECONDITION2(
+        ok, false, "js_cocos2dx_spine_MeshAttachment_setRegionForJSB: Converting Invalid Rect failed!");
+
+    cocos2d::Size originalSize;
+    ok = seval_to_Size(args[2], &originalSize);
+    SE_PRECONDITION2(
+        ok, false, "js_cocos2dx_spine_MeshAttachment_setRegionForJSB: Converting Invalid OriginalSize failed!");
+
+    cocos2d::Vec2 offset;
+    ok = seval_to_Vec2(args[3], &offset);
+    SE_PRECONDITION2(
+        ok, false, "js_cocos2dx_spine_MeshAttachment_setRegionForJSB: Converting Invalid Offset failed!");
+
+    float degrees;
+    ok = seval_to_float(args[4], &degrees);
+    SE_PRECONDITION2(
+        ok, false, "js_cocos2dx_spine_MeshAttachment_setRegionForJSB: Converting Invalid Degrees failed!");
+
+    spine::AttachmentVertices* attachmentVertices = (spine::AttachmentVertices*)attachment->getRendererObject();
+
+    CC_SAFE_RELEASE(attachmentVertices->_texture);
+    attachmentVertices->_texture = texture;
+    CC_SAFE_RETAIN(texture);
+
+    float u, v, u2, v2;
+    float w = texture->getNativeTexture()->getWidth();
+    float h = texture->getNativeTexture()->getHeight();
+    if (degrees != 0) {
+        u = rect.x / w;
+        v = rect.y / h;
+        u2 = (rect.x + rect.h) / w;
+        v2 = (rect.y + rect.w) / h;
+    } else {
+        u = rect.x / w;
+        v = rect.y / h;
+        u2 = (rect.x + rect.w) / w;
+        v2 = (rect.y + rect.h) / h;
+    }
+
+    attachment->setRegionU(u);
+    attachment->setRegionV(v);
+    attachment->setRegionU2(u2);
+    attachment->setRegionV2(v2);
+    attachment->setRegionRotate(degrees != 0);
+    attachment->setRegionDegrees(degrees);
+
+    attachment->setRegionX(rect.x);
+    attachment->setRegionY(rect.y);
+    attachment->setRegionWidth(rect.w);
+    attachment->setRegionHeight(rect.h);
+    attachment->setRegionOriginalWidth(originalSize.width);
+    attachment->setRegionOriginalHeight(originalSize.height);
+    attachment->setRegionOffsetX(offset.x);
+    attachment->setRegionOffsetY(offset.y);
+
+    attachment->updateUVs();
+
+    cocos2d::middleware::V2F_T2F_C4B* vertices = attachmentVertices->_triangles->verts;
+        for (size_t i = 0, ii = 0, nn = attachment->getWorldVerticesLength(); ii < nn; ++i, ii += 2) {
+            vertices[i].texCoord.u = attachment->getUVs()[ii];
+            vertices[i].texCoord.v = attachment->getUVs()[ii + 1];
+        }
+
+    return true;
+}
+SE_BIND_FUNC(js_cocos2dx_spine_MeshAttachment_setRegionForJSB)
+
 bool register_all_spine_manual(se::Object* obj)
 {
     // Get the ns
@@ -249,7 +497,15 @@ bool register_all_spine_manual(se::Object* obj)
     ns->defineFunction("initSkeletonData", _SE(js_register_spine_initSkeletonData));
     ns->defineFunction("retainSkeletonData", _SE(js_register_spine_retainSkeletonData));
     ns->defineFunction("disposeSkeletonData", _SE(js_register_spine_disposeSkeletonData));
-    
+
+    __jsb_spine_Skin_proto->defineFunction("getAttachments", _SE(js_cocos2dx_spine_Skin_getAttachmentsForJSB));
+
+    __jsb_spine_RegionAttachment_proto->defineFunction("getTextureForJSB",_SE(js_cocos2dx_spine_RegionAttachment_getTextureForJSB));
+    __jsb_spine_RegionAttachment_proto->defineFunction("setRegionForJSB",_SE(js_cocos2dx_spine_RegionAttachment_setRegionForJSB));
+
+    __jsb_spine_MeshAttachment_proto->defineFunction("getTextureForJSB",_SE(js_cocos2dx_spine_MeshAttachment_getTextureForJSB));
+    __jsb_spine_MeshAttachment_proto->defineFunction("setRegionForJSB",_SE(js_cocos2dx_spine_MeshAttachment_setRegionForJSB));
+
     spine::setSpineObjectDisposeCallback([](void* spineObj){
         se::Object* seObj = nullptr;
         

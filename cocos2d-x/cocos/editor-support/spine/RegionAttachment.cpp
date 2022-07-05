@@ -103,26 +103,35 @@ void RegionAttachment::updateOffset() {
 	_vertexOffset[BRY] = localYCos + localX2Sin;
 }
 
-void RegionAttachment::setUVs(float u, float v, float u2, float v2, bool rotate) {
-	if (rotate) {
-		_uvs[URX] = u;
-		_uvs[URY] = v2;
-		_uvs[BRX] = u;
-		_uvs[BRY] = v;
-		_uvs[BLX] = u2;
-		_uvs[BLY] = v;
-		_uvs[ULX] = u2;
-		_uvs[ULY] = v2;
-	} else {
-		_uvs[ULX] = u;
-		_uvs[ULY] = v2;
-		_uvs[URX] = u;
-		_uvs[URY] = v;
-		_uvs[BRX] = u2;
-		_uvs[BRY] = v;
-		_uvs[BLX] = u2;
-		_uvs[BLY] = v2;
-	}
+void RegionAttachment::setUVs(float u, float v, float u2, float v2, float degrees) {
+    if (degrees == 90) {
+        _uvs[URX] = u;
+        _uvs[URY] = v2;
+        _uvs[BRX] = u;
+        _uvs[BRY] = v;
+        _uvs[BLX] = u2;
+        _uvs[BLY] = v;
+        _uvs[ULX] = u2;
+        _uvs[ULY] = v2;
+    } else if (degrees == 270) {
+        _uvs[BLX] = u;
+        _uvs[BLY] = v2;
+        _uvs[ULX] = u;
+        _uvs[ULY] = v;
+        _uvs[URX] = u2;
+        _uvs[URY] = v;
+        _uvs[BRX] = u2;
+        _uvs[BRY] = v2;
+    } else {
+        _uvs[ULX] = u;
+        _uvs[ULY] = v2;
+        _uvs[URX] = u;
+        _uvs[URY] = v;
+        _uvs[BRX] = u2;
+        _uvs[BRY] = v;
+        _uvs[BLX] = u2;
+        _uvs[BLY] = v2;
+    }
 }
 
 void RegionAttachment::computeWorldVertices(Bone &bone, Vector<float> &worldVertices, size_t offset, size_t stride) {
@@ -223,6 +232,14 @@ void RegionAttachment::setPath(const String &inValue) {
 	_path = inValue;
 }
 
+float RegionAttachment::getRegionDegrees() {
+	return _regionDegrees;
+}
+
+void RegionAttachment::setRegionDegrees(float inValue) {
+    _regionDegrees = inValue;
+}
+
 float RegionAttachment::getRegionOffsetX() {
 	return _regionOffsetX;
 }
@@ -237,6 +254,22 @@ float RegionAttachment::getRegionOffsetY() {
 
 void RegionAttachment::setRegionOffsetY(float inValue) {
 	_regionOffsetY = inValue;
+}
+
+float RegionAttachment::getRegionX() {
+	return _regionX;
+}
+
+void RegionAttachment::setRegionX(float inValue) {
+	_regionX = inValue;
+}
+
+float RegionAttachment::getRegionY() {
+	return _regionY;
+}
+
+void RegionAttachment::setRegionY(float inValue) {
+	_regionY = inValue;
 }
 
 float RegionAttachment::getRegionWidth() {

@@ -47,7 +47,11 @@ namespace spine {
         virtual void update(float dt) override;
         virtual void render(float dt) override;
         virtual uint32_t getRenderOrder() const override;
-        
+
+        void renderMulti(float dt);
+        std::vector<spine::SkeletonCache::SegmentMultiData> toMultiSegments(
+            const std::vector<spine::SkeletonCache::SegmentData*>& segments);
+
         Skeleton* getSkeleton() const;
         
         void setTimeScale (float scale);
@@ -78,7 +82,8 @@ namespace spine {
         void onEnable();
         void onDisable();
         void setUseTint(bool enabled);
-        
+        void setUseMulti(bool enabled);
+
         void setAnimation (const std::string& name, bool loop);
         void addAnimation (const std::string& name, bool loop, float delay = 0);
         Animation* findAnimation(const std::string& name) const;
@@ -118,7 +123,8 @@ namespace spine {
         bool _isAniComplete = true;
         std::string _animationName = "";
         bool _useTint = false;
-        
+        bool _useMulti = false;
+
         struct AniQueueData {
             std::string animationName = "";
             bool loop = false;
@@ -127,5 +133,7 @@ namespace spine {
         std::queue<AniQueueData*> _animationQueue;
         AniQueueData* _headAnimation = nullptr;
         CacheModeAttachUtil* _attachUtil = nullptr;
+
+        std::unordered_map<GLuint, float> _effectTextures = std::unordered_map<GLuint, float>();
     };
 }

@@ -44,6 +44,7 @@ const char* ATTRIB_NAME_UV4 = "a_uv4";
 const char* ATTRIB_NAME_UV5 = "a_uv5";
 const char* ATTRIB_NAME_UV6 = "a_uv6";
 const char* ATTRIB_NAME_UV7 = "a_uv7";
+const char* ATTRIB_NAME_TEXID = "a_texId";
 
 const size_t ATTRIB_NAME_POSITION_HASH = std::hash<std::string>{}(ATTRIB_NAME_POSITION);
 const size_t ATTRIB_NAME_NORMAL_HASH = std::hash<std::string>{}(ATTRIB_NAME_NORMAL);
@@ -63,6 +64,7 @@ const size_t ATTRIB_NAME_UV4_HASH = std::hash<std::string>{}(ATTRIB_NAME_UV4);
 const size_t ATTRIB_NAME_UV5_HASH = std::hash<std::string>{}(ATTRIB_NAME_UV5);
 const size_t ATTRIB_NAME_UV6_HASH = std::hash<std::string>{}(ATTRIB_NAME_UV6);
 const size_t ATTRIB_NAME_UV7_HASH = std::hash<std::string>{}(ATTRIB_NAME_UV7);
+const size_t ATTRIB_NAME_TEXID_HASH = std::hash<std::string>{}(ATTRIB_NAME_TEXID);
 
 Rect Rect::ZERO;
 

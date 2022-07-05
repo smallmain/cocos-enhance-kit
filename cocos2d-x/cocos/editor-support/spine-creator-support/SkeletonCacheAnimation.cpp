@@ -35,12 +35,17 @@
 #include "renderer/scene/assembler/CustomAssembler.hpp"
 #include "renderer/gfx/Texture.h"
 #include "spine-creator-support/AttachUtil.h"
+#include <climits>
 
 USING_NS_CC;
 USING_NS_MW;
 using namespace cocos2d::renderer;
 static const std::string techStage = "opaque";
 static const std::string textureKey = "texture";
+static const std::vector<std::string> textureKeys = {
+    "texture",  "texture2", "texture3", "texture4",
+    "texture5", "texture6", "texture7", "texture8",
+};
 
 namespace spine {
     
@@ -138,9 +143,77 @@ namespace spine {
         }
         _curFrameIndex = frameIdx;
     }
-    
-    void SkeletonCacheAnimation::render(float dt) {
+
+    std::vector<spine::SkeletonCache::SegmentMultiData>
+    SkeletonCacheAnimation::toMultiSegments(
+        const std::vector<spine::SkeletonCache::SegmentData*>& segments){
+        std::vector<spine::SkeletonCache::SegmentMultiData> multiSegments;
+        if (segments.size() <= 0) return multiSegments;
         
+        auto end = segments.end();
+        auto cur = segments.begin();
+        multiSegments.emplace_back();
+        auto* tmp = &multiSegments.back();
+
+        auto getTextureId = [&]() -> float {
+            auto glID = (*cur)->getTexture()->getNativeTexture()->getHandle();
+            auto result = _effectTextures.find(glID);
+            if (result == _effectTextures.end()) {
+                for (size_t i = 0; i < textureKeys.size(); i++) {
+                    auto prop = _effect->getProperty(textureKeys[i]);
+                    if (prop->getTexture()->getHandle() == glID) {
+                        _effectTextures.insert(std::make_pair(glID, i));
+                        return i;
+                    }
+                }
+                _effectTextures.insert(std::make_pair(glID, -1));
+                return -1;
+            } else {
+                return result->second;
+            }
+        };
+
+        tmp->blendMode = (*cur)->blendMode;
+        tmp->indexCount = (*cur)->indexCount;
+        tmp->vertexFloatCount = (*cur)->vertexFloatCount;
+        float curTextureId = getTextureId();
+        tmp->textureDatas.emplace_back(curTextureId, (*cur)->vertexFloatCount, 0, (*cur)->getTexture()->getNativeTexture());
+        tmp->inEffect = curTextureId != -1;
+        cur++;
+
+        while (cur != end)
+        {
+            float curTextureId = getTextureId();
+            float tmpTextureId = tmp->textureDatas[0].textureId;
+
+            if ((*cur)->blendMode != tmp->blendMode ||
+                (tmpTextureId != -1 && curTextureId == -1) ||
+                tmpTextureId == -1) {
+                multiSegments.emplace_back();
+                tmp = &multiSegments.back();
+                tmp->blendMode = (*cur)->blendMode;
+                tmp->indexCount = (*cur)->indexCount;
+                tmp->vertexFloatCount = (*cur)->vertexFloatCount;
+                tmp->textureDatas.emplace_back(curTextureId, (*cur)->vertexFloatCount, 0, (*cur)->getTexture()->getNativeTexture());
+                tmp->inEffect = curTextureId != -1;
+            } else {
+                tmp->textureDatas.emplace_back(curTextureId, (*cur)->vertexFloatCount, tmp->indexCount, (*cur)->getTexture()->getNativeTexture());
+                tmp->indexCount += (*cur)->indexCount;
+                tmp->vertexFloatCount += (*cur)->vertexFloatCount;
+            }
+
+            cur++;
+        }
+
+        return multiSegments;
+    }
+
+    void SkeletonCacheAnimation::render(float dt) {
+        if (_useMulti) {
+            renderMulti(dt);
+            return;
+        }
+
         if (!_nodeProxy || !_effect) {
             return;
         }
@@ -377,6 +450,289 @@ namespace spine {
             _attachUtil->syncAttachedNode(_nodeProxy, frameData);
         }
     }
+
+    void SkeletonCacheAnimation::renderMulti(float dt) {
+        if (!_nodeProxy || !_effect) {
+            return;
+        }
+        
+        CustomAssembler* assembler = (CustomAssembler*)_nodeProxy->getAssembler();
+        if (assembler == nullptr) {
+            return;
+        }
+        assembler->reset();
+        assembler->setUseModel(!_batch);
+        
+        if (!_animationData) return;
+        SkeletonCache::FrameData* frameData = _animationData->getFrameData(_curFrameIndex);
+        if (!frameData) return;
+        
+        auto& tmpSegments = frameData->getSegments();
+        auto& colors = frameData->getColors();
+        if (tmpSegments.size() == 0 || colors.size() == 0) return;
+        
+        auto mgr = MiddlewareManager::getInstance();
+        if (!mgr->isRendering) return;
+        
+        _nodeColor.a = _nodeProxy->getRealOpacity() / (float)255;
+
+        auto vertexFormat = _useTint ? VF_XYUVCCT : VF_XYUVCT;
+        middleware::MeshBuffer* mb = mgr->getMeshBuffer(vertexFormat);
+        middleware::IOBuffer& vb = mb->getVB();
+        middleware::IOBuffer& ib = mb->getIB();
+        const auto& srcVB = frameData->vb;
+        const auto& srcIB = frameData->ib;
+        
+        // vertex size int bytes with one color
+        int vbs1 = sizeof(V2F_T2F_C4B_T1F);
+        // vertex size in floats with one color
+        int vs1 = vbs1 / sizeof(float);
+        // vertex size int bytes with two color
+        int vbs2 = sizeof(V2F_T2F_C4B_C4B_T1F);
+        // vertex size in floats with two color
+        int vs2 = vbs2 / sizeof(float);
+
+        int vbs3 = sizeof(V2F_T2F_C4B);
+        int vs3 = vbs3 / sizeof(float);
+
+        int vbs4 = sizeof(V2F_T2F_C4B_C4B);
+        int vs4 = vbs4 / sizeof(float);
+
+        int vs = _useTint ? vs2 : vs1;
+        int vbs = _useTint ? vbs2 : vbs1;
+        
+        const cocos2d::Mat4& nodeWorldMat = _nodeProxy->getWorldMatrix();
+
+        int colorOffset = 0;
+        SkeletonCache::ColorData* nowColor = colors[colorOffset++];
+        auto maxVFOffset = nowColor->vertexFloatOffset;
+        
+        Color4B finalColor;
+        Color4B darkColor;
+        float tempR = 0.0f, tempG = 0.0f, tempB = 0.0f, tempA = 0.0f;
+        float multiplier = 1.0f;
+        int srcVertexBytesOffset = 0;
+        int srcVertexBytes = 0;
+        int vertexBytes = 0;
+        int vertexFloats = 0;
+        int tintBytes = 0;
+        int srcIndexBytesOffset = 0;
+        int indexBytes = 0;
+        GLuint textureHandle = 0;
+        double effectHash = 0;
+        int blendMode = 0;
+        int dstVertexOffset = 0;
+        float* dstVertexBuffer = nullptr;
+        unsigned int* dstColorBuffer = nullptr;
+        unsigned short* dstIndexBuffer = nullptr;
+        bool needColor = false;
+        BlendFactor curBlendSrc = BlendFactor::ONE;
+        BlendFactor curBlendDst = BlendFactor::ZERO;
+        
+        if (abs(_nodeColor.r - 1.0f) > 0.0001f ||
+            abs(_nodeColor.g - 1.0f) > 0.0001f ||
+            abs(_nodeColor.b - 1.0f) > 0.0001f ||
+            abs(_nodeColor.a - 1.0f) > 0.0001f ||
+            _premultipliedAlpha) {
+            needColor = true;
+        }
+        
+        auto handleColor = [&](SkeletonCache::ColorData* colorData){
+            tempA = colorData->finalColor.a * _nodeColor.a;
+            multiplier = _premultipliedAlpha ? tempA / 255 : 1;
+            tempR = _nodeColor.r * multiplier;
+            tempG = _nodeColor.g * multiplier;
+            tempB = _nodeColor.b * multiplier;
+            
+            finalColor.a = (GLubyte)tempA;
+            finalColor.r = (GLubyte)(colorData->finalColor.r * tempR);
+            finalColor.g = (GLubyte)(colorData->finalColor.g * tempG);
+            finalColor.b = (GLubyte)(colorData->finalColor.b * tempB);
+            
+            darkColor.r = (GLubyte)(colorData->darkColor.r * tempR);
+            darkColor.g = (GLubyte)(colorData->darkColor.g * tempG);
+            darkColor.b = (GLubyte)(colorData->darkColor.b * tempB);
+            darkColor.a = _premultipliedAlpha ? 255 : 0;
+        };
+        
+        handleColor(nowColor);
+
+        // 重新生成多纹理使用的 segments
+        auto segments = toMultiSegments(tmpSegments);
+        
+        for (std::size_t segIndex = 0, segLen = segments.size(); segIndex < segLen; segIndex++) {
+            auto segment = &segments[segIndex];
+            srcVertexBytes = segment->vertexFloatCount * sizeof(float);
+            if (!_useTint) {
+                vertexBytes = srcVertexBytes;
+                vertexFloats = segment->vertexFloatCount;
+            } else {
+                tintBytes = segment->vertexFloatCount / vs4 * sizeof(float);
+                vertexBytes = srcVertexBytes + tintBytes;
+                vertexFloats = vertexBytes / sizeof(float);
+            }
+
+            // fill vertex buffer
+            vb.checkSpace(vertexBytes, true);
+            dstVertexOffset = (int)vb.getCurPos() / vbs;
+            dstVertexBuffer = (float*)vb.getCurBuffer();
+            dstColorBuffer = (unsigned int*)vb.getCurBuffer();
+
+            char* srcBuffer = (char*)srcVB.getBuffer() + srcVertexBytesOffset;
+            auto curTextureData = segment->textureDatas.begin();
+            auto curTextureDataVfc = (*curTextureData).vertexFloatCount * sizeof(float);
+
+            if (!_useTint) {
+                int t = 0;
+                for (std::size_t srcBufferIdx = 0; srcBufferIdx < srcVertexBytes; srcBufferIdx += vbs4) {
+                    if (curTextureDataVfc <= srcBufferIdx) {
+                        curTextureData++;
+                        curTextureDataVfc += (*curTextureData).vertexFloatCount * sizeof(float);
+                    }
+                    vb.writeBytes(srcBuffer + srcBufferIdx, vbs3);
+                    vb.writeFloat32((*curTextureData).textureId);
+                }
+            } else {
+                for (std::size_t srcBufferIdx = 0; srcBufferIdx < srcVertexBytes; srcBufferIdx += vbs4) {
+                    if (curTextureDataVfc <= srcBufferIdx) {
+                        curTextureData++;
+                        curTextureDataVfc += (*curTextureData).vertexFloatCount * sizeof(float);
+                    }
+                    vb.writeBytes(srcBuffer + srcBufferIdx, vbs4);
+                    vb.writeFloat32((*curTextureData).textureId);
+                }
+            }
+            
+            // batch handle
+            if (_batch) {
+                cocos2d::Vec3* point = nullptr;
+                float tempZ = 0.0f;
+                for (auto posIndex = 0; posIndex < vertexFloats; posIndex += vs)
+                {
+                    point = (cocos2d::Vec3*)(dstVertexBuffer + posIndex);
+                    tempZ = point->z;
+                    point->z = 0;
+                    nodeWorldMat.transformPoint(point);
+                    point->z = tempZ;
+                }
+            }
+            
+            // handle vertex color
+            if (needColor) {
+                int srcVertexFloatOffset = srcVertexBytesOffset / sizeof(float);
+                if (_useTint) {
+                    for (auto colorIndex = 0; colorIndex < vertexFloats; colorIndex += vs, srcVertexFloatOffset += vs4)
+                    {
+                        if (srcVertexFloatOffset >= maxVFOffset) {
+                            nowColor = colors[colorOffset++];
+                            handleColor(nowColor);
+                            maxVFOffset = nowColor->vertexFloatOffset;
+                        }
+                        memcpy(dstColorBuffer + colorIndex + 4, &finalColor, sizeof(finalColor));
+                        memcpy(dstColorBuffer + colorIndex + 5, &darkColor, sizeof(darkColor));
+                    }
+                } else {
+                    for (auto colorIndex = 0; colorIndex < vertexFloats; colorIndex += vs, srcVertexFloatOffset += vs4)
+                    {
+                        if (srcVertexFloatOffset >= maxVFOffset) {
+                            nowColor = colors[colorOffset++];
+                            handleColor(nowColor);
+                            maxVFOffset = nowColor->vertexFloatOffset;
+                        }
+                        memcpy(dstColorBuffer + colorIndex + 4, &finalColor, sizeof(finalColor));
+                    }
+                }
+            }
+            
+            // move src vertex buffer offset
+            srcVertexBytesOffset += srcVertexBytes;
+            
+            // fill index buffer
+            indexBytes = segment->indexCount * sizeof(unsigned short);
+            ib.checkSpace(indexBytes, true);
+            assembler->updateIARange(segIndex, (int)ib.getCurPos() / sizeof(unsigned short), segment->indexCount);
+            dstIndexBuffer = (unsigned short*)ib.getCurBuffer();
+            ib.writeBytes((char*)srcIB.getBuffer() + srcIndexBytesOffset, indexBytes);
+
+            curTextureData = ++segment->textureDatas.begin();
+            curTextureDataVfc = 0;
+            auto leftTextureData = segment->textureDatas.begin();
+            auto curTextureDataIo = curTextureData == segment->textureDatas.end() ? INT_MAX : (*curTextureData).indexOffset;
+
+            for (auto indexPos = 0; indexPos < segment->indexCount; indexPos++) {
+                if (curTextureDataIo <= indexPos) {
+                    curTextureDataVfc += (*leftTextureData).vertexFloatCount / vs4;
+                    leftTextureData = curTextureData;
+                    curTextureData++;
+                    curTextureDataIo = curTextureData == segment->textureDatas.end() ? INT_MAX : (*curTextureData).indexOffset;
+                }
+                dstIndexBuffer[indexPos] += dstVertexOffset + curTextureDataVfc;
+            }
+            srcIndexBytesOffset += indexBytes;
+            
+            // set assembler glvb and glib
+            assembler->updateIABuffer(segIndex, mb->getGLVB(), mb->getGLIB());
+            
+            // handle material
+            blendMode = segment->blendMode;
+            effectHash =
+                segment->inEffect
+                    ? ((blendMode << 16) + ((int)_useTint << 24) +
+                       ((int)_batch << 25) + ((int)_effect->getHash() << 26))
+                    : (segment->textureDatas[0].texture->getHandle() + (blendMode << 16) + ((int)_useTint << 24) +
+                       ((int)_batch << 25) + ((int)_effect->getHash() << 26));
+            EffectVariant* renderEffect = assembler->getEffect(segIndex);
+            bool needUpdate = false;
+            if (renderEffect) {
+                double renderHash = renderEffect->getHash();
+                if (abs(renderHash - effectHash) >= 0.01) {
+                    needUpdate = true;
+                }
+            }
+            else {
+                auto effect = new cocos2d::renderer::EffectVariant();
+                effect->autorelease();
+                effect->copy(_effect);
+                
+                assembler->updateEffect(segIndex, effect);
+                renderEffect = effect;
+                needUpdate = true;
+            }
+
+            if (needUpdate) {
+                if (!segment->inEffect) {
+                    renderEffect->setProperty(textureKey, segment->textureDatas[0].texture);
+                }
+
+                switch (blendMode) {
+                    case BlendMode_Additive:
+                        curBlendSrc = _premultipliedAlpha ? BlendFactor::ONE : BlendFactor::SRC_ALPHA;
+                        curBlendDst = BlendFactor::ONE;
+                        break;
+                    case BlendMode_Multiply:
+                        curBlendSrc = BlendFactor::DST_COLOR;
+                        curBlendDst = BlendFactor::ONE_MINUS_SRC_ALPHA;
+                        break;
+                    case BlendMode_Screen:
+                        curBlendSrc = BlendFactor::ONE;
+                        curBlendDst = BlendFactor::ONE_MINUS_SRC_COLOR;
+                        break;
+                    default:
+                        curBlendSrc = _premultipliedAlpha ? BlendFactor::ONE : BlendFactor::SRC_ALPHA;
+                        curBlendDst = BlendFactor::ONE_MINUS_SRC_ALPHA;
+                }
+                renderEffect->setBlend(true, BlendOp::ADD, curBlendSrc, curBlendDst,
+                               BlendOp::ADD, curBlendSrc, curBlendDst);
+            }
+            
+            renderEffect->updateHash(effectHash);
+        }
+        
+        if (_attachUtil)
+        {
+            _attachUtil->syncAttachedNode(_nodeProxy, frameData);
+        }
+    }
     
     Skeleton* SkeletonCacheAnimation::getSkeleton() const {
         return _skeletonCache->getSkeleton();
@@ -466,7 +822,11 @@ namespace spine {
     void SkeletonCacheAnimation::setUseTint(bool enabled) {
         _useTint = enabled;
     }
-    
+
+    void SkeletonCacheAnimation::setUseMulti(bool enabled) {
+        _useMulti = enabled;
+    }
+
     void SkeletonCacheAnimation::setAnimation (const std::string& name, bool loop) {
         _playTimes = loop ? 0 : 1;
         _animationName = name;
@@ -524,6 +884,7 @@ namespace spine {
     }
     
     void SkeletonCacheAnimation::setEffect(cocos2d::renderer::EffectVariant* effect) {
+        _effectTextures.clear();
         if (effect == _effect) return;
         CC_SAFE_RELEASE(_effect);
         _effect = effect;

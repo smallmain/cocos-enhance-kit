@@ -52,7 +52,31 @@ namespace spine {
         private:
             cocos2d::middleware::Texture2D* _texture = nullptr;
         };
-        
+
+        struct TextureMultiData {
+            TextureMultiData(float textureId, int vertexFloatCount,
+                             int indexOffset,
+                             cocos2d::renderer::Texture* texture)
+                : textureId(textureId),
+                  vertexFloatCount(vertexFloatCount),
+                  indexOffset(indexOffset),
+                  texture(texture){};
+
+            int vertexFloatCount = 0;
+            int indexOffset = 0;
+            float textureId = -1;
+            cocos2d::renderer::Texture* texture = nullptr;
+        };
+
+        struct SegmentMultiData {
+           public:
+            int indexCount = 0;
+            int vertexFloatCount = 0;
+            int blendMode = 0;
+            bool inEffect = false;
+            std::vector<TextureMultiData> textureDatas;
+        };
+
         struct BoneData {
             cocos2d::Mat4 globalTransformMatrix;
         };

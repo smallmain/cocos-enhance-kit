@@ -30,4 +30,7 @@ namespace se {
     class Object;
 }
 
+SE_DECLARE_FUNC(js_cocos2dx_spine_Skin_getAttachmentsForJSB);
+SE_DECLARE_FUNC(js_cocos2dx_spine_RegionAttachment_getTextureForJSB);
+
 bool register_all_spine_manual(se::Object* obj);

@@ -54,7 +54,7 @@ namespace spine {
 
 		void updateOffset();
 
-		void setUVs(float u, float v, float u2, float v2, bool rotate);
+		void setUVs(float u, float v, float u2, float v2, float degress);
 
 		/// Transforms the attachment's four vertices to world coordinates.
 		/// @param bone The parent bone.
@@ -84,11 +84,20 @@ namespace spine {
 		const String& getPath();
 		void setPath(const String& inValue);
 
+		float getRegionDegrees();
+		void setRegionDegrees(float inValue);
+
 		float getRegionOffsetX();
 		void setRegionOffsetX(float inValue);
 
 		float getRegionOffsetY();
 		void setRegionOffsetY(float inValue);
+
+		float getRegionX();
+		void setRegionX(float inValue);
+
+		float getRegionY();
+		void setRegionY(float inValue);
 
 		float getRegionWidth();
 		void setRegionWidth(float inValue);
@@ -118,7 +127,7 @@ namespace spine {
 		static const int BRY;
 
 		float _x, _y, _rotation, _scaleX, _scaleY, _width, _height;
-		float _regionOffsetX, _regionOffsetY, _regionWidth, _regionHeight, _regionOriginalWidth, _regionOriginalHeight;
+		float _regionOffsetX, _regionOffsetY, _regionX, _regionY, _regionWidth, _regionHeight, _regionOriginalWidth, _regionOriginalHeight;
 		Vector<float> _vertexOffset;
 		Vector<float> _uvs;
 		String _path;
@@ -127,6 +136,7 @@ namespace spine {
 		float _regionU2;
 		float _regionV2;
 		Color _color;
+		float _regionDegrees;
 	};
 }
 

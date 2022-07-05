@@ -5938,6 +5938,44 @@ static bool js_cocos2dx_spine_MeshAttachment_setRegionOffsetX(se::State& s)
 }
 SE_BIND_FUNC(js_cocos2dx_spine_MeshAttachment_setRegionOffsetX)
 
+static bool js_cocos2dx_spine_MeshAttachment_setRegionY(se::State& s)
+{
+    spine::MeshAttachment* cobj = (spine::MeshAttachment*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_spine_MeshAttachment_setRegionY : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1) {
+        float arg0 = 0;
+        ok &= seval_to_float(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_spine_MeshAttachment_setRegionY : Error processing arguments");
+        cobj->setRegionY(arg0);
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+    return false;
+}
+SE_BIND_FUNC(js_cocos2dx_spine_MeshAttachment_setRegionY)
+
+static bool js_cocos2dx_spine_MeshAttachment_setRegionX(se::State& s)
+{
+    spine::MeshAttachment* cobj = (spine::MeshAttachment*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_spine_MeshAttachment_setRegionX : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1) {
+        float arg0 = 0;
+        ok &= seval_to_float(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_spine_MeshAttachment_setRegionX : Error processing arguments");
+        cobj->setRegionX(arg0);
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+    return false;
+}
+SE_BIND_FUNC(js_cocos2dx_spine_MeshAttachment_setRegionX)
+
 static bool js_cocos2dx_spine_MeshAttachment_copy(se::State& s)
 {
     spine::MeshAttachment* cobj = (spine::MeshAttachment*)s.nativeThisObject();
@@ -6579,6 +6617,42 @@ static bool js_cocos2dx_spine_MeshAttachment_getRegionOffsetX(se::State& s)
 }
 SE_BIND_FUNC(js_cocos2dx_spine_MeshAttachment_getRegionOffsetX)
 
+static bool js_cocos2dx_spine_MeshAttachment_getRegionY(se::State& s)
+{
+    spine::MeshAttachment* cobj = (spine::MeshAttachment*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_spine_MeshAttachment_getRegionY : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 0) {
+        float result = cobj->getRegionY();
+        ok &= float_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_spine_MeshAttachment_getRegionY : Error processing arguments");
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+    return false;
+}
+SE_BIND_FUNC(js_cocos2dx_spine_MeshAttachment_getRegionY)
+
+static bool js_cocos2dx_spine_MeshAttachment_getRegionX(se::State& s)
+{
+    spine::MeshAttachment* cobj = (spine::MeshAttachment*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_spine_MeshAttachment_getRegionX : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 0) {
+        float result = cobj->getRegionX();
+        ok &= float_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_spine_MeshAttachment_getRegionX : Error processing arguments");
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+    return false;
+}
+SE_BIND_FUNC(js_cocos2dx_spine_MeshAttachment_getRegionX)
+
 static bool js_cocos2dx_spine_MeshAttachment_getRegionV(se::State& s)
 {
     spine::MeshAttachment* cobj = (spine::MeshAttachment*)s.nativeThisObject();
@@ -6662,6 +6736,8 @@ bool js_register_cocos2dx_spine_MeshAttachment(se::Object* obj)
     cls->defineFunction("setRegionOriginalHeight", _SE(js_cocos2dx_spine_MeshAttachment_setRegionOriginalHeight));
     cls->defineFunction("setRegionOffsetY", _SE(js_cocos2dx_spine_MeshAttachment_setRegionOffsetY));
     cls->defineFunction("setRegionOffsetX", _SE(js_cocos2dx_spine_MeshAttachment_setRegionOffsetX));
+    cls->defineFunction("setRegionY", _SE(js_cocos2dx_spine_MeshAttachment_setRegionY));
+    cls->defineFunction("setRegionX", _SE(js_cocos2dx_spine_MeshAttachment_setRegionX));
     cls->defineFunction("copy", _SE(js_cocos2dx_spine_MeshAttachment_copy));
     cls->defineFunction("getRegionOriginalWidth", _SE(js_cocos2dx_spine_MeshAttachment_getRegionOriginalWidth));
     cls->defineFunction("getWidth", _SE(js_cocos2dx_spine_MeshAttachment_getWidth));
@@ -6697,6 +6773,8 @@ bool js_register_cocos2dx_spine_MeshAttachment(se::Object* obj)
     cls->defineFunction("getTriangles", _SE(js_cocos2dx_spine_MeshAttachment_getTriangles));
     cls->defineFunction("getRegionOffsetY", _SE(js_cocos2dx_spine_MeshAttachment_getRegionOffsetY));
     cls->defineFunction("getRegionOffsetX", _SE(js_cocos2dx_spine_MeshAttachment_getRegionOffsetX));
+    cls->defineFunction("getRegionY", _SE(js_cocos2dx_spine_MeshAttachment_getRegionY));
+    cls->defineFunction("getRegionX", _SE(js_cocos2dx_spine_MeshAttachment_getRegionX));
     cls->defineFunction("getRegionV", _SE(js_cocos2dx_spine_MeshAttachment_getRegionV));
     cls->defineFunction("getRegionRotate", _SE(js_cocos2dx_spine_MeshAttachment_getRegionRotate));
     cls->defineFunction("getParentMesh", _SE(js_cocos2dx_spine_MeshAttachment_getParentMesh));
@@ -7905,6 +7983,43 @@ static bool js_cocos2dx_spine_RegionAttachment_setRegionOriginalHeight(se::State
 }
 SE_BIND_FUNC(js_cocos2dx_spine_RegionAttachment_setRegionOriginalHeight)
 
+static bool js_cocos2dx_spine_RegionAttachment_setRegionDegrees(se::State& s)
+{
+    spine::RegionAttachment* cobj = (spine::RegionAttachment*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_spine_RegionAttachment_setRegionDegrees : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1) {
+        int arg0 = 0;
+        do { int32_t tmp = 0; ok &= seval_to_int32(args[0], &tmp); arg0 = (int)tmp; } while(false);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_spine_RegionAttachment_setRegionDegrees : Error processing arguments");
+        cobj->setRegionDegrees(arg0);
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+    return false;
+}
+SE_BIND_FUNC(js_cocos2dx_spine_RegionAttachment_setRegionDegrees)
+
+static bool js_cocos2dx_spine_RegionAttachment_getRegionDegrees(se::State& s)
+{
+    spine::RegionAttachment* cobj = (spine::RegionAttachment*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_spine_RegionAttachment_getRegionDegrees : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 0) {
+        int result = cobj->getRegionDegrees();
+        ok &= int32_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_spine_RegionAttachment_getRegionDegrees : Error processing arguments");
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+    return false;
+}
+SE_BIND_FUNC(js_cocos2dx_spine_RegionAttachment_getRegionDegrees)
+
 static bool js_cocos2dx_spine_RegionAttachment_setRegionOffsetY(se::State& s)
 {
     spine::RegionAttachment* cobj = (spine::RegionAttachment*)s.nativeThisObject();
@@ -7943,6 +8058,44 @@ static bool js_cocos2dx_spine_RegionAttachment_setRegionOffsetX(se::State& s)
 }
 SE_BIND_FUNC(js_cocos2dx_spine_RegionAttachment_setRegionOffsetX)
 
+static bool js_cocos2dx_spine_RegionAttachment_setRegionY(se::State& s)
+{
+    spine::RegionAttachment* cobj = (spine::RegionAttachment*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_spine_RegionAttachment_setRegionY : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1) {
+        float arg0 = 0;
+        ok &= seval_to_float(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_spine_RegionAttachment_setRegionY : Error processing arguments");
+        cobj->setRegionY(arg0);
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+    return false;
+}
+SE_BIND_FUNC(js_cocos2dx_spine_RegionAttachment_setRegionY)
+
+static bool js_cocos2dx_spine_RegionAttachment_setRegionX(se::State& s)
+{
+    spine::RegionAttachment* cobj = (spine::RegionAttachment*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_spine_RegionAttachment_setRegionX : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1) {
+        float arg0 = 0;
+        ok &= seval_to_float(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_spine_RegionAttachment_setRegionX : Error processing arguments");
+        cobj->setRegionX(arg0);
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+    return false;
+}
+SE_BIND_FUNC(js_cocos2dx_spine_RegionAttachment_setRegionX)
+
 static bool js_cocos2dx_spine_RegionAttachment_getRegionOriginalWidth(se::State& s)
 {
     spine::RegionAttachment* cobj = (spine::RegionAttachment*)s.nativeThisObject();
@@ -7973,12 +8126,12 @@ static bool js_cocos2dx_spine_RegionAttachment_setUVs(se::State& s)
         float arg1 = 0;
         float arg2 = 0;
         float arg3 = 0;
-        bool arg4;
+        float arg4 = 0;
         ok &= seval_to_float(args[0], &arg0);
         ok &= seval_to_float(args[1], &arg1);
         ok &= seval_to_float(args[2], &arg2);
         ok &= seval_to_float(args[3], &arg3);
-        ok &= seval_to_boolean(args[4], &arg4);
+        ok &= seval_to_float(args[4], &arg4);
         SE_PRECONDITION2(ok, false, "js_cocos2dx_spine_RegionAttachment_setUVs : Error processing arguments");
         cobj->setUVs(arg0, arg1, arg2, arg3, arg4);
         return true;
@@ -8518,6 +8671,41 @@ static bool js_cocos2dx_spine_RegionAttachment_getRegionOffsetX(se::State& s)
 }
 SE_BIND_FUNC(js_cocos2dx_spine_RegionAttachment_getRegionOffsetX)
 
+static bool js_cocos2dx_spine_RegionAttachment_getRegionY(se::State& s)
+{
+    spine::RegionAttachment* cobj = (spine::RegionAttachment*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_spine_RegionAttachment_getRegionY : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 0) {
+        float result = cobj->getRegionY();
+        ok &= float_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_spine_RegionAttachment_getRegionY : Error processing arguments");
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+    return false;
+}
+SE_BIND_FUNC(js_cocos2dx_spine_RegionAttachment_getRegionY)
+
+static bool js_cocos2dx_spine_RegionAttachment_getRegionX(se::State& s)
+{
+    spine::RegionAttachment* cobj = (spine::RegionAttachment*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_spine_RegionAttachment_getRegionX : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 0) {
+        float result = cobj->getRegionX();
+        ok &= float_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_spine_RegionAttachment_getRegionX : Error processing arguments");
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+    return false;
+}
+SE_BIND_FUNC(js_cocos2dx_spine_RegionAttachment_getRegionX)
 
 extern se::Object* __jsb_spine_Attachment_proto;
 
@@ -8529,6 +8717,8 @@ bool js_register_cocos2dx_spine_RegionAttachment(se::Object* obj)
     cls->defineFunction("setRegionOriginalHeight", _SE(js_cocos2dx_spine_RegionAttachment_setRegionOriginalHeight));
     cls->defineFunction("setRegionOffsetY", _SE(js_cocos2dx_spine_RegionAttachment_setRegionOffsetY));
     cls->defineFunction("setRegionOffsetX", _SE(js_cocos2dx_spine_RegionAttachment_setRegionOffsetX));
+    cls->defineFunction("setRegionY", _SE(js_cocos2dx_spine_RegionAttachment_setRegionY));
+    cls->defineFunction("setRegionX", _SE(js_cocos2dx_spine_RegionAttachment_setRegionX));
     cls->defineFunction("getRegionOriginalWidth", _SE(js_cocos2dx_spine_RegionAttachment_getRegionOriginalWidth));
     cls->defineFunction("setUVs", _SE(js_cocos2dx_spine_RegionAttachment_setUVs));
     cls->defineFunction("getWidth", _SE(js_cocos2dx_spine_RegionAttachment_getWidth));
@@ -8560,6 +8750,10 @@ bool js_register_cocos2dx_spine_RegionAttachment(se::Object* obj)
     cls->defineFunction("getRegionOriginalHeight", _SE(js_cocos2dx_spine_RegionAttachment_getRegionOriginalHeight));
     cls->defineFunction("getRegionOffsetY", _SE(js_cocos2dx_spine_RegionAttachment_getRegionOffsetY));
     cls->defineFunction("getRegionOffsetX", _SE(js_cocos2dx_spine_RegionAttachment_getRegionOffsetX));
+    cls->defineFunction("getRegionY", _SE(js_cocos2dx_spine_RegionAttachment_getRegionY));
+    cls->defineFunction("getRegionX", _SE(js_cocos2dx_spine_RegionAttachment_getRegionX));
+    cls->defineFunction("setRegionDegrees", _SE(js_cocos2dx_spine_RegionAttachment_setRegionDegrees));
+    cls->defineFunction("getRegionDegrees", _SE(js_cocos2dx_spine_RegionAttachment_getRegionDegrees));
     cls->install();
     JSBClassType::registerClass<spine::RegionAttachment>(cls);
 
@@ -12876,6 +13070,25 @@ static bool js_cocos2dx_spine_SkeletonRenderer_setUseTint(se::State& s)
 }
 SE_BIND_FUNC(js_cocos2dx_spine_SkeletonRenderer_setUseTint)
 
+static bool js_cocos2dx_spine_SkeletonRenderer_setUseMulti(se::State& s)
+{
+    spine::SkeletonRenderer* cobj = (spine::SkeletonRenderer*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_spine_SkeletonRenderer_setUseMulti : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1) {
+        bool arg0;
+        ok &= seval_to_boolean(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_spine_SkeletonRenderer_setUseMulti : Error processing arguments");
+        cobj->setUseMulti(arg0);
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+    return false;
+}
+SE_BIND_FUNC(js_cocos2dx_spine_SkeletonRenderer_setUseMulti)
+
 static bool js_cocos2dx_spine_SkeletonRenderer_setTimeScale(se::State& s)
 {
     spine::SkeletonRenderer* cobj = (spine::SkeletonRenderer*)s.nativeThisObject();
@@ -13913,6 +14126,7 @@ bool js_register_cocos2dx_spine_SkeletonRenderer(se::Object* obj)
     auto cls = se::Class::create("Skeleton", obj, nullptr, _SE(js_cocos2dx_spine_SkeletonRenderer_constructor));
 
     cls->defineFunction("setUseTint", _SE(js_cocos2dx_spine_SkeletonRenderer_setUseTint));
+    cls->defineFunction("setUseMulti", _SE(js_cocos2dx_spine_SkeletonRenderer_setUseMulti));
     cls->defineFunction("setTimeScale", _SE(js_cocos2dx_spine_SkeletonRenderer_setTimeScale));
     cls->defineFunction("render", _SE(js_cocos2dx_spine_SkeletonRenderer_render));
     cls->defineFunction("initWithUUID", _SE(js_cocos2dx_spine_SkeletonRenderer_initWithUUID));
@@ -15341,6 +15555,25 @@ static bool js_cocos2dx_spine_SkeletonCacheAnimation_setUseTint(se::State& s)
 }
 SE_BIND_FUNC(js_cocos2dx_spine_SkeletonCacheAnimation_setUseTint)
 
+static bool js_cocos2dx_spine_SkeletonCacheAnimation_setUseMulti(se::State& s)
+{
+    spine::SkeletonCacheAnimation* cobj = (spine::SkeletonCacheAnimation*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_spine_SkeletonCacheAnimation_setUseMulti : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1) {
+        bool arg0;
+        ok &= seval_to_boolean(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_spine_SkeletonCacheAnimation_setUseMulti : Error processing arguments");
+        cobj->setUseMulti(arg0);
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+    return false;
+}
+SE_BIND_FUNC(js_cocos2dx_spine_SkeletonCacheAnimation_setUseMulti)
+
 static bool js_cocos2dx_spine_SkeletonCacheAnimation_setTimeScale(se::State& s)
 {
     spine::SkeletonCacheAnimation* cobj = (spine::SkeletonCacheAnimation*)s.nativeThisObject();
@@ -16096,6 +16329,7 @@ bool js_register_cocos2dx_spine_SkeletonCacheAnimation(se::Object* obj)
     auto cls = se::Class::create("SkeletonCacheAnimation", obj, nullptr, _SE(js_cocos2dx_spine_SkeletonCacheAnimation_constructor));
 
     cls->defineFunction("setUseTint", _SE(js_cocos2dx_spine_SkeletonCacheAnimation_setUseTint));
+    cls->defineFunction("setUseMulti", _SE(js_cocos2dx_spine_SkeletonCacheAnimation_setUseMulti));
     cls->defineFunction("setTimeScale", _SE(js_cocos2dx_spine_SkeletonCacheAnimation_setTimeScale));
     cls->defineFunction("findAnimation", _SE(js_cocos2dx_spine_SkeletonCacheAnimation_findAnimation));
     cls->defineFunction("setAttachUtil", _SE(js_cocos2dx_spine_SkeletonCacheAnimation_setAttachUtil));

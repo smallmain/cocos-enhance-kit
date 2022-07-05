@@ -147,6 +147,8 @@ public:
 
 	AttachmentMap::Entries getAttachments();
 
+    std::vector<std::map<std::string, Attachment *>> getAttachmentsForJSB();
+
 	Vector<BoneData*>& getBones();
 
 	Vector<ConstraintData*>& getConstraints();
