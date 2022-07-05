@@ -4,13 +4,21 @@
 <dict>
 	<key>files</key>
 	<dict>
-		<key>Resources/Base.lproj/ConsoleWindow.nib</key>
+		<key>Resources/Base.lproj/ConsoleWindow.nib/keyedobjects-101300.nib</key>
 		<data>
-		W3M/YhCuxRv6ev/bqeCL20SnfTE=
+		ujLJkh4IAdlf9wwaFb+liu01ezo=
 		</data>
-		<key>Resources/Base.lproj/MainMenu.nib</key>
+		<key>Resources/Base.lproj/ConsoleWindow.nib/keyedobjects.nib</key>
 		<data>
-		jCBt72kycmN4ehEplxS6jh+OFOw=
+		z0dpzUAcFMs8snODqhySYZ/n9KM=
+		</data>
+		<key>Resources/Base.lproj/MainMenu.nib/keyedobjects-101300.nib</key>
+		<data>
+		eVxnSkv0iaFObKGizf2JoX7jePw=
+		</data>
+		<key>Resources/Base.lproj/MainMenu.nib/keyedobjects.nib</key>
+		<data>
+		hVLOAqVlkSu11KcXE62HS1t9jk8=
 		</data>
 		<key>Resources/Icon.icns</key>
 		<data>
@@ -33,11 +41,20 @@
 			<key>optional</key>
 			<true/>
 		</dict>
-		<key>Resources/zh-Hans.lproj/MainMenu.nib</key>
+		<key>Resources/zh-Hans.lproj/MainMenu.nib/keyedobjects-101300.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			bEEnglv6WqF+4dVZ2v8DHjLmAJA=
+			G/AwO9H3MxvM2wyQJO9dAL0WFbc=
+			</data>
+			<key>optional</key>
+			<true/>
+		</dict>
+		<key>Resources/zh-Hans.lproj/MainMenu.nib/keyedobjects.nib</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			euP3v1XZFmBXJu/a4igoMppnihc=
 			</data>
 			<key>optional</key>
 			<true/>
@@ -45,26 +62,48 @@
 	</dict>
 	<key>files2</key>
 	<dict>
-		<key>Resources/Base.lproj/ConsoleWindow.nib</key>
+		<key>Resources/Base.lproj/ConsoleWindow.nib/keyedobjects-101300.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			W3M/YhCuxRv6ev/bqeCL20SnfTE=
+			ujLJkh4IAdlf9wwaFb+liu01ezo=
 			</data>
 			<key>hash2</key>
 			<data>
-			wLSNZ4wmx0MdhM4GE0hIF0jiN+X3FIlh9mKTM/i7XAM=
+			LJyFJImQF1ZCzXDbWIM+f/Z9UvVQw/1595moI8Yv6mY=
 			</data>
 		</dict>
-		<key>Resources/Base.lproj/MainMenu.nib</key>
+		<key>Resources/Base.lproj/ConsoleWindow.nib/keyedobjects.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			jCBt72kycmN4ehEplxS6jh+OFOw=
+			z0dpzUAcFMs8snODqhySYZ/n9KM=
 			</data>
 			<key>hash2</key>
 			<data>
-			SnLiOCUX+y85i7WZsvO5CRtIvZPZ0Kjh2e1kmgU8aoc=
+			qg3ofTF0sqkSDHDsvE4ZsKjx389zQKJwxmTbZNvCSyA=
+			</data>
+		</dict>
+		<key>Resources/Base.lproj/MainMenu.nib/keyedobjects-101300.nib</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			eVxnSkv0iaFObKGizf2JoX7jePw=
+			</data>
+			<key>hash2</key>
+			<data>
+			es9m0z0SQcUGdMFtfVL0DT+BOmDewAG0EOyi/IYxPDc=
+			</data>
+		</dict>
+		<key>Resources/Base.lproj/MainMenu.nib/keyedobjects.nib</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			hVLOAqVlkSu11KcXE62HS1t9jk8=
+			</data>
+			<key>hash2</key>
+			<data>
+			PmDqaK0rW4uHcVL7eEcPdmH3cuSUBNCMTqfIOwagjLM=
 			</data>
 		</dict>
 		<key>Resources/Icon.icns</key>
@@ -113,15 +152,28 @@
 			<key>optional</key>
 			<true/>
 		</dict>
-		<key>Resources/zh-Hans.lproj/MainMenu.nib</key>
+		<key>Resources/zh-Hans.lproj/MainMenu.nib/keyedobjects-101300.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			bEEnglv6WqF+4dVZ2v8DHjLmAJA=
+			G/AwO9H3MxvM2wyQJO9dAL0WFbc=
 			</data>
 			<key>hash2</key>
 			<data>
-			+89vUpJrAw3xCiz5OHzAaH1JbkpIdjzll0yc8BCVSF0=
+			/pewAcwr78DYOecC+ukwZA9wkN7zk9/PMjnFlfETY7Q=
+			</data>
+			<key>optional</key>
+			<true/>
+		</dict>
+		<key>Resources/zh-Hans.lproj/MainMenu.nib/keyedobjects.nib</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			euP3v1XZFmBXJu/a4igoMppnihc=
+			</data>
+			<key>hash2</key>
+			<data>
+			Luox0GeNZdkQQxzdjWth3+Klv1g5XnBqcfS2q0aw7To=
 			</data>
 			<key>optional</key>
 			<true/>
