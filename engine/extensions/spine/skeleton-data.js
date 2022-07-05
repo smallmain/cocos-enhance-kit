@@ -29,6 +29,228 @@
 let SkeletonCache = !CC_JSB && require('./skeleton-cache').sharedCache;
 
 /**
+ * Spine Attachment 的 Region 数据
+ */
+class RegionData {
+
+    static middlewareTextureID = -1;
+
+    static updateUV(region) {
+        const texture = CC_JSB ? region.texture2D : region.texture._texture;
+        if (region.rotate) {
+            region.u = region.x / texture.width;
+            region.v = region.y / texture.height;
+            region.u2 = (region.x + region.height) / texture.width;
+            region.v2 = (region.y + region.width) / texture.height;
+        } else {
+            region.u = region.x / texture.width;
+            region.v = region.y / texture.height;
+            region.u2 = (region.x + region.width) / texture.width;
+            region.v2 = (region.y + region.height) / texture.height;
+        }
+    }
+
+    x;
+    y;
+    degrees;
+    texture;
+    texture2D;
+    u;
+    v;
+    u2;
+    v2;
+    width;
+    height;
+    rotate;
+    offsetX;
+    offsetY;
+    originalWidth;
+    originalHeight;
+
+
+    constructor(attachmentOrSpriteFrame) {
+        if (attachmentOrSpriteFrame instanceof cc.SpriteFrame) {
+            this.initWithSpriteFrame(attachmentOrSpriteFrame);
+        } else if (attachmentOrSpriteFrame != null) {
+            this.initWithAttachment(attachmentOrSpriteFrame);
+        }
+    }
+
+
+    initWithSpriteFrame(spriteFrame) {
+        const texture = spriteFrame.getTexture();
+        const rect = spriteFrame.getRect();
+        const origSize = spriteFrame.getOriginalSize();
+        const _offset = spriteFrame.getOffset();
+        const rotate = spriteFrame.isRotated();
+        const offset = cc.v2(
+            (origSize.width - rect.width) * 0.5 + _offset.x,
+            (origSize.height - rect.height) * 0.5 + _offset.y,
+        );
+        const degrees = rotate ? 270 : 0;
+
+        this.x = rect.x;
+        this.y = rect.y;
+        this.width = rect.width;
+        this.height = rect.height;
+        this.originalWidth = origSize.width;
+        this.originalHeight = origSize.height;
+        this.offsetX = offset.x;
+        this.offsetY = offset.y;
+        this.rotate = degrees != 0;
+        this.degrees = degrees;
+
+        this.updateWithTexture2D(texture);
+    }
+
+
+    initWithAttachment(attachment) {
+        if (CC_JSB) {
+            this.x = attachment.regionX;
+            this.y = attachment.regionY;
+            this.width = attachment.regionWidth;
+            this.height = attachment.regionHeight;
+            this.originalWidth = attachment.regionOriginalWidth;
+            this.originalHeight = attachment.regionOriginalHeight;
+            this.offsetX = attachment.regionOffsetX;
+            this.offsetY = attachment.regionOffsetY;
+            this.degrees = attachment.regionDegrees;
+            this.rotate = this.degrees !== 0;
+            this.texture = attachment.textureForJSB;
+            this.texture2D = attachment.getTexture2D();
+            this.updateUV();
+        } else {
+            const region = attachment.region;
+            this.x = region.x;
+            this.y = region.y;
+            this.width = region.width;
+            this.height = region.height;
+            this.originalWidth = region.originalWidth;
+            this.originalHeight = region.originalHeight;
+            this.offsetX = region.offsetX;
+            this.offsetY = region.offsetY;
+            this.rotate = region.rotate;
+            this.degrees = region.degrees;
+            this.texture = region.texture;
+            this.texture2D = region.texture._texture;
+            this.u = region.u;
+            this.u2 = region.u2;
+            this.v = region.v;
+            this.v2 = region.v2;
+        }
+    }
+
+
+    updateUV() {
+        RegionData.updateUV(this);
+    }
+
+
+    updateWithPackedFrame(packedFrame) {
+        this.x = packedFrame.x;
+        this.y = packedFrame.y;
+        this.updateWithTexture2D(packedFrame.texture);
+    }
+
+
+    updateWithTexture2D(texture2d) {
+        if (CC_JSB) {
+            const spTex = new middleware.Texture2D();
+            spTex.setRealTextureIndex(RegionData.middlewareTextureID--);
+            spTex.setPixelsWide(texture2d.width);
+            spTex.setPixelsHigh(texture2d.height);
+            spTex.setNativeTexture(texture2d.getImpl());
+            this.texture = spTex;
+        } else {
+            this.texture = new sp.SkeletonTexture({
+                width: texture2d.width,
+                height: texture2d.height,
+            });
+            this.texture.setRealTexture(texture2d);
+        }
+
+        this.texture2D = texture2d;
+        this.updateUV();
+    }
+
+
+    toSpriteFrame(strict) {
+        if (strict && (this.degrees !== 270 || this.degrees !== 0)) {
+            return null;
+        }
+
+        const frame = new cc.SpriteFrame(
+            this.texture2D,
+            cc.rect(this.x, this.y, this.width, this.height),
+            this.rotate,  // 如果 region 不是 0 或 270 则会出现问题
+            cc.v2(this.offsetX - (this.originalWidth - this.width) * 0.5, this.offsetY - (this.originalHeight - this.height) * 0.5),
+            cc.size(this.originalWidth, this.originalHeight),
+        );
+
+        return frame;
+    }
+
+
+    assignToAttachment(attachment, strict = true, resetDynamicAtlas = true) {
+        if (CC_JSB) {
+            if (resetDynamicAtlas) {
+                // 如果有在使用动态合图则先还原
+                if (attachment && attachment._spriteFrame) {
+                    const spriteFrame = attachment._spriteFrame;
+                    attachment._spriteFrame = null;
+                    spriteFrame.destroy();
+                }
+            }
+            attachment._texture2D = this.texture2D;
+            attachment.setRegionForJSB(this.texture, { x: this.x, y: this.y, w: this.width, h: this.height }, cc.size(this.originalWidth, this.originalHeight), cc.v2(this.offsetX, this.offsetY), this.degrees);
+        } else {
+            const region = attachment.region;
+
+            if (resetDynamicAtlas) {
+                // 如果有在使用动态合图则先还原
+                if (region && region._spriteFrame) {
+                    const spriteFrame = region._spriteFrame;
+                    region._spriteFrame = null;
+                    spriteFrame.destroy();
+                }
+            }
+         
+            if (strict) {
+                region.x = this.x;
+                region.y = this.y;
+                region.width = this.width;
+                region.height = this.height;
+                region.originalWidth = this.originalWidth;
+                region.originalHeight = this.originalHeight;
+                region.offsetX = this.offsetX;
+                region.offsetY = this.offsetY;
+                region.rotate = this.rotate;
+                region.degrees = this.degrees;
+                region.texture = this.texture;
+                region.u = this.u;
+                region.u2 = this.u2;
+                region.v = this.v;
+                region.v2 = this.v2;
+            }
+
+            if (attachment instanceof sp.spine.MeshAttachment) {
+                attachment.updateUVs();
+            } else if (attachment instanceof sp.spine.RegionAttachment) {
+                attachment.setRegion(region);
+                attachment.updateOffset();
+            }
+        }
+    }
+
+
+    reset() {
+        this.texture = null;
+        this.texture2D = null;
+    }
+
+}
+
+/**
  * !#en The skeleton data of spine.
  * !#zh Spine 的 骨骼数据。
  * @class SkeletonData
@@ -139,74 +361,7 @@ let SkeletonData = cc.Class({
 
     statics: {
         preventDeferredLoadDependents: true,
-
-        createRegion(spriteFrame, original = undefined) {
-            const region = new sp.spine.TextureAtlasRegion();
-
-            const texture = spriteFrame.getTexture();
-            const rect = spriteFrame.getRect();
-            const origSize = spriteFrame.getOriginalSize();
-            const _offset = spriteFrame.getOffset();
-            const rotate = spriteFrame.isRotated();
-            const offset = cc.v2(
-                (origSize.width - rect.width) * 0.5 + _offset.x,
-                (origSize.height - rect.height) * 0.5 + _offset.y,
-            );
-            const degrees = rotate ? 270 : 0;
-
-            if (original) {
-                region.name = original.name;
-                region.page = original.page;
-            }
-
-            region.x = rect.x;
-            region.y = rect.y;
-            region.width = rect.width;
-            region.height = rect.height;
-            region.originalWidth = origSize.width;
-            region.originalHeight = origSize.height;
-            region.offsetX = offset.x;
-            region.offsetY = offset.y;
-            region.rotate = degrees != 0;
-            region.degrees = degrees;
-
-            const skelTex = new sp.SkeletonTexture({
-                width: texture.width,
-                height: texture.height,
-            });
-            skelTex.setRealTexture(texture);
-            region.texture = skelTex;
-
-            this.updateRegionUV(region);
-
-            return region;
-        },
-
-        updateRegionUV(region) {
-            const texture = region.texture._texture;
-            if (region.rotate) {
-                region.u = region.x / texture.width;
-                region.v = region.y / texture.height;
-                region.u2 = (region.x + region.height) / texture.width;
-                region.v2 = (region.y + region.width) / texture.height;
-            } else {
-                region.u = region.x / texture.width;
-                region.v = region.y / texture.height;
-                region.u2 = (region.x + region.width) / texture.width;
-                region.v2 = (region.y + region.height) / texture.height;
-            }
-        },
-
-        createSpriteFrame(region) {
-            const frame = new cc.SpriteFrame(
-                region.texture._texture,
-                cc.rect(region.x, region.y, region.width, region.height),
-                region.rotate,  // 如果 region 不是 0 或 270 则会出现问题
-                cc.v2(region.offsetX - (region.originalWidth - region.width) * 0.5, region.offsetY - (region.originalHeight - region.height) * 0.5),
-                cc.size(region.originalWidth, region.originalHeight),
-            );
-            return frame;
-        },
+        cloneId: 0,
     },
 
     // PUBLIC
@@ -234,11 +389,10 @@ let SkeletonData = cc.Class({
             this._skinsEnum = null;
             this._animsEnum = null;
         }
-        this._cloneId = 0;
     },
 
     ensureTexturesLoaded (loaded, caller) {
-        let textures = this.textures; 
+        let textures = this.textures;
         let texsLen = textures.length;
         if (texsLen == 0) {
             loaded.call(caller, false);
@@ -263,7 +417,7 @@ let SkeletonData = cc.Class({
     },
 
     isTexturesLoaded () {
-        let textures = this.textures; 
+        let textures = this.textures;
         let texsLen = textures.length;
         for (let i = 0; i < texsLen; i++) {
             let tex = textures[i];
@@ -396,48 +550,55 @@ let SkeletonData = cc.Class({
      */
     clone: function () {
         const cloned = new SkeletonData();
-        cloned._cloneId = this._cloneId + 1;
-        const suffix = '(clone ' + String(cloned._cloneId) + ')';
-        cloned._uuid = this._uuid + suffix;
+        SkeletonData.cloneId++;
+        const suffix = '(clone ' + String(SkeletonData.cloneId) + ')';
+        cloned._uuid = this._uuid.split('(')[0] + suffix;
         cloned.name = this.name + suffix;
         cloned.scale = this.scale;
-        cloned.textureNames = this.textureNames;
-        cloned.textures = this.textures;
+
         cloned._atlasText = this._atlasText;
+        cloned.textureNames = this.textureNames;
         cloned._skeletonJson = this._skeletonJson;
-        cloned._buffer = this._buffer;
+        cloned.textures = this.textures;
+        if (CC_JSB) {
+            const realUuid = cloned._uuid;
+            cloned._uuid = this._uuid;
+            cloned._nativeUrl = this._nativeUrl;
+            cloned._native = this._native;
+            cloned.nativeUrl;                       // 触发 nativeUrl getter
+            cloned._uuid = realUuid;
+        } else {
+            cloned._buffer = this._buffer;
+        }
+        cloned.getRuntimeData();
 
         return cloned;
     },
 
-    destroy() {
-        // 删除动态图集
-        if (this._atlasCache) {
-            const regions = this._atlasCache.regions;
-            for (const region of regions) {
-                if (region._spriteFrame) {
-                    region._spriteFrame.destroy();
-                    region._spriteFrame = null;
-                }
-            }
-        }
+    _destroyFromDynamicAtlas() {
         if (this._skeletonCache) {
             const skins = this._skeletonCache.skins;
             for (const skin of skins) {
                 for (const attachments of skin.attachments) {
                     for (const key in attachments) {
-                        const region = attachments[key].region;
+                        const region = CC_JSB ? attachments[key] : attachments[key].region;
                         if (region && region._spriteFrame) {
-                            region._spriteFrame.destroy();
+                            const spriteFrame = region._spriteFrame;
                             region._spriteFrame = null;
+                            spriteFrame.destroy();
                         }
                     }
                 }
             }
         }
+    },
+
+    destroy() {
+        this._destroyFromDynamicAtlas();
         SkeletonCache.removeSkeleton(this._uuid);
         this._super();
     },
 });
 
 sp.SkeletonData = module.exports = SkeletonData;
+sp.RegionData = RegionData;

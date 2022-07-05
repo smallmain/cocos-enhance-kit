@@ -505,6 +505,12 @@ sp.Skeleton = cc.Class({
             if (isMultiSupport) {
                 if (!this.enableBatch) this.enableBatch = true;
             }
+
+            if (CC_JSB) {
+                if (this._nativeSkeleton) {
+                    this._nativeSkeleton.setUseMulti(isMultiSupport);
+                }
+            }
         }
         this._materialCache = {};
     },
@@ -1012,29 +1018,21 @@ sp.Skeleton = cc.Class({
     },
 
     /**
-     * 获取 attachment 的 region
+     * 获取 attachment 的 region 数据
      */
-    getRegion(slotName, attachmentName) {
+    getRegionData(slotName, attachmentName) {
         const attachment = this.getAttachment(slotName, attachmentName);
-        if (attachment) {
-            return attachment.region;
-        }
+        if (attachment) return new sp.RegionData(attachment);
         return null;
     },
 
     /**
-     * 修改 attachment 的 region
+     * 修改 attachment 的 region 数据
      */
-    setRegion(slotName, attachmentName, region) {
+    setRegionData(slotName, attachmentName, regionData) {
         const attachment = this.getAttachment(slotName, attachmentName);
         if (attachment) {
-            attachment.region = region;
-            if (attachment instanceof sp.spine.MeshAttachment) {
-                attachment.updateUVs();
-            } else if (attachment instanceof sp.spine.RegionAttachment) {
-                attachment.setRegion(region);
-                attachment.updateOffset();
-            }
+            regionData.assignToAttachment(attachment);
             this.setVertsDirty();
             return true;
         }
