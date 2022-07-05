@@ -448,6 +448,10 @@ class LetterAtlases {
         const atlas = letter.atlas;
         const comp = _assembler._renderComp;
 
+        if (!_usedMaterial) {
+            return;
+        }
+
         // 检查是否需要自动切换材质
         if (_needCheckMaterial) {
             _needCheckMaterial = false;
@@ -605,7 +609,7 @@ export default class LetterFontAssembler extends WebglBmfontAssembler {
         const verts = renderData.vDatas[0];
         const floatsPerVert = this.floatsPerVert;
         let texIdOffset = offset + this.texIdOffset;
-        const id = _usedMaterial.material !== _shareAtlas.material ? letter.atlas._tmpId : letter.atlas._id;
+        const id = !_usedMaterial ? 0 : (_usedMaterial.material !== _shareAtlas.material ? letter.atlas._tmpId : letter.atlas._id);
 
         verts[texIdOffset] = id;
         texIdOffset += floatsPerVert;

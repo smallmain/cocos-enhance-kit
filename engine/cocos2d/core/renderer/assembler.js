@@ -69,7 +69,7 @@ export default class Assembler {
                     if (CC_JSB) comp.node._inJsbDirtyList = false;
                     // setMaterial 中会置 comp._texIdDirty = true;
                     if (!this.isMulti) {
-                        comp._assembler.updateRenderDataForSwitchMaterial(comp);
+                        if (comp._assembler) comp._assembler.updateRenderDataForSwitchMaterial(comp);
                         return true;
                     }
                 }
