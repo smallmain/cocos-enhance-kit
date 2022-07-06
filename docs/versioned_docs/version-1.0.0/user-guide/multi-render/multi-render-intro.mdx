@@ -1,0 +1,30 @@
+import DocCardList from '@theme/DocCardList';
+import {useCurrentSidebarCategory} from '@docusaurus/theme-common';
+
+# 多纹理渲染
+
+:::tip 提示
+
+多纹理渲染属底层设施，如果你不是准备手动使用多纹理材质或者多纹理合批管理器的话，请跳过本特性文档。
+
+:::
+
+多纹理渲染在 [新 UI 渲染批次合并指南](../../start-guide/batcher-guide.md#什么是多纹理渲染) 中有所介绍。
+
+其原理非常简单，并且为了让它能以最简单的方式在引擎中使用，已经在内部做好了封装：
+
+<DocCardList items={useCurrentSidebarCategory().items}/>
+
+:::caution 注意
+
+- **支持的渲染组件**
+
+    cc.Sprite、cc.Label、cc.RichText、cc.MotionSteak、Spine 组件。
+
+- **不支持的渲染组件**
+
+    cc.ParticleSystem、TiledMap 组件：这两个组件当前的引擎实现会强制打断合批，暂时不支持。
+
+    DragonBones 组件：因人力有限，并且这个组件与 Spine 组件可以相互代替，所以暂时不支持该组件。
+
+:::

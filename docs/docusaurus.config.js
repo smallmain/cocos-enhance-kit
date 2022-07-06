@@ -35,6 +35,12 @@ const config = {
       ({
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
+          includeCurrentVersion: false,
+          versions: {
+            "1.0.0": {
+              label: "v1.0.0",
+            }
+          }
         },
         blog: {
           showReadingTime: true,
@@ -74,12 +80,12 @@ const config = {
             label: '演示',
             position: 'right',
           },
-          // {
-          //   type: 'docsVersionDropdown',
-          //   position: 'right',
-          //   dropdownItemsAfter: [{ to: '/versions', label: 'All versions' }],
-          //   dropdownActiveClassDisabled: true,
-          // },
+          {
+            type: 'docsVersionDropdown',
+            position: 'right',
+            // dropdownItemsAfter: [{ to: '/versions', label: 'All versions' }],
+            dropdownActiveClassDisabled: true,
+          },
           // { to: '/blog', label: 'Blog', position: 'left' },
           {
             href: 'https://github.com/smallmain/cocos-service-pack',
