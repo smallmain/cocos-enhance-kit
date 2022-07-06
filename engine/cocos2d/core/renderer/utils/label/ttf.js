@@ -387,6 +387,7 @@ export default class TTFAssembler extends Assembler2D {
             frame._texture._uuid = _fontDesc
                 + _overflow
                 + (_premultiply ? 'P' : 'NP')
+                + comp.node.color.toHEX()
                 + (_enableUnderline ? 'UL' : 'NUL')
                 + _string;
 
