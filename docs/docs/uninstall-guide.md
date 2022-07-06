@@ -15,9 +15,11 @@ sidebar_position: 6
 ---
 ## 使用引擎扩展卸载 
 
-请参考 [手动卸载](#手动卸载) 中提到的 **解除代码依赖与资源依赖**，确保项目不再依赖任何服务包的特性之后，点击服务包管理界面的 **卸载服务包** 按钮，会自动帮你恢复自定义引擎，将引擎内的 `jsb-adapter` 替换为原版备份，并删除 `creator-sp.d.ts` 文件。
+请参考 [手动卸载](#手动卸载) 中提到的 **解除代码依赖与资源依赖**，确保项目不再依赖任何服务包的特性之后再卸载。
 
-![extuninstall](./assets/ext-uninstall.png)
+在 Cocos Creator 的菜单栏依次点击 **扩展 - 服务包管理 - 卸载服务包** 即可。
+
+![plugin-uninstall](./assets/plugin-uninstall.png)
 
 之后重启即可生效。
 
