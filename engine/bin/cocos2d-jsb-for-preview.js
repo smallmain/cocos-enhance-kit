@@ -51454,7 +51454,7 @@
       _proto.packDynamicAtlasAndCheckMaterial = function packDynamicAtlasAndCheckMaterial(comp, frame) {
         var allowDynamicAtlas = comp.allowDynamicAtlas;
         if (cc.sp.allowDynamicAtlas && 0 === allowDynamicAtlas || 1 === allowDynamicAtlas) {
-          frame._texture._uuid = _fontDesc + _overflow + (_premultiply ? "P" : "NP") + (_enableUnderline ? "UL" : "NUL") + _string;
+          frame._texture._uuid = _fontDesc + _overflow + (_premultiply ? "P" : "NP") + comp.node.color.toHEX() + (_enableUnderline ? "UL" : "NUL") + _string;
           _outlineComp && (frame._texture._uuid += _outlineComp.color.toHEX() + "," + _outlineComp.width + ",");
           _shadowComp && (frame._texture._uuid += _shadowComp.color.toHEX() + _shadowComp.offset.x + "," + _shadowComp.offset.y + "," + _shadowComp.blur);
         }
