@@ -8,7 +8,7 @@ description: "推荐使用此方式进行一键安装。"
 ---
 ## 前往 Cocos Store 下载
 
-在 Cocos Store 搜索名为 **Cocos Service Pack** 的引擎扩展，或者 [点此跳转](pathname://TODO)。
+在 Cocos Store 搜索名为 **Cocos Service Pack** 的引擎扩展，或者 [点此跳转](https://store.cocos.com/app/detail/3824)。
 
 这个扩展不是免费的，**但其唯一的作用就是帮助你管理服务包的版本（查看、安装和卸载服务包）。**
 

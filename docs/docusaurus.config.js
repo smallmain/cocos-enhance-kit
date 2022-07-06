@@ -76,7 +76,7 @@ const config = {
             label: '文档',
           },
           {
-            href: 'https://smallmain.github.io/cocos-service-pack/demo/v1.0.0-alpha/web-desktop/index.html',
+            href: 'https://smallmain.github.io/cocos-service-pack/demo/v1.0.0/web-desktop/index.html',
             label: '演示',
             position: 'right',
           },
