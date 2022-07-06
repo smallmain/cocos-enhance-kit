@@ -1,8 +1,0 @@
-//
-// Prefix header for all source files of the 'Cocos-Service-Pack-Demo' target in the 'Cocos-Service-Pack-Demo' project
-//
-
-#ifdef __OBJC__
-	#import <Foundation/Foundation.h>
-	#import <UIKit/UIKit.h>
-#endif

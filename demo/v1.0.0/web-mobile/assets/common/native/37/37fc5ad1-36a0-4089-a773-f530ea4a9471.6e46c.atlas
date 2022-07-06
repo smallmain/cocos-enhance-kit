@@ -1,0 +1,13 @@
+
+shengxing_kuang.png
+size: 180,351
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+fx_frame_red
+  rotate: false
+  xy: 2, 2
+  size: 176, 347
+  orig: 180, 351
+  offset: 2, 2
+  index: -1

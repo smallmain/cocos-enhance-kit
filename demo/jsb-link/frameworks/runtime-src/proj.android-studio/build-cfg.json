@@ -1,8 +1,0 @@
-{
-    "ndk_module_path" :[
-        "/Users/smallmain/Documents/Work/cocos-service-pack-src/cocos2d-x",
-        "/Users/smallmain/Documents/Work/cocos-service-pack-src/cocos2d-x/cocos",
-        "/Users/smallmain/Documents/Work/cocos-service-pack-src/cocos2d-x/external"
-    ],
-    "copy_resources": []
-}
