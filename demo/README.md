@@ -4,6 +4,6 @@
 
 ## 如何运行
 
-1. 将项目克隆下来之后，根据文档中的 [安装指南](https://smallmain.github.io/cocos-service-pack/docs/installation-guide/installation-intro) 安装服务包。
+1. 将项目克隆下来之后，根据文档中的 [安装指南](https://smallmain.gitee.io/cocos-service-pack/docs/installation-guide/installation-intro) 安装服务包。
 
 2. 重启编辑器后运行项目的 `main.fire` 场景。

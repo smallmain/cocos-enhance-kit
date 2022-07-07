@@ -41,9 +41,9 @@ hide_title: true
 
 ## 功能演示
 
-[Web Desktop 演示项目](https://smallmain.github.io/cocos-service-pack/demo/v1.0.0/web-desktop/index.html)
+[Web Desktop 演示项目](https://smallmain.gitee.io/cocos-service-pack/demo/v1.0.0/web-desktop/index.html)
 
-[Web Mobile 演示项目](https://smallmain.github.io/cocos-service-pack/demo/v1.0.0/web-mobile/index.html)（请将设备横屏）
+[Web Mobile 演示项目](https://smallmain.gitee.io/cocos-service-pack/demo/v1.0.0/web-mobile/index.html)（请将设备横屏）
 
 :::note 提示
 
@@ -70,7 +70,7 @@ hide_title: true
 - [修复] CHAR 缓存模式 hash 计算可能会有重复的问题
 - [调整] 默认禁用 Label 原生 TTF 渲染器
 
-[点此](https://smallmain.github.io/cocos-service-pack/docs/update-log) 查看所有的更新日志。
+[点此](https://smallmain.gitee.io/cocos-service-pack/docs/update-log) 查看所有的更新日志。
 
 ## 贡献指南
 
