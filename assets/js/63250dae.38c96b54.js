@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[7103],{6147:function(c){c.exports=JSON.parse('{"label":"facebook","permalink":"/cocos-service-pack/blog/tags/facebook","allTagsPath":"/cocos-service-pack/blog/tags","count":1}')}}]);
