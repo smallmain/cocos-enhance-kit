@@ -49656,6 +49656,7 @@
         return _maxFrameSize;
       },
       set maxFrameSize(value) {
+        value > _textureSize && (value = _textureSize);
         _maxFrameSize = value;
       },
       get autoMultiBatch() {
@@ -49934,6 +49935,7 @@
         var rect = spriteFrame._rect, texture = spriteFrame._texture;
         var sx = rect.x, sy = rect.y;
         var width = texture.width, height = texture.height;
+        if (0 === this.rootRect.used && width > this.rootRect.width && height > this.rootRect.height) return this.insertSpriteFrameMax(spriteFrame);
         var result = this.insert(texture);
         if (!result) return null;
         if (cc.dynamicAtlasManager.textureBleeding) {
@@ -49957,6 +49959,26 @@
         var frame = {
           x: sx,
           y: sy,
+          texture: this._texture
+        };
+        return frame;
+      };
+      _proto.insertSpriteFrameMax = function insertSpriteFrameMax(spriteFrame) {
+        var rect = spriteFrame._rect;
+        var texture = spriteFrame._texture;
+        var original = this.rootRect;
+        original.uuid = texture._uuid;
+        original.used++;
+        original.parentRect && original.parentRect.used++;
+        cc.dynamicAtlasManager.rects[texture._uuid] = original;
+        this.removeFreeRect(0);
+        this._texture.drawTextureAt(texture, 0, 0);
+        this._count++;
+        original.spriteFrames.push(spriteFrame);
+        this._dirty = true;
+        var frame = {
+          x: rect.x,
+          y: rect.y,
           texture: this._texture
         };
         return frame;
