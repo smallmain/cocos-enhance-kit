@@ -273,6 +273,13 @@ export class Atlas {
         let sx = rect.x, sy = rect.y;
         let width = texture.width, height = texture.height;
 
+        // 如果纹理与图集尺寸一致则使用直接插入逻辑
+        if (this.rootRect.used === 0
+            && width > this.rootRect.width
+            && height > this.rootRect.height) {
+            return this.insertSpriteFrameMax(spriteFrame);
+        }
+
         const result = this.insert(texture);
 
         if (!result) {
@@ -309,6 +316,38 @@ export class Atlas {
         let frame = {
             x: sx,
             y: sy,
+            texture: this._texture,
+        };
+
+        return frame;
+    }
+
+
+    /**
+     * 插入与图集长宽相等的 SpriteFrame
+     */
+    insertSpriteFrameMax(spriteFrame: any) {
+        const rect = spriteFrame._rect;
+
+        const texture = spriteFrame._texture;
+        const original = this.rootRect;
+        original.uuid = texture._uuid;
+        original.used++;
+        if (original.parentRect) original.parentRect.used++;
+        cc.dynamicAtlasManager.rects[texture._uuid] = original;
+        this.removeFreeRect(0);
+
+        this._texture.drawTextureAt(texture, 0, 0);
+
+        this._count++;
+
+        original.spriteFrames.push(spriteFrame);
+
+        this._dirty = true;
+
+        let frame = {
+            x: rect.x,
+            y: rect.y,
             texture: this._texture,
         };
 

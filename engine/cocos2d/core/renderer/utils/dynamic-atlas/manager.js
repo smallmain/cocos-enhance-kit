@@ -123,6 +123,7 @@ let dynamicAtlasManager = {
         return _maxFrameSize;
     },
     set maxFrameSize(value) {
+        if (value > _textureSize) value = _textureSize;
         _maxFrameSize = value;
     },
 
