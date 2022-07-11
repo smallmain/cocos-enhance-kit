@@ -21,7 +21,7 @@ const FeatureList: FeatureItem[] = [
     title: '完全开源',
     description: (
       <>
-        服务包是完全开源的项目，包括对原生引擎、JavaScript 引擎的改动都附有详细的原理文档。
+        增强包是完全开源的项目，包括对原生引擎、JavaScript 引擎的改动都附有详细的原理文档。
       </>
     ),
   },

@@ -31,7 +31,7 @@ cc.macro.ENABLE_NATIVE_TTF_RENDERER = false;
 
 - **如果你有手动修改 `cc.dynamicAtlasManager.maxAtlasCount` 属性，请考虑删除**
 
-服务包会根据设备最大纹理数和 Char 缓存模式字符图集的相关设置自动调整动态合图的最大图集数量。
+增强包会根据设备最大纹理数和 Char 缓存模式字符图集的相关设置自动调整动态合图的最大图集数量。
 
 这不意味着你不能手动调整了，而是建议你阅读新动态图集和新 Char 缓存模式相关的文档后再考虑是否有必要进行调整。
 

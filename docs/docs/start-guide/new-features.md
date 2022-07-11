@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-description: "了解并上手服务包提供的所有其他新特性。"
+description: "了解并上手增强包提供的所有其他新特性。"
 ---
 
 # 上手其它新特性
@@ -31,7 +31,7 @@ cc.sp.labelRetinaScale = 2;     // 渲染文本时纹理的缩放倍数，默认
 
 官方文档中介绍了替换 attachment 对象进行换装的方法，但如果动画中有切换 attachment 的关键帧，这种方法就失效了。
 
-还有一种方法是修改 attachment 的 region 对象来进行换装，但这种方法引擎没有直接支持，所以服务包对其进行了支持。
+还有一种方法是修改 attachment 的 region 对象来进行换装，但这种方法引擎没有直接支持，所以增强包对其进行了支持。
 
 只需要一句代码即可使用 cc.SpriteFrame 的数据修改 attachment 的 region 对象数据：
 

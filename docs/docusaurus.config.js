@@ -6,10 +6,10 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Cocos Service Pack',
-  tagline: '提供 Cocos Creator 引擎特性增强、修复与优化的开源非官方服务包',
+  title: 'Cocos Enhance Kit',
+  tagline: '提供 Cocos Creator 引擎特性增强、修复与优化的开源非官方增强包',
   url: 'https://smallmain.github.io',
-  baseUrl: '/cocos-service-pack/',
+  baseUrl: '/cocos-enhance-kit/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
@@ -17,7 +17,7 @@ const config = {
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'smallmain', // Usually your GitHub org/user name.
-  projectName: 'cocos-service-pack', // Usually your repo name.
+  projectName: 'cocos-enhance-kit', // Usually your repo name.
   deploymentBranch: 'gh-pages',
 
   // Even if you don't use internalization, you can use this field to set useful
@@ -56,10 +56,10 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
-        title: 'Cocos Service Pack',
+        title: 'Cocos Enhance Kit',
         // style: 'primary',
         logo: {
-          alt: 'Cocos Service Pack',
+          alt: 'Cocos Enhance Kit',
           src: 'img/logo.png',
         },
         items: [
@@ -76,7 +76,7 @@ const config = {
             label: '文档',
           },
           {
-            href: 'https://smallmain.gitee.io/cocos-service-pack/demo/v1.0.0/web-desktop/index.html',
+            href: 'https://smallmain.gitee.io/cocos-enhance-kit/demo/v1.0.0/web-desktop/index.html',
             label: '演示',
             position: 'right',
           },
@@ -88,7 +88,7 @@ const config = {
           },
           // { to: '/blog', label: 'Blog', position: 'left' },
           {
-            href: 'https://github.com/smallmain/cocos-service-pack',
+            href: 'https://github.com/smallmain/cocos-enhance-kit',
             label: '加星鼓励',
             position: 'right',
             className: 'header-github-link',

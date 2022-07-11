@@ -5,14 +5,14 @@ description: "需掌握一定的自定义引擎知识。"
 
 # 手动安装
 
-## Service Pack v1.0.0
+## Enhance Kit v1.0.0
 
-适配 Cocos Creator v2.4.9 版本，[点此下载服务包](https://github.com/smallmain/cocos-service-pack/releases/tag/v1.0.0)
+适配 Cocos Creator v2.4.9 版本，[点此下载增强包](https://github.com/smallmain/cocos-enhance-kit/releases/tag/v1.0.0)
 
 ---
 ## 标准安装
 
-**请确保您的项目所使用的引擎版本与服务包适配的引擎版本一致，否则请使用 [补丁安装](#补丁安装)。**
+**请确保您的项目所使用的引擎版本与增强包适配的引擎版本一致，否则请使用 [补丁安装](#补丁安装)。**
 
 :::tip 提示
 
@@ -24,7 +24,7 @@ description: "需掌握一定的自定义引擎知识。"
 
 ### 1.替换自定义引擎
 
-下载服务包后，解压压缩包可以看到压缩包内的 `engine` `cocos2d-x` `jsb-adapter` 这三个目录分别是已经整理好的 **JavaScript 引擎**、**Cocos2d-x 引擎** 和 **jsb-adpater**。
+下载增强包后，解压压缩包可以看到压缩包内的 `engine` `cocos2d-x` `jsb-adapter` 这三个目录分别是已经整理好的 **JavaScript 引擎**、**Cocos2d-x 引擎** 和 **jsb-adpater**。
 
 接着打开 Cocos Creator 菜单的 **项目 - 项目设置 - 自定义引擎**。
 
@@ -50,13 +50,13 @@ description: "需掌握一定的自定义引擎知识。"
 
 **请勿将此引擎扩展与 [使用引擎扩展安装](./installation-engine-plugin) 中的引擎扩展混淆！**
 
-**该扩展提供了必需的内置资源，是服务包开源的一部分，请勿同时安装两个引擎扩展，这会引起冲突！**
+**该扩展提供了必需的内置资源，是增强包开源的一部分，请勿同时安装两个引擎扩展，这会引起冲突！**
 
 :::
 
-压缩包内 `service-pack-support` 目录即是扩展本身，将其放到项目的 `packages` 目录即可。
+压缩包内 `enhance-kit-support` 目录即是扩展本身，将其放到项目的 `packages` 目录即可。
 
-服务包需要使用名为 `sp` 的 AssetBundle 存放资源，如果你的项目有使用 AssetBundle，请**确保该名称未被占用**。
+增强包需要使用名为 `sp` 的 AssetBundle 存放资源，如果你的项目有使用 AssetBundle，请**确保该名称未被占用**。
 
 没有必要将这个 Asset Bundle 设为远程包或者 Zip 压缩，里面只有 Effect 着色器资源。
 
@@ -78,14 +78,14 @@ description: "需掌握一定的自定义引擎知识。"
 
 ![](./assets/installed-console.png)
 
-接下来推荐你从 [入门教程](../start-guide/start-guide-intro.mdx) 开始了解服务包为你的开发都带来了哪些新特性！
+接下来推荐你从 [入门教程](../start-guide/start-guide-intro.mdx) 开始了解增强包为你的开发都带来了哪些新特性！
 
 ---
 ## 补丁安装
 
 :::caution 提示
 
-**建议至少将 Cocos Creator 升级到 v2.4.x 版本，服务包所做的改动不保证对 v2.4 版本以下的兼容性。**
+**建议至少将 Cocos Creator 升级到 v2.4.x 版本，增强包所做的改动不保证对 v2.4 版本以下的兼容性。**
 
 补丁安装需要掌握一定的 [Git](https://git-scm.com/doc) 知识和修改引擎源码的能力。
 

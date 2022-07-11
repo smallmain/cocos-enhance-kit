@@ -1,7 +1,7 @@
 {
-  "name": "service-pack",
+  "name": "enhance-kit",
   "version": "1.0.0",
-  "description": "This extension provides support for cocos service pack.",
+  "description": "This extension provides support for cocos enhance kit.",
   "author": "SmallMain",
   "main": "main.js",
   "runtime-resource": {

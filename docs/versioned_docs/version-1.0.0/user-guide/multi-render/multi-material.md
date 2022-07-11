@@ -6,7 +6,7 @@ toc_max_heading_level: 5
 
 # 多纹理材质
 
-服务包在引擎内置了可以直接使用的多纹理 Effect 着色器资源，并且你可以直接使用多纹理材质而不需要编写任何代码。
+增强包在引擎内置了可以直接使用的多纹理 Effect 着色器资源，并且你可以直接使用多纹理材质而不需要编写任何代码。
 
 ---
 ## 创建多纹理材质
@@ -53,7 +53,7 @@ Spine 组件使用多纹理材质时会强制勾选 `enableBatch`，因为不开
 
 除了直接在内置着色器的基础上修改之外，任何着色器中如果存在一个宏 `USE_MULTI_TEXTURE = true`，则会被认为是多纹理材质。
 
-[演示项目](https://smallmain.gitee.io/cocos-service-pack/demo/v1.0.0/web-desktop/index.html) 中有自定义材质的示范代码。
+[演示项目](https://smallmain.gitee.io/cocos-enhance-kit/demo/v1.0.0/web-desktop/index.html) 中有自定义材质的示范代码。
 
 :::tip 提示
 
@@ -70,7 +70,7 @@ Spine 组件使用多纹理材质时会强制勾选 `enableBatch`，因为不开
 ---
 ## 通过代码设置纹理插槽
 
-每个多纹理材质都对应着一个多纹理材质管理器，这是服务包新增的一个工具类，其主要用处是便捷、高性能地管理多纹理材质上面的纹理插槽。
+每个多纹理材质都对应着一个多纹理材质管理器，这是增强包新增的一个工具类，其主要用处是便捷、高性能地管理多纹理材质上面的纹理插槽。
 
 通过 `material.getMultiHandler()` 可以获取到管理器实例，请使用这个实例来操作多纹理材质的纹理插槽。
 

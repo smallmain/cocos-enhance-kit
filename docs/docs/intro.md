@@ -6,19 +6,21 @@ hide_title: true
 
 ![logo](/img/logo2.png)
 
-这是一个提供 Cocos Creator 引擎特性增强、修复与优化的**开源非官方服务包**。
+这是一个提供 Cocos Creator 引擎特性增强、修复与优化的**开源非官方增强包**。
 
 该项目使用自定义引擎的方式在符合原始引擎架构设计的基础上为 Cocos Creator 引擎加入新的特性、修复已知问题以及性能优化。
 
-正因为如此，服务包中的大部分特性能像升级引擎版本一样无需改动项目代码即可生效。
+正因为如此，增强包中的大部分特性能像升级引擎版本一样无需改动项目代码即可生效。
 
 :::info 项目的起源
 
 2021 年 2 月，Cocos 发布 Cocos Creator 3.0，之后不会再开发 2.x 版本的新特性，但 2.x 在一些方面还并不完善，所以这个非官方的引擎“魔改”合集应运而生。
 
-给项目取名的时候想到相似的事情发生在 2014 年 4 月，官方停止了对 Windows XP 的维护，之后 Harkaz 发布了一个非官方服务包 Service Pack 4 (SP4)。
+给项目取名的时候想到相似的事情发生在 2014 年 4 月，官方停止了对 Windows XP 的维护，之后 Harkaz 发布了一个非官方增强包 Service Pack 4 (SP4)。
 
-受到这个命名的启发，遂项目取名为 Service Pack。
+受到这个命名的启发，遂想将项目取名为 Service Pack。
+
+但是这个名字有点怪怪的，最后在 麒麟子(Kylins) 的帮助下，我们为项目想到了一个更好的名字，Enhance Kit，再次感谢 麒麟子(Kylins)。
 
 :::
 
@@ -41,13 +43,13 @@ hide_title: true
 
 ## 功能演示
 
-[Web Desktop 演示项目](https://smallmain.gitee.io/cocos-service-pack/demo/v1.0.0/web-desktop/index.html)
+[Web Desktop 演示项目](https://smallmain.gitee.io/cocos-enhance-kit/demo/v1.0.0/web-desktop/index.html)
 
-[Web Mobile 演示项目](https://smallmain.gitee.io/cocos-service-pack/demo/v1.0.0/web-mobile/index.html)（请将设备横屏）
+[Web Mobile 演示项目](https://smallmain.gitee.io/cocos-enhance-kit/demo/v1.0.0/web-mobile/index.html)（请将设备横屏）
 
 :::note 提示
 
-服务包对引擎的改动完全开源，每个改动会带有原理说明文档，当你发现问题时请与我们进行反馈，如果你有兴致，可以默默帅气地提交一个 PR，帮助我们一起完善这个项目。
+增强包对引擎的改动完全开源，每个改动会带有原理说明文档，当你发现问题时请与我们进行反馈，如果你有兴致，可以默默帅气地提交一个 PR，帮助我们一起完善这个项目。
 
 :::
 
@@ -57,7 +59,7 @@ hide_title: true
 
 ## 更新日志
 
-### Service Pack v1.0.0
+### Enhance Kit v1.0.0
 
 - **[新特性] 支持多纹理渲染**
 - **[新特性] 重构动态图集，支持多个新特性**
@@ -70,7 +72,7 @@ hide_title: true
 - [修复] CHAR 缓存模式 hash 计算可能会有重复的问题
 - [调整] 默认禁用 Label 原生 TTF 渲染器
 
-[点此](https://smallmain.gitee.io/cocos-service-pack/docs/update-log) 查看所有的更新日志。
+[点此](https://smallmain.gitee.io/cocos-enhance-kit/docs/update-log) 查看所有的更新日志。
 
 ## 贡献指南
 
@@ -94,12 +96,12 @@ hide_title: true
 
 以上问题我们都思考过，首先，现在引擎的 2.x 版本已经停止了更新（仅做一些维护工作），也就是说修改引擎不会遇到在官方新版本发布后需要用大量时间去适配的情况。
 
-其次，即使服务包的所有改动都能做成一个插件脚本，但无法兼容原生平台，并且一般都需要大量拷贝代码，包体会增大，可维护性会大幅降低。
+其次，即使增强包的所有改动都能做成一个插件脚本，但无法兼容原生平台，并且一般都需要大量拷贝代码，包体会增大，可维护性会大幅降低。
 
 最后，我们希望它接近 “原生” 的使用体验，就像引擎本来就有的功能一样，对于没有接触过自定义引擎的人，可以通过引擎扩展一键安装。
 
-对于已经修改过引擎的人，由于服务包提供的是 Git Patch，所以可以让你在原有的基础上轻松应用服务包的改动，你甚至可以只选取你想要的特性进行应用。
+对于已经修改过引擎的人，由于增强包提供的是 Git Patch，所以可以让你在原有的基础上轻松应用增强包的改动，你甚至可以只选取你想要的特性进行应用。
 
 ### 启动 Cocos Creator 报 Error: Can not parse this input:undefined 错误
 
-这是你可能忘记安装配套的引擎扩展，所以没有找到服务包的内置资源导致的报错。
+这是你可能忘记安装配套的引擎扩展，所以没有找到增强包的内置资源导致的报错。

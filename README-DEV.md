@@ -38,7 +38,7 @@
 
 1.将对 engine 的改动整合到 Git Patch，然后将 Patch 按相应的引擎目录放置在 `patches` 目录并放在压缩包根目录内。
 2.编译 JavaScript 引擎和原生模拟器，再将三个引擎目录放到压缩包根目录内，包括类型提示文件。
-3.将 `service-pack-support` 目录放在压缩包根目录内。
+3.将 `enhance-kit-support` 目录放在压缩包根目录内。
 4.更新文档的更新日志。
 
 ### 发布压缩包

@@ -79,7 +79,7 @@ a.getRegion(slotName, attachmentName);
 
 如果你只想替换其中一个组件，那么就可以克隆这个 SkeletonData 让每个组件都使用不同的 SkeletonData 实例进行渲染。
 
-服务包提供了一个克隆数据的接口来实现这个需求：
+增强包提供了一个克隆数据的接口来实现这个需求：
 
 ```js
 const clonedSkeletonData = skeletonData.clone();
@@ -88,4 +88,4 @@ const clonedSkeletonData = skeletonData.clone();
 使用以上代码克隆 SkeletonData 后再进行换装，赋值给 Spine 组件，那么替换操作就只会对这个 Spine 组件生效。
 
 ---
-以上所有用法你可以在 [演示项目](https://smallmain.gitee.io/cocos-service-pack/demo/v1.0.0/web-desktop/index.html) 中找到示范代码。
+以上所有用法你可以在 [演示项目](https://smallmain.gitee.io/cocos-enhance-kit/demo/v1.0.0/web-desktop/index.html) 中找到示范代码。
