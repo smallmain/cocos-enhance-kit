@@ -133,7 +133,7 @@ let RichText = cc.Class({
     editor: CC_EDITOR && {
         menu: 'i18n:MAIN_MENU.component.renderers/RichText',
         help: 'i18n:COMPONENT.help_url.richtext',
-        inspector: 'packages://service-pack/inspectors/comps/richtext.js',
+        inspector: 'packages://enhance-kit/inspectors/comps/richtext.js',
         executeInEditMode: true
     },
 

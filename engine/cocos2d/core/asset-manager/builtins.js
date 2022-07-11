@@ -102,7 +102,7 @@ var builtins = {
 
     _loadMultiEffect(name, cb) {
         if (CC_EDITOR) {
-            cc.assetManager.loadAny(Editor.assetdb.remote.urlToUuid('db://service-pack-resources/sp/effects/' + name + '.effect'), function (err, effect) {
+            cc.assetManager.loadAny(Editor.assetdb.remote.urlToUuid('db://enhance-kit-resources/sp/effects/' + name + '.effect'), function (err, effect) {
                 if (err) {
                     return Editor.error(err);
                 } else {

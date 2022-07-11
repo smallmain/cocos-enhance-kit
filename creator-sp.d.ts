@@ -1,7 +1,7 @@
 declare module cc {
 
     /**
-     * Cocos Creator Service Pack 命名空间
+     * Cocos Creator Enhance Kit 命名空间
      */
     module sp {
 

@@ -192,7 +192,7 @@ let Label = cc.Class({
     editor: CC_EDITOR && {
         menu: 'i18n:MAIN_MENU.component.renderers/Label',
         help: 'i18n:COMPONENT.help_url.label',
-        inspector: 'packages://service-pack/inspectors/comps/label.js',
+        inspector: 'packages://enhance-kit/inspectors/comps/label.js',
     },
 
     properties: {

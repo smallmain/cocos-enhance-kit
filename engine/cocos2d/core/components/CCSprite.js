@@ -160,7 +160,7 @@ var Sprite = cc.Class({
     editor: CC_EDITOR && {
         menu: 'i18n:MAIN_MENU.component.renderers/Sprite',
         help: 'i18n:COMPONENT.help_url.sprite',
-        inspector: 'packages://service-pack/inspectors/comps/sprite.js',
+        inspector: 'packages://enhance-kit/inspectors/comps/sprite.js',
     },
 
     properties: {
