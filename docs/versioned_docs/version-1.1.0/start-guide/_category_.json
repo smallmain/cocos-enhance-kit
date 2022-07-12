@@ -1,0 +1,9 @@
+{
+  "label": "入门教程",
+  "position": 3,
+  "collapsed": false,
+  "link": {
+    "type": "doc",
+    "id": "start-guide-intro"
+  }
+}

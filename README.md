@@ -30,6 +30,7 @@
 - [功能演示](#功能演示)
 - [使用方法](#使用方法)
 - [更新日志](#更新日志)
+  - [Enhance Kit v1.1.0](#enhance-kit-v110)
   - [Enhance Kit v1.0.0](#enhance-kit-v100)
 - [贡献指南](#贡献指南)
 - [常见问题](#常见问题)
@@ -68,6 +69,13 @@
 请阅读文档的 [安装指南](https://smallmain.gitee.io/cocos-enhance-kit/docs/installation-guide/installation-intro) 与 [入门教程](https://smallmain.gitee.io/cocos-enhance-kit/docs/start-guide/start-guide-intro)。
 
 ## 更新日志
+
+### Enhance Kit v1.1.0
+
+- **[新特性] 动态合图在符合条件的情况下会忽略 padding 将纹理加入动态图集**
+- [修复] 修复动态图集 maxFrameSize 能设置为超出图集尺寸大小的问题
+- [修复] 修复 Spine 动态合图时未判断 attachment 是否存在 region 对象导致报错的问题
+- [修复] 修复 Android 平台打包出现 Implicit instantiation of undefined template 错误
 
 ### Enhance Kit v1.0.0
 
