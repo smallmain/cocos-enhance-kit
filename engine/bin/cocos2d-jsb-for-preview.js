@@ -56799,7 +56799,7 @@
     "use strict";
     cc.sp = {
       inited: false,
-      version: "1.0.0",
+      version: "1.1.0",
       MAX_MULTITEXTURE_NUM: -1,
       autoSwitchMaterial: true,
       allowDynamicAtlas: true,
