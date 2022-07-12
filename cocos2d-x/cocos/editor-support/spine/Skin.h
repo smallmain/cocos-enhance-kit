@@ -34,6 +34,7 @@
 #include <spine/SpineString.h>
 #include <vector>
 #include <map>
+#include <string>
 
 namespace spine {
 class Attachment;
