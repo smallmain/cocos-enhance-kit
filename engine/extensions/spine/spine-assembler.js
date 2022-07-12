@@ -325,41 +325,43 @@ export default class SpineAssembler extends Assembler {
                                     }
                                 } else {
                                     const region = attachment.region;
-                                    const alreadyInAtlas = !!region._original;
+                                    if (region) {
+                                        const alreadyInAtlas = !!region._original;
 
-                                    if (alreadyInAtlas) {
-                                        // 可能出现多个 attachment 共用同一个 region
-                                        if (_packedRegions.includes(region)) {
-                                            this.updatePackedAttachment(attachment, false);
-                                        }
-                                    } else if (region.texture && region.texture._texture.packable) {
-                                        if (region._spriteFrame) {
-                                            const spriteFrame = region._spriteFrame;
-                                            region._spriteFrame = null;
-                                            spriteFrame.destroy();
-                                        }
-                                        _tmpRegionData.initWithAttachment(attachment);
-                                        const frame = _tmpRegionData.toSpriteFrame();
-                                        const packedFrame = cc.dynamicAtlasManager.insertSpriteFrame(frame);
-                                        if (packedFrame) {
-                                            frame._setDynamicAtlasFrame(packedFrame);
-                                            
-                                            region._original = {
-                                                _texture: region.texture,
-                                                _x: region.x,
-                                                _y: region.y,
-                                                _ref: 0,
-                                            };
+                                        if (alreadyInAtlas) {
+                                            // 可能出现多个 attachment 共用同一个 region
+                                            if (_packedRegions.includes(region)) {
+                                                this.updatePackedAttachment(attachment, false);
+                                            }
+                                        } else if (region.texture && region.texture._texture.packable) {
+                                            if (region._spriteFrame) {
+                                                const spriteFrame = region._spriteFrame;
+                                                region._spriteFrame = null;
+                                                spriteFrame.destroy();
+                                            }
+                                            _tmpRegionData.initWithAttachment(attachment);
+                                            const frame = _tmpRegionData.toSpriteFrame();
+                                            const packedFrame = cc.dynamicAtlasManager.insertSpriteFrame(frame);
+                                            if (packedFrame) {
+                                                frame._setDynamicAtlasFrame(packedFrame);
 
-                                            region._spriteFrame = frame;
+                                                region._original = {
+                                                    _texture: region.texture,
+                                                    _x: region.x,
+                                                    _y: region.y,
+                                                    _ref: 0,
+                                                };
 
-                                            _tmpRegionData.updateWithPackedFrame(packedFrame);
+                                                region._spriteFrame = frame;
 
-                                            this.updatePackedAttachment(attachment);
+                                                _tmpRegionData.updateWithPackedFrame(packedFrame);
 
-                                            _packedRegions.push(region);
-                                        } else {
-                                            frame.destroy();
+                                                this.updatePackedAttachment(attachment);
+
+                                                _packedRegions.push(region);
+                                            } else {
+                                                frame.destroy();
+                                            }
                                         }
                                     }
                                 }
