@@ -31094,6 +31094,7 @@
       },
       _updateMaterial: function _updateMaterial() {
         var material = this.getMaterial(0);
+        if (!material) return;
         var isMultiMaterial = material.material.isMultiSupport();
         if (isMultiMaterial) {
           if (!this._texture) return;
