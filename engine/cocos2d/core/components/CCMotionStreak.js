@@ -255,6 +255,7 @@ var MotionStreak = cc.Class({
 
     _updateMaterial () {
         let material = this.getMaterial(0);
+        if (!material) return;
 
         // 根据材质更新 uniform
         const isMultiMaterial = material.material.isMultiSupport();
