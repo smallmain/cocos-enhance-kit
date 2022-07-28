@@ -486,8 +486,9 @@ var Sprite = cc.Class({
             // 根据材质更新 uniform
             const isMultiMaterial = material.material.isMultiSupport();
             if (isMultiMaterial) {
-                // 在 assembler 中进行更新性能会更好，不需要每次 setSpriteFrame 都更新，并且动态图集会导致两次触发
-                // if (texture) this._updateMultiTexId(material, texture);
+                if (texture instanceof cc.Texture2D && !texture.loaded) {
+                    cc.assetManager.postLoadNative(texture);
+                }
                 this._texIdDirty = true;
             } else {
                 const textureImpl = texture && texture.getImpl();

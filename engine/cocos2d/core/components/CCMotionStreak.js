@@ -261,6 +261,10 @@ var MotionStreak = cc.Class({
         const isMultiMaterial = material.material.isMultiSupport();
         if (isMultiMaterial) {
             if (!this._texture) return;
+            const texture = this._texture;
+            if (texture instanceof cc.Texture2D && !texture.loaded) {
+                cc.assetManager.postLoadNative(texture);
+            }
             this._updateMultiTexId(material, this._texture);
         } else {
             const textureImpl = this._texture && this._texture.getImpl();

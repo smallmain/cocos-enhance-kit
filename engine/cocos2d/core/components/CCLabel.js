@@ -819,8 +819,10 @@ let Label = cc.Class({
             // 根据材质更新 uniform
             const isMultiMaterial = material.material.isMultiSupport();
             if (isMultiMaterial) {
-                // 贴图在 updateRenderData 才确定下来
-                // if (texture) this._updateMultiTexId(material, texture);
+                const texture = this._frame._texture;
+                if (texture instanceof cc.Texture2D && !texture.loaded) {
+                    cc.assetManager.postLoadNative(texture);
+                }
                 this._texIdDirty = true;
             } else {
                 material.setProperty('texture', this._frame._texture);
