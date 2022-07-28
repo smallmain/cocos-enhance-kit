@@ -30001,7 +30001,11 @@
         if (!this._frame) return;
         if (material) {
           var isMultiMaterial = material.material.isMultiSupport();
-          isMultiMaterial ? this._texIdDirty = true : material.setProperty("texture", this._frame._texture);
+          if (isMultiMaterial) {
+            var texture = this._frame._texture;
+            texture instanceof cc.Texture2D && !texture.loaded && cc.assetManager.postLoadNative(texture);
+            this._texIdDirty = true;
+          } else material.setProperty("texture", this._frame._texture);
           this._assembler && (isMultiMaterial && !this._assembler.isMulti || !isMultiMaterial && this._assembler.isMulti) && RenderComponent.prototype._resetAssembler.call(this);
         }
         BlendFunc.prototype._updateMaterial.call(this);
@@ -31098,6 +31102,8 @@
         var isMultiMaterial = material.material.isMultiSupport();
         if (isMultiMaterial) {
           if (!this._texture) return;
+          var texture = this._texture;
+          texture instanceof cc.Texture2D && !texture.loaded && cc.assetManager.postLoadNative(texture);
           this._updateMultiTexId(material, this._texture);
         } else {
           var textureImpl = this._texture && this._texture.getImpl();
@@ -33933,7 +33939,10 @@
           var oldDefine = material.getDefine("USE_TEXTURE");
           void 0 === oldDefine || oldDefine || material.define("USE_TEXTURE", true);
           var isMultiMaterial = material.material.isMultiSupport();
-          if (isMultiMaterial) this._texIdDirty = true; else {
+          if (isMultiMaterial) {
+            texture instanceof cc.Texture2D && !texture.loaded && cc.assetManager.postLoadNative(texture);
+            this._texIdDirty = true;
+          } else {
             var textureImpl = texture && texture.getImpl();
             material.getProperty("texture") !== textureImpl && material.setProperty("texture", texture);
           }
