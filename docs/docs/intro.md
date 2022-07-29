@@ -59,6 +59,12 @@ hide_title: true
 
 ## 更新日志
 
+### Enhance Kit v1.2.0
+
+- **[新特性] cc.TiledLayer 支持复用 Culling 数据**
+- [修复] 修复 MotionStreak 初始化报错的问题
+- [修复] 修复勾选延迟加载资源时资源不会加载的问题
+
 ### Enhance Kit v1.1.0
 
 - **[新特性] 动态合图在符合条件的情况下会忽略 padding 将纹理加入动态图集**
@@ -112,3 +118,9 @@ hide_title: true
 ### 启动 Cocos Creator 报 Error: Can not parse this input:undefined 错误
 
 这是你可能忘记安装配套的引擎扩展，所以没有找到增强包的内置资源导致的报错。
+
+### 原生平台或模拟器报错：Assertion failed: (_type == Type::String), function toString, file Value.cpp, line 496.
+
+这是你没有替换引擎的 `jsb-adapter` 部分，或者说没有重启以生效。
+
+注意：原生平台构建时可能需要先删除原有的 build 文件，替换操作才会生效。

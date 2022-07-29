@@ -5,6 +5,15 @@ sidebar_position: 7
 # 更新日志
 
 ---
+## Enhance Kit v1.2.0
+
+适配 Cocos Creator v2.4.9 版本，[点此下载压缩包](https://github.com/smallmain/cocos-enhance-kit/releases/tag/v1.2.0)
+
+- **[新特性] cc.TiledLayer 支持复用 Culling 数据**
+- [修复] 修复 MotionStreak 初始化报错的问题
+- [修复] 修复勾选延迟加载资源时资源不会加载的问题
+
+---
 ## Enhance Kit v1.1.0
 
 适配 Cocos Creator v2.4.9 版本，[点此下载压缩包](https://github.com/smallmain/cocos-enhance-kit/releases/tag/v1.1.0)

@@ -57,3 +57,10 @@ skeletonComponent.setRegionData('Head', 'Head', new sp.RegionData(spriteFrame));
 虽然加上去也简单，但这可能是很少用得到的功能，主要还是我们看到几乎所有渲染组件都可以自定义材质，这个组件却不可以。
 
 可前往 [RichText 自定义材质](../user-guide/text-render/text-richtext.md) 文档了解更多详情。
+
+---
+## 复用 TiledMap 的 Culling 数据
+
+一个 TiledMap 可能会有很多 TiledLayer，如果开启了 Culling，那这些 Layer 都需要单独计算 Culling 数据，增强包新增了在满足一定条件的情况下可以复用 Culling 数据的特性，以减少 CPU 的性能消耗。
+
+可前往 [复用 Culling 数据](../user-guide/tiledmap/tiledmap-culling.md) 文档了解更多详情。
