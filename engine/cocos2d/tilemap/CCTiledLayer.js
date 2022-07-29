@@ -62,7 +62,29 @@ let TiledLayer = cc.Class({
     extends: RenderComponent,
 
     editor: {
-        inspector: 'packages://inspector/inspectors/comps/tiled-layer.js',
+        inspector: 'packages://enhance-kit/inspectors/comps/tiled-layer.js',
+    },
+
+    properties: {
+        /**
+         * !#en Use the culling data of the specified layer, this reduces the performance consumption of culling but has limitations, please read the documentation for details.
+         * !#zh 使用指定 TiledLayer 的裁剪数据，这能降低裁剪的性能消耗，但该功能有所限制，详情请阅读文档。
+         * @property {TiledLayer} cullingLayer
+         */
+        cullingLayer: {
+            default: null,
+            type: cc.Node,
+            tooltip: CC_DEV && '使用指定 TiledLayer 的裁剪数据，这能降低裁剪的性能消耗，但该功能有所限制，详情请阅读文档',
+            animatable: false,
+            notify(oldValue) {
+                if (this.cullingLayer) { 
+                    if (!this.cullingLayer.getComponent(cc.TiledLayer)) {
+                        cc.warn("no cc.TiledLayer component on the cullingLayer node");
+                        this.cullingLayer = undefined;
+                    }
+                }
+            },
+        }
     },
 
     ctor () {
@@ -86,6 +108,7 @@ let TiledLayer = cc.Class({
             rightTop:{row:-1, col:-1}
         };
         this._cullingDirty = true;
+        this._cullingDirtyForReuse = true;
         this._rightTop = {row:-1, col:-1};
 
         this._layerInfo = null;
@@ -821,20 +844,35 @@ let TiledLayer = cc.Class({
         if (CC_EDITOR) {
             this.enableCulling(false);
         } else if (this._enableCulling) {
-            this.node._updateWorldMatrix();
-            Mat4.invert(_mat4_temp, this.node._worldMatrix);
-            let rect = cc.visibleRect;
-            let camera = cc.Camera.findCamera(this.node);
-            if (camera) {
-                _vec2_temp.x = 0;
-                _vec2_temp.y = 0;
-                _vec2_temp2.x = _vec2_temp.x + rect.width;
-                _vec2_temp2.y = _vec2_temp.y + rect.height;
-                camera.getScreenToWorldPoint(_vec2_temp, _vec2_temp);
-                camera.getScreenToWorldPoint(_vec2_temp2, _vec2_temp2);
-                Vec2.transformMat4(_vec2_temp, _vec2_temp, _mat4_temp);
-                Vec2.transformMat4(_vec2_temp2, _vec2_temp2, _mat4_temp);
-                this._updateViewPort(_vec2_temp.x, _vec2_temp.y, _vec2_temp2.x - _vec2_temp.x, _vec2_temp2.y - _vec2_temp.y);
+            if (this.cullingLayer) {
+                const _cullingRect = this._cullingRect;
+                const layerComp = this.cullingLayer.getComponent(cc.TiledLayer);
+                if (layerComp) {
+                    const __cullingRect = layerComp._cullingRect;
+                    _cullingRect.leftDown.row = __cullingRect.leftDown.row;
+                    _cullingRect.leftDown.col = __cullingRect.leftDown.col;
+                    _cullingRect.rightTop.row = __cullingRect.rightTop.row;
+                    _cullingRect.rightTop.col = __cullingRect.rightTop.col;
+                    this._cullingDirty = this._cullingDirtyForReuse;
+                }
+            } else {
+                this.node._updateWorldMatrix();
+                Mat4.invert(_mat4_temp, this.node._worldMatrix);
+                let rect = cc.visibleRect;
+                let camera = cc.Camera.findCamera(this.node);
+                if (camera) {
+                    _vec2_temp.x = 0;
+                    _vec2_temp.y = 0;
+                    _vec2_temp2.x = _vec2_temp.x + rect.width;
+                    _vec2_temp2.y = _vec2_temp.y + rect.height;
+                    camera.getScreenToWorldPoint(_vec2_temp, _vec2_temp);
+                    camera.getScreenToWorldPoint(_vec2_temp2, _vec2_temp2);
+                    Vec2.transformMat4(_vec2_temp, _vec2_temp, _mat4_temp);
+                    Vec2.transformMat4(_vec2_temp2, _vec2_temp2, _mat4_temp);
+                    this._updateViewPort(_vec2_temp.x, _vec2_temp.y, _vec2_temp2.x - _vec2_temp.x, _vec2_temp2.y - _vec2_temp.y);
+                    // fillBuffers 之后会修改 _cullingDirty 导致无法复用裁剪数据
+                    this._cullingDirtyForReuse = this._cullingDirty;
+                }
             }
         }
     },
