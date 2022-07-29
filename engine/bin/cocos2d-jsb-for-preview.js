@@ -68707,7 +68707,21 @@
       name: "cc.TiledLayer",
       extends: RenderComponent,
       editor: {
-        inspector: "packages://inspector/inspectors/comps/tiled-layer.js"
+        inspector: "packages://enhance-kit/inspectors/comps/tiled-layer.js"
+      },
+      properties: {
+        cullingLayer: {
+          default: null,
+          type: cc.Node,
+          tooltip: (true, "\u4f7f\u7528\u6307\u5b9a TiledLayer \u7684\u88c1\u526a\u6570\u636e\uff0c\u8fd9\u80fd\u964d\u4f4e\u88c1\u526a\u7684\u6027\u80fd\u6d88\u8017\uff0c\u4f46\u8be5\u529f\u80fd\u6709\u6240\u9650\u5236\uff0c\u8be6\u60c5\u8bf7\u9605\u8bfb\u6587\u6863"),
+          animatable: false,
+          notify: function notify(oldValue) {
+            if (this.cullingLayer && !this.cullingLayer.getComponent(cc.TiledLayer)) {
+              cc.warn("no cc.TiledLayer component on the cullingLayer node");
+              this.cullingLayer = void 0;
+            }
+          }
+        }
       },
       ctor: function ctor() {
         this._userNodeGrid = {};
@@ -68734,6 +68748,7 @@
           }
         };
         this._cullingDirty = true;
+        this._cullingDirtyForReuse = true;
         this._rightTop = {
           row: -1,
           col: -1
@@ -69201,7 +69216,18 @@
       },
       _updateCulling: function _updateCulling() {
         false;
-        if (this._enableCulling) {
+        if (this._enableCulling) if (this.cullingLayer) {
+          var _cullingRect = this._cullingRect;
+          var layerComp = this.cullingLayer.getComponent(cc.TiledLayer);
+          if (layerComp) {
+            var __cullingRect = layerComp._cullingRect;
+            _cullingRect.leftDown.row = __cullingRect.leftDown.row;
+            _cullingRect.leftDown.col = __cullingRect.leftDown.col;
+            _cullingRect.rightTop.row = __cullingRect.rightTop.row;
+            _cullingRect.rightTop.col = __cullingRect.rightTop.col;
+            this._cullingDirty = this._cullingDirtyForReuse;
+          }
+        } else {
           this.node._updateWorldMatrix();
           _valueTypes.Mat4.invert(_mat4_temp, this.node._worldMatrix);
           var rect = cc.visibleRect;
@@ -69216,6 +69242,7 @@
             _valueTypes.Vec2.transformMat4(_vec2_temp, _vec2_temp, _mat4_temp);
             _valueTypes.Vec2.transformMat4(_vec2_temp2, _vec2_temp2, _mat4_temp);
             this._updateViewPort(_vec2_temp.x, _vec2_temp.y, _vec2_temp2.x - _vec2_temp.x, _vec2_temp2.y - _vec2_temp.y);
+            this._cullingDirtyForReuse = this._cullingDirty;
           }
         }
       },
