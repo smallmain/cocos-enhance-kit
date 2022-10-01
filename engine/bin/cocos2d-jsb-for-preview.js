@@ -3295,7 +3295,10 @@
       return this;
     };
     Tween.prototype.stop = function() {
-      this._finalAction && cc.director.getActionManager().removeAction(this._finalAction);
+      if (this._finalAction) {
+        cc.director.getActionManager().removeAction(this._finalAction);
+        this._finalAction = null;
+      }
       return this;
     };
     Tween.prototype.tag = function(tag) {
@@ -18066,18 +18069,19 @@
           this.purgeDirector();
         } else {
           this.calculateDeltaTime(now);
+          var deltaTime = this._deltaTime;
           if (!this._paused) {
-            this.emit(cc.Director.EVENT_BEFORE_UPDATE);
+            this.emit(cc.Director.EVENT_BEFORE_UPDATE, deltaTime);
             this._compScheduler.startPhase();
-            this._compScheduler.updatePhase(this._deltaTime);
-            this._scheduler.update(this._deltaTime);
-            this._compScheduler.lateUpdatePhase(this._deltaTime);
-            this.emit(cc.Director.EVENT_AFTER_UPDATE);
+            this._compScheduler.updatePhase(deltaTime);
+            this._scheduler.update(deltaTime);
+            this._compScheduler.lateUpdatePhase(deltaTime);
+            this.emit(cc.Director.EVENT_AFTER_UPDATE, deltaTime);
             Obj._deferredDestroy();
           }
-          this.emit(cc.Director.EVENT_BEFORE_DRAW);
-          renderer.render(this._scene, this._deltaTime);
-          this.emit(cc.Director.EVENT_AFTER_DRAW);
+          this.emit(cc.Director.EVENT_BEFORE_DRAW, deltaTime);
+          renderer.render(this._scene, deltaTime);
+          this.emit(cc.Director.EVENT_AFTER_DRAW, deltaTime);
           eventManager.frameUpdateListeners();
           this._totalFrames++;
         }
@@ -21947,7 +21951,7 @@
           true;
           if (onceWarns.loader) {
             onceWarns.loader = false;
-            cc.log("cc.loader is deprecated, use cc.assetManager instead please. See https://docs.cocos.com/creator/manual/zh/release-notes/asset-manager-upgrade-guide.html");
+            cc.log("cc.loader is deprecated, use cc.assetManager instead please. See https://docs.cocos.com/creator/2.4/manual/zh/release-notes/asset-manager-upgrade-guide.html");
           }
           return loader;
         }
@@ -24865,8 +24869,8 @@
         if (!texture) return;
         var w = texture.width, h = texture.height;
         self._rect ? self._checkRect(self._texture) : self._rect = cc.rect(0, 0, w, h);
-        self._originalSize || self.setOriginalSize(cc.size(w, h));
-        self._offset || self.setOffset(cc.v2(0, 0));
+        self._originalSize || (self._originalSize = cc.size(w, h));
+        self._offset || (self._offset = cc.v2(0, 0));
         self._calculateUV();
         self.emit("load");
       },
@@ -29906,6 +29910,7 @@
         this._resetFrame();
         this._super();
       },
+      onRestore: false,
       _nodeSizeChanged: function _nodeSizeChanged() {
         (false, this.overflow !== Overflow.NONE) && this.setVertsDirty();
       },
@@ -30984,6 +30989,7 @@
       ctor: function ctor() {
         this._points = [];
         this._lastWPos = new cc.Vec2();
+        this._lastWPosUpdated = false;
       },
       properties: {
         preview: {
@@ -31122,8 +31128,7 @@
       reset: function reset() {
         this._points.length = 0;
         this._assembler && this._assembler._renderData.clear();
-        this._lastWPos.x = 0;
-        this._lastWPos.y = 0;
+        this._lastWPosUpdated = false;
         false;
       },
       lateUpdate: function lateUpdate(dt) {
@@ -40647,12 +40652,12 @@
       var list = [];
       var d, lowerDist, upperDist;
       var p;
-      var lowerInt = cc.v2();
-      var upperInt = cc.v2();
+      var lowerInt = null;
+      var upperInt = null;
       var lowerIndex = 0, upperIndex = 0;
       var lowerPoly, upperPoly;
       for (var i = 0; i < vertices.length; ++i) if (Reflex(i, vertices)) {
-        lowerDist = upperDist = 1e8;
+        lowerDist = upperDist = Number.MAX_SAFE_INTEGER || 9999999999999;
         for (var j = 0; j < vertices.length; ++j) {
           if (Left(At(i - 1, vertices), At(i, vertices), At(j, vertices)) && RightOn(At(i - 1, vertices), At(i, vertices), At(j - 1, vertices))) {
             p = LineIntersect(At(i - 1, vertices), At(i, vertices), At(j, vertices), At(j - 1, vertices));
@@ -53845,6 +53850,7 @@
     exports["default"] = void 0;
     var _motionStreak = _interopRequireDefault(require("./motion-streak"));
     var _vertexFormat = require("../../webgl/vertex-format");
+    var _mat = _interopRequireDefault(require("../../../value-types/mat4"));
     function _interopRequireDefault(obj) {
       return obj && obj.__esModule ? obj : {
         default: obj
@@ -53880,6 +53886,7 @@
     };
     var _normal = cc.v2();
     var _vec2 = cc.v2();
+    var _worldMat = new _mat["default"]();
     function normal(out, dir) {
       out.x = -dir.y;
       out.y = dir.x;
@@ -53904,12 +53911,12 @@
         false;
         var stroke = comp._stroke / 2;
         var node = comp.node;
-        var matrix = node._worldMatrix.m;
-        var tx = matrix[12], ty = matrix[13];
+        node.getWorldMatrix(_worldMat);
+        var tx = _worldMat.m[12], ty = _worldMat.m[13];
         var points = comp._points;
         var lastPos = comp._lastWPos;
         var fadeTime = comp._fadeTime;
-        var moved = lastPos.x !== tx || lastPos.y !== ty;
+        var moved = comp._lastWPosUpdated && (lastPos.x !== tx || lastPos.y !== ty);
         if (moved) {
           var cur;
           var newHead = false;
@@ -53944,6 +53951,7 @@
         }
         lastPos.x = tx;
         lastPos.y = ty;
+        comp._lastWPosUpdated = true;
         if (points.length < 2) return;
         var color = comp._color, ca = color.a;
         var crgb = color.b << 16 | color.g << 8 | color.r;
@@ -54039,6 +54047,7 @@
     module.exports = exports["default"];
   }), {
     "../../../components/CCMotionStreak": 188,
+    "../../../value-types/mat4": 403,
     "../../render-flow": 323,
     "../../webgl/vertex-format": 371,
     "./motion-streak": 347
@@ -54048,6 +54057,7 @@
     exports.__esModule = true;
     exports["default"] = void 0;
     var _assembler2d = _interopRequireDefault(require("../../assembler-2d"));
+    var _mat = _interopRequireDefault(require("../../../value-types/mat4"));
     function _interopRequireDefault(obj) {
       return obj && obj.__esModule ? obj : {
         default: obj
@@ -54084,6 +54094,7 @@
     var _miter = cc.v2();
     var _normal = cc.v2();
     var _vec2 = cc.v2();
+    var _worldMat = new _mat["default"]();
     function normal(out, dir) {
       out.x = -dir.y;
       out.y = dir.x;
@@ -54116,12 +54127,12 @@
         false;
         var stroke = comp._stroke / 2;
         var node = comp.node;
-        var matrix = node._worldMatrix.m;
-        var tx = matrix[12], ty = matrix[13];
+        node.getWorldMatrix(_worldMat);
+        var tx = _worldMat.m[12], ty = _worldMat.m[13];
         var points = comp._points;
         var lastPos = comp._lastWPos;
         var fadeTime = comp._fadeTime;
-        var moved = lastPos.x !== tx || lastPos.y !== ty;
+        var moved = comp._lastWPosUpdated && (lastPos.x !== tx || lastPos.y !== ty);
         if (moved) {
           var cur;
           var newHead = false;
@@ -54156,6 +54167,7 @@
         }
         lastPos.x = tx;
         lastPos.y = ty;
+        comp._lastWPosUpdated = true;
         if (points.length < 2) return;
         var color = comp._color, ca = color.a;
         var crgb = color.b << 16 | color.g << 8 | color.r;
@@ -54236,6 +54248,7 @@
     exports["default"] = MotionStreakAssembler;
     module.exports = exports["default"];
   }), {
+    "../../../value-types/mat4": 403,
     "../../assembler-2d": 299,
     "../../render-flow": 323
   } ],
@@ -56809,7 +56822,7 @@
     "use strict";
     cc.sp = {
       inited: false,
-      version: "1.1.0",
+      version: "1.2.0",
       MAX_MULTITEXTURE_NUM: -1,
       autoSwitchMaterial: true,
       allowDynamicAtlas: true,
@@ -65058,6 +65071,7 @@
       },
       onFocusInEditor: false,
       onLostFocusInEditor: false,
+      onRestore: false,
       _startPreview: false,
       _stopPreview: false,
       _convertTextureToSpriteFrame: false,
@@ -97884,7 +97898,7 @@
     defineDeprecatedMacroGetter("CC_QQPLAY", QQPLAY);
     true;
     cc._Test = {};
-    var engineVersion = "2.4.9";
+    var engineVersion = "2.4.10";
     _global["CocosEngine"] = cc.ENGINE_VERSION = engineVersion;
   }), {} ]
 }, {}, [ 464 ]);
