@@ -383,11 +383,11 @@ let SpriteFrame = cc.Class(/** @lends cc.SpriteFrame# */{
         }
 
         if (!self._originalSize) {
-            self.setOriginalSize(cc.size(w, h));
+            self._originalSize = cc.size(w, h);
         }
 
         if (!self._offset) {
-            self.setOffset(cc.v2(0, 0));
+            self._offset = cc.v2(0, 0);
         }
 
         self._calculateUV();

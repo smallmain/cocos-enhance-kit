@@ -46,6 +46,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.os.Vibrator;
+import android.os.LocaleList;
 import android.preference.PreferenceManager.OnActivityResultListener;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -304,11 +305,19 @@ public class Cocos2dxHelper {
     }
 
     public static String getCurrentLanguage() {
-        return Locale.getDefault().getLanguage();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return LocaleList.getDefault().get(0).getLanguage();
+        } else {
+            return Locale.getDefault().getLanguage();
+        }
     }
 
     public static String getCurrentLanguageCode() {
-        return Locale.getDefault().toString();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return LocaleList.getDefault().get(0).getLanguage();
+        } else {
+            return Locale.getDefault().getLanguage();
+        }
     }
 
     public static String getDeviceModel(){

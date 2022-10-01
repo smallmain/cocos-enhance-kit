@@ -25,6 +25,8 @@
 
 import MotionStreakAssembler from "./motion-streak";
 import { vfmtPosUvColorTexId } from '../../webgl/vertex-format';
+import Mat4 from '../../../value-types/mat4';
+
 const MotionStreak = require('../../../components/CCMotionStreak');
 const RenderFlow = require('../../render-flow');
 
@@ -47,6 +49,7 @@ Point.prototype.setDir = function (x, y) {
 
 let _normal = cc.v2();
 let _vec2 = cc.v2();
+let _worldMat = new Mat4();
 
 function normal (out, dir) {
     //get perpendicular
@@ -74,14 +77,14 @@ export default class MultiMotionStreakAssembler extends MotionStreakAssembler {
         let stroke = comp._stroke / 2;
 
         let node = comp.node;
-        let matrix = node._worldMatrix.m;
-        let tx = matrix[12], ty = matrix[13];
+        node.getWorldMatrix(_worldMat);
+        let tx = _worldMat.m[12], ty = _worldMat.m[13];
 
         let points = comp._points;
         let lastPos = comp._lastWPos;
         let fadeTime = comp._fadeTime;
 
-        let moved = lastPos.x !== tx || lastPos.y !== ty;
+        let moved = comp._lastWPosUpdated && (lastPos.x !== tx || lastPos.y !== ty);
         if (moved) {
             let cur;
             let newHead = false;
@@ -126,7 +129,8 @@ export default class MultiMotionStreakAssembler extends MotionStreakAssembler {
 
         lastPos.x = tx;
         lastPos.y = ty;
-
+        comp._lastWPosUpdated = true;
+        
         if (points.length < 2) {
             return;
         }

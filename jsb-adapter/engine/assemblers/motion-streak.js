@@ -11,8 +11,6 @@ cc.js.mixin(proto, {
         this.ignoreOpacityFlag();
     },
     update (comp, dt) {
-        comp.node._updateWorldMatrix();
-        
         _update.call(this, comp, dt);
 
         let { iData, usedVertices } = this._renderData._flexBuffer;
