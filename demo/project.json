@@ -1,7 +1,7 @@
 {
   "engine": "cocos2d-html5",
   "packages": "packages",
-  "version": "2.4.9",
+  "version": "2.4.10",
   "name": "cocos-enhance-kit-demo",
   "id": "00fac3aa-a82e-4242-8505-128adae1c6c7",
   "isNew": false
