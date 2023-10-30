@@ -5021,7 +5021,6 @@
             this._element instanceof WebAudioElement ? this._element = null : this._element && (this._element.src = "");
             this._state = Audio.State.INITIALZING;
           }
-          return clip;
         },
         enumerable: true,
         configurable: true
@@ -5120,7 +5119,7 @@
         },
         set: function set(bool) {
           this._currentSource && (this._currentSource.loop = bool);
-          return this._loop = bool;
+          this._loop = bool;
         },
         enumerable: true,
         configurable: true
@@ -5158,7 +5157,6 @@
             this.playedLength = num;
             this.play();
           }
-          return num;
         },
         enumerable: true,
         configurable: true
@@ -5192,7 +5190,7 @@
       audio.off("ended");
       audio.off("stop");
       audio.src = null;
-      _audioPool.includes(audio) || (_audioPool.length < audioEngine._maxPoolSize ? _audioPool.push(audio) : audio.destroy());
+      cc.sys.platform === cc.sys.ALIPAY_GAME ? audio.destroy() : _audioPool.includes(audio) || (_audioPool.length < audioEngine._maxPoolSize ? _audioPool.push(audio) : audio.destroy());
       audio._shouldRecycleOnEnded = false;
     };
     var getAudioFromPath = function getAudioFromPath(path) {
@@ -6975,7 +6973,7 @@
     var _CCEnum = _interopRequireDefault(require("../platform/CCEnum"));
     var _CCComponent2 = _interopRequireDefault(require("../components/CCComponent"));
     var _CCClassDecorator = require("../platform/CCClassDecorator");
-    var _dec, _dec2, _dec3, _dec4, _dec5, _class, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, _descriptor8, _descriptor9, _descriptor10, _descriptor11, _descriptor12, _descriptor13, _class3;
+    var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _class, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, _descriptor8, _descriptor9, _descriptor10, _descriptor11, _descriptor12, _descriptor13, _class3;
     function _interopRequireDefault(obj) {
       return obj && obj.__esModule ? obj : {
         default: obj
@@ -7064,11 +7062,12 @@
     });
     var Light = (_dec = (0, _CCClassDecorator.ccclass)("cc.Light"), _dec2 = (0, _CCClassDecorator.menu)("i18n:MAIN_MENU.component.renderers/Light"), 
     _dec3 = (0, _CCClassDecorator.inspector)("packages://inspector/inspectors/comps/light.js"), 
-    _dec4 = (0, _CCClassDecorator.property)({
+    _dec4 = (0, _CCClassDecorator.help)("i18n:COMPONENT.help_url.light"), _dec5 = (0, 
+    _CCClassDecorator.property)({
       type: LightType
-    }), _dec5 = (0, _CCClassDecorator.property)({
+    }), _dec6 = (0, _CCClassDecorator.property)({
       type: LightShadowType
-    }), _dec(_class = _dec2(_class = (0, _CCClassDecorator.executeInEditMode)(_class = _dec3(_class = (_class2 = (_class3 = (function(_CCComponent) {
+    }), _dec(_class = _dec2(_class = (0, _CCClassDecorator.executeInEditMode)(_class = _dec3(_class = _dec4(_class = (_class2 = (_class3 = (function(_CCComponent) {
       _inheritsLoose(Light, _CCComponent);
       function Light() {
         var _this;
@@ -7315,19 +7314,19 @@
       initializer: function initializer() {
         return 5e-4;
       }
-    }), _applyDecoratedDescriptor(_class2.prototype, "type", [ _dec4 ], Object.getOwnPropertyDescriptor(_class2.prototype, "type"), _class2.prototype), 
+    }), _applyDecoratedDescriptor(_class2.prototype, "type", [ _dec5 ], Object.getOwnPropertyDescriptor(_class2.prototype, "type"), _class2.prototype), 
     _applyDecoratedDescriptor(_class2.prototype, "color", [ _CCClassDecorator.property ], Object.getOwnPropertyDescriptor(_class2.prototype, "color"), _class2.prototype), 
     _applyDecoratedDescriptor(_class2.prototype, "intensity", [ _CCClassDecorator.property ], Object.getOwnPropertyDescriptor(_class2.prototype, "intensity"), _class2.prototype), 
     _applyDecoratedDescriptor(_class2.prototype, "range", [ _CCClassDecorator.property ], Object.getOwnPropertyDescriptor(_class2.prototype, "range"), _class2.prototype), 
     _applyDecoratedDescriptor(_class2.prototype, "spotAngle", [ _CCClassDecorator.property ], Object.getOwnPropertyDescriptor(_class2.prototype, "spotAngle"), _class2.prototype), 
     _applyDecoratedDescriptor(_class2.prototype, "spotExp", [ _CCClassDecorator.property ], Object.getOwnPropertyDescriptor(_class2.prototype, "spotExp"), _class2.prototype), 
-    _applyDecoratedDescriptor(_class2.prototype, "shadowType", [ _dec5 ], Object.getOwnPropertyDescriptor(_class2.prototype, "shadowType"), _class2.prototype), 
+    _applyDecoratedDescriptor(_class2.prototype, "shadowType", [ _dec6 ], Object.getOwnPropertyDescriptor(_class2.prototype, "shadowType"), _class2.prototype), 
     _applyDecoratedDescriptor(_class2.prototype, "shadowResolution", [ _CCClassDecorator.property ], Object.getOwnPropertyDescriptor(_class2.prototype, "shadowResolution"), _class2.prototype), 
     _applyDecoratedDescriptor(_class2.prototype, "shadowDarkness", [ _CCClassDecorator.property ], Object.getOwnPropertyDescriptor(_class2.prototype, "shadowDarkness"), _class2.prototype), 
     _applyDecoratedDescriptor(_class2.prototype, "shadowMinDepth", [ _CCClassDecorator.property ], Object.getOwnPropertyDescriptor(_class2.prototype, "shadowMinDepth"), _class2.prototype), 
     _applyDecoratedDescriptor(_class2.prototype, "shadowMaxDepth", [ _CCClassDecorator.property ], Object.getOwnPropertyDescriptor(_class2.prototype, "shadowMaxDepth"), _class2.prototype), 
     _applyDecoratedDescriptor(_class2.prototype, "shadowFrustumSize", [ _CCClassDecorator.property ], Object.getOwnPropertyDescriptor(_class2.prototype, "shadowFrustumSize"), _class2.prototype), 
-    _class2)) || _class) || _class) || _class) || _class);
+    _class2)) || _class) || _class) || _class) || _class) || _class);
     exports["default"] = Light;
     cc.Light = Light;
     module.exports = exports["default"];
@@ -10384,7 +10383,7 @@
     var _particleGeneralFunction = require("./particle-general-function");
     var _trail = _interopRequireDefault(require("./renderer/trail"));
     var _CCMesh = _interopRequireDefault(require("../../mesh/CCMesh"));
-    var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _dec10, _dec11, _dec12, _dec13, _dec14, _dec15, _dec16, _dec17, _dec18, _dec19, _dec20, _dec21, _dec22, _dec23, _dec24, _dec25, _dec26, _dec27, _dec28, _dec29, _dec30, _dec31, _dec32, _dec33, _class, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, _descriptor8, _descriptor9, _descriptor10, _descriptor11, _descriptor12, _descriptor13, _descriptor14, _descriptor15, _descriptor16, _descriptor17, _descriptor18, _descriptor19, _descriptor20, _descriptor21, _descriptor22, _descriptor23, _descriptor24, _descriptor25, _descriptor26, _descriptor27, _descriptor28, _descriptor29, _descriptor30, _descriptor31;
+    var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _dec10, _dec11, _dec12, _dec13, _dec14, _dec15, _dec16, _dec17, _dec18, _dec19, _dec20, _dec21, _dec22, _dec23, _dec24, _dec25, _dec26, _dec27, _dec28, _dec29, _dec30, _dec31, _dec32, _dec33, _dec34, _class, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, _descriptor8, _descriptor9, _descriptor10, _descriptor11, _descriptor12, _descriptor13, _descriptor14, _descriptor15, _descriptor16, _descriptor17, _descriptor18, _descriptor19, _descriptor20, _descriptor21, _descriptor22, _descriptor23, _descriptor24, _descriptor25, _descriptor26, _descriptor27, _descriptor28, _descriptor29, _descriptor30, _descriptor31;
     function _getRequireWildcardCache(nodeInterop) {
       if ("function" !== typeof WeakMap) return null;
       var cacheBabelInterop = new WeakMap();
@@ -10512,94 +10511,95 @@
     function _initializerWarningHelper(descriptor, context) {
       throw new Error("Decorating class property failed. Please ensure that proposal-class-properties is enabled and runs after the decorators transform.");
     }
-    var _require = require("../../platform/CCClassDecorator"), ccclass = _require.ccclass, menu = _require.menu, property = _require.property, executeInEditMode = _require.executeInEditMode, executionOrder = _require.executionOrder;
+    var _require = require("../../platform/CCClassDecorator"), ccclass = _require.ccclass, menu = _require.menu, property = _require.property, executeInEditMode = _require.executeInEditMode, executionOrder = _require.executionOrder, help = _require.help;
     var RenderComponent = require("../../components/CCRenderComponent");
     var _world_mat = new _valueTypes.Mat4();
     var _module_props = false;
     var ParticleSystem3D = (_dec = ccclass("cc.ParticleSystem3D"), _dec2 = menu("i18n:MAIN_MENU.component.renderers/ParticleSystem3D"), 
-    _dec3 = executionOrder(99), _dec4 = property({
-      animatable: false
-    }), _dec5 = property({
+    _dec3 = help("i18n:COMPONENT.help_url.particle-system-3d"), _dec4 = executionOrder(99), 
+    _dec5 = property({
       animatable: false
     }), _dec6 = property({
-      type: _enum.Space,
       animatable: false
     }), _dec7 = property({
-      type: _curveRange["default"]
+      type: _enum.Space,
+      animatable: false
     }), _dec8 = property({
       type: _curveRange["default"]
     }), _dec9 = property({
-      type: _gradientRange["default"]
-    }), _dec10 = property({
-      type: _enum.Space
-    }), _dec11 = property({
       type: _curveRange["default"]
+    }), _dec10 = property({
+      type: _gradientRange["default"]
+    }), _dec11 = property({
+      type: _enum.Space
     }), _dec12 = property({
+      type: _curveRange["default"]
+    }), _dec13 = property({
       type: _curveRange["default"],
       range: [ -1, 1 ]
-    }), _dec13 = property({
+    }), _dec14 = property({
       type: _curveRange["default"],
       range: [ -1, 1 ],
       radian: true
-    }), _dec14 = property({
+    }), _dec15 = property({
       type: _curveRange["default"],
       range: [ -1, 1 ]
-    }), _dec15 = property({
-      type: _curveRange["default"]
     }), _dec16 = property({
       type: _curveRange["default"]
     }), _dec17 = property({
+      type: _curveRange["default"]
+    }), _dec18 = property({
       type: [ _burst["default"] ],
       animatable: false
-    }), _dec18 = property({
+    }), _dec19 = property({
       type: [ _CCMaterial["default"] ],
       displayName: "Materials",
       visible: false,
       override: true
-    }), _dec19 = property({
+    }), _dec20 = property({
       type: _shapeModule["default"],
       animatable: false
-    }), _dec20 = property({
+    }), _dec21 = property({
       type: _colorOvertime["default"],
       animatable: false
-    }), _dec21 = property({
+    }), _dec22 = property({
       type: _sizeOvertime["default"],
       animatable: false
-    }), _dec22 = property({
+    }), _dec23 = property({
       type: _velocityOvertime["default"],
       animatable: false
-    }), _dec23 = property({
+    }), _dec24 = property({
       type: _forceOvertime["default"],
       animatable: false
-    }), _dec24 = property({
+    }), _dec25 = property({
       type: _limitVelocityOvertime["default"],
       animatable: false
-    }), _dec25 = property({
+    }), _dec26 = property({
       type: _rotationOvertime["default"],
       animatable: false
-    }), _dec26 = property({
+    }), _dec27 = property({
       type: _textureAnimation["default"],
       animatable: false
-    }), _dec27 = property({
+    }), _dec28 = property({
       type: _trail["default"],
       animatable: false
-    }), _dec28 = property({
-      type: _enum.RenderMode,
-      animatable: false
     }), _dec29 = property({
+      type: _enum.RenderMode,
       animatable: false
     }), _dec30 = property({
       animatable: false
     }), _dec31 = property({
-      type: _CCMesh["default"],
       animatable: false
     }), _dec32 = property({
-      type: _CCMaterial["default"],
+      type: _CCMesh["default"],
       animatable: false
     }), _dec33 = property({
       type: _CCMaterial["default"],
       animatable: false
-    }), _dec(_class = _dec2(_class = _dec3(_class = executeInEditMode(_class = (_class2 = (function(_RenderComponent) {
+    }), _dec34 = property({
+      type: _CCMaterial["default"],
+      animatable: false
+    }), _dec(_class = _dec2(_class = _dec3(_class = _dec4(_class = executeInEditMode(_class = (_class2 = (function(_RenderComponent) {
       _inheritsLoose(ParticleSystem3D, _RenderComponent);
       function ParticleSystem3D() {
         var _this2;
@@ -11064,7 +11064,7 @@
       initializer: function initializer() {
         return true;
       }
-    }), _descriptor4 = _applyDecoratedDescriptor(_class2.prototype, "playOnAwake", [ _dec4 ], {
+    }), _descriptor4 = _applyDecoratedDescriptor(_class2.prototype, "playOnAwake", [ _dec5 ], {
       configurable: true,
       enumerable: true,
       writable: true,
@@ -11078,7 +11078,7 @@
       initializer: function initializer() {
         return false;
       }
-    }), _applyDecoratedDescriptor(_class2.prototype, "prewarm", [ _dec5 ], Object.getOwnPropertyDescriptor(_class2.prototype, "prewarm"), _class2.prototype), 
+    }), _applyDecoratedDescriptor(_class2.prototype, "prewarm", [ _dec6 ], Object.getOwnPropertyDescriptor(_class2.prototype, "prewarm"), _class2.prototype), 
     _descriptor6 = _applyDecoratedDescriptor(_class2.prototype, "_simulationSpace", [ property ], {
       configurable: true,
       enumerable: true,
@@ -11086,7 +11086,7 @@
       initializer: function initializer() {
         return _enum.Space.Local;
       }
-    }), _applyDecoratedDescriptor(_class2.prototype, "simulationSpace", [ _dec6 ], Object.getOwnPropertyDescriptor(_class2.prototype, "simulationSpace"), _class2.prototype), 
+    }), _applyDecoratedDescriptor(_class2.prototype, "simulationSpace", [ _dec7 ], Object.getOwnPropertyDescriptor(_class2.prototype, "simulationSpace"), _class2.prototype), 
     _descriptor7 = _applyDecoratedDescriptor(_class2.prototype, "simulationSpeed", [ property ], {
       configurable: true,
       enumerable: true,
@@ -11094,84 +11094,84 @@
       initializer: function initializer() {
         return 1;
       }
-    }), _descriptor8 = _applyDecoratedDescriptor(_class2.prototype, "startDelay", [ _dec7 ], {
+    }), _descriptor8 = _applyDecoratedDescriptor(_class2.prototype, "startDelay", [ _dec8 ], {
       configurable: true,
       enumerable: true,
       writable: true,
       initializer: function initializer() {
         return new _curveRange["default"]();
       }
-    }), _descriptor9 = _applyDecoratedDescriptor(_class2.prototype, "startLifetime", [ _dec8 ], {
+    }), _descriptor9 = _applyDecoratedDescriptor(_class2.prototype, "startLifetime", [ _dec9 ], {
       configurable: true,
       enumerable: true,
       writable: true,
       initializer: function initializer() {
         return new _curveRange["default"]();
       }
-    }), _descriptor10 = _applyDecoratedDescriptor(_class2.prototype, "startColor", [ _dec9 ], {
+    }), _descriptor10 = _applyDecoratedDescriptor(_class2.prototype, "startColor", [ _dec10 ], {
       configurable: true,
       enumerable: true,
       writable: true,
       initializer: function initializer() {
         return new _gradientRange["default"]();
       }
-    }), _descriptor11 = _applyDecoratedDescriptor(_class2.prototype, "scaleSpace", [ _dec10 ], {
+    }), _descriptor11 = _applyDecoratedDescriptor(_class2.prototype, "scaleSpace", [ _dec11 ], {
       configurable: true,
       enumerable: true,
       writable: true,
       initializer: function initializer() {
         return _enum.Space.Local;
       }
-    }), _descriptor12 = _applyDecoratedDescriptor(_class2.prototype, "startSize", [ _dec11 ], {
+    }), _descriptor12 = _applyDecoratedDescriptor(_class2.prototype, "startSize", [ _dec12 ], {
       configurable: true,
       enumerable: true,
       writable: true,
       initializer: function initializer() {
         return new _curveRange["default"]();
       }
-    }), _descriptor13 = _applyDecoratedDescriptor(_class2.prototype, "startSpeed", [ _dec12 ], {
+    }), _descriptor13 = _applyDecoratedDescriptor(_class2.prototype, "startSpeed", [ _dec13 ], {
       configurable: true,
       enumerable: true,
       writable: true,
       initializer: function initializer() {
         return new _curveRange["default"]();
       }
-    }), _descriptor14 = _applyDecoratedDescriptor(_class2.prototype, "startRotation", [ _dec13 ], {
+    }), _descriptor14 = _applyDecoratedDescriptor(_class2.prototype, "startRotation", [ _dec14 ], {
       configurable: true,
       enumerable: true,
       writable: true,
       initializer: function initializer() {
         return new _curveRange["default"]();
       }
-    }), _descriptor15 = _applyDecoratedDescriptor(_class2.prototype, "gravityModifier", [ _dec14 ], {
+    }), _descriptor15 = _applyDecoratedDescriptor(_class2.prototype, "gravityModifier", [ _dec15 ], {
       configurable: true,
       enumerable: true,
       writable: true,
       initializer: function initializer() {
         return new _curveRange["default"]();
       }
-    }), _descriptor16 = _applyDecoratedDescriptor(_class2.prototype, "rateOverTime", [ _dec15 ], {
+    }), _descriptor16 = _applyDecoratedDescriptor(_class2.prototype, "rateOverTime", [ _dec16 ], {
       configurable: true,
       enumerable: true,
       writable: true,
       initializer: function initializer() {
         return new _curveRange["default"]();
       }
-    }), _descriptor17 = _applyDecoratedDescriptor(_class2.prototype, "rateOverDistance", [ _dec16 ], {
+    }), _descriptor17 = _applyDecoratedDescriptor(_class2.prototype, "rateOverDistance", [ _dec17 ], {
       configurable: true,
       enumerable: true,
       writable: true,
       initializer: function initializer() {
         return new _curveRange["default"]();
       }
-    }), _descriptor18 = _applyDecoratedDescriptor(_class2.prototype, "bursts", [ _dec17 ], {
+    }), _descriptor18 = _applyDecoratedDescriptor(_class2.prototype, "bursts", [ _dec18 ], {
       configurable: true,
       enumerable: true,
       writable: true,
       initializer: function initializer() {
         return new Array();
       }
-    }), _applyDecoratedDescriptor(_class2.prototype, "materials", [ _dec18 ], Object.getOwnPropertyDescriptor(_class2.prototype, "materials"), _class2.prototype), 
+    }), _applyDecoratedDescriptor(_class2.prototype, "materials", [ _dec19 ], Object.getOwnPropertyDescriptor(_class2.prototype, "materials"), _class2.prototype), 
     _descriptor19 = _applyDecoratedDescriptor(_class2.prototype, "_shapeModule", [ property ], {
       configurable: true,
       enumerable: true,
@@ -11179,7 +11179,7 @@
       initializer: function initializer() {
         return new _shapeModule["default"]();
       }
-    }), _applyDecoratedDescriptor(_class2.prototype, "shapeModule", [ _dec19 ], Object.getOwnPropertyDescriptor(_class2.prototype, "shapeModule"), _class2.prototype), 
+    }), _applyDecoratedDescriptor(_class2.prototype, "shapeModule", [ _dec20 ], Object.getOwnPropertyDescriptor(_class2.prototype, "shapeModule"), _class2.prototype), 
     _descriptor20 = _applyDecoratedDescriptor(_class2.prototype, "_colorOverLifetimeModule", [ property ], {
       configurable: true,
       enumerable: true,
@@ -11187,7 +11187,7 @@
       initializer: function initializer() {
         return new _colorOvertime["default"]();
       }
-    }), _applyDecoratedDescriptor(_class2.prototype, "colorOverLifetimeModule", [ _dec20 ], Object.getOwnPropertyDescriptor(_class2.prototype, "colorOverLifetimeModule"), _class2.prototype), 
+    }), _applyDecoratedDescriptor(_class2.prototype, "colorOverLifetimeModule", [ _dec21 ], Object.getOwnPropertyDescriptor(_class2.prototype, "colorOverLifetimeModule"), _class2.prototype), 
     _descriptor21 = _applyDecoratedDescriptor(_class2.prototype, "_sizeOvertimeModule", [ property ], {
       configurable: true,
       enumerable: true,
@@ -11195,7 +11195,7 @@
       initializer: function initializer() {
         return new _sizeOvertime["default"]();
       }
-    }), _applyDecoratedDescriptor(_class2.prototype, "sizeOvertimeModule", [ _dec21 ], Object.getOwnPropertyDescriptor(_class2.prototype, "sizeOvertimeModule"), _class2.prototype), 
+    }), _applyDecoratedDescriptor(_class2.prototype, "sizeOvertimeModule", [ _dec22 ], Object.getOwnPropertyDescriptor(_class2.prototype, "sizeOvertimeModule"), _class2.prototype), 
     _descriptor22 = _applyDecoratedDescriptor(_class2.prototype, "_velocityOvertimeModule", [ property ], {
       configurable: true,
       enumerable: true,
@@ -11203,7 +11203,7 @@
       initializer: function initializer() {
         return new _velocityOvertime["default"]();
       }
-    }), _applyDecoratedDescriptor(_class2.prototype, "velocityOvertimeModule", [ _dec22 ], Object.getOwnPropertyDescriptor(_class2.prototype, "velocityOvertimeModule"), _class2.prototype), 
+    }), _applyDecoratedDescriptor(_class2.prototype, "velocityOvertimeModule", [ _dec23 ], Object.getOwnPropertyDescriptor(_class2.prototype, "velocityOvertimeModule"), _class2.prototype), 
     _descriptor23 = _applyDecoratedDescriptor(_class2.prototype, "_forceOvertimeModule", [ property ], {
       configurable: true,
       enumerable: true,
@@ -11211,7 +11211,7 @@
       initializer: function initializer() {
         return new _forceOvertime["default"]();
       }
-    }), _applyDecoratedDescriptor(_class2.prototype, "forceOvertimeModule", [ _dec23 ], Object.getOwnPropertyDescriptor(_class2.prototype, "forceOvertimeModule"), _class2.prototype), 
+    }), _applyDecoratedDescriptor(_class2.prototype, "forceOvertimeModule", [ _dec24 ], Object.getOwnPropertyDescriptor(_class2.prototype, "forceOvertimeModule"), _class2.prototype), 
     _descriptor24 = _applyDecoratedDescriptor(_class2.prototype, "_limitVelocityOvertimeModule", [ property ], {
       configurable: true,
       enumerable: true,
@@ -11219,7 +11219,7 @@
       initializer: function initializer() {
         return new _limitVelocityOvertime["default"]();
       }
-    }), _applyDecoratedDescriptor(_class2.prototype, "limitVelocityOvertimeModule", [ _dec24 ], Object.getOwnPropertyDescriptor(_class2.prototype, "limitVelocityOvertimeModule"), _class2.prototype), 
+    }), _applyDecoratedDescriptor(_class2.prototype, "limitVelocityOvertimeModule", [ _dec25 ], Object.getOwnPropertyDescriptor(_class2.prototype, "limitVelocityOvertimeModule"), _class2.prototype), 
     _descriptor25 = _applyDecoratedDescriptor(_class2.prototype, "_rotationOvertimeModule", [ property ], {
       configurable: true,
       enumerable: true,
@@ -11227,7 +11227,7 @@
       initializer: function initializer() {
         return new _rotationOvertime["default"]();
       }
-    }), _applyDecoratedDescriptor(_class2.prototype, "rotationOvertimeModule", [ _dec25 ], Object.getOwnPropertyDescriptor(_class2.prototype, "rotationOvertimeModule"), _class2.prototype), 
+    }), _applyDecoratedDescriptor(_class2.prototype, "rotationOvertimeModule", [ _dec26 ], Object.getOwnPropertyDescriptor(_class2.prototype, "rotationOvertimeModule"), _class2.prototype), 
     _descriptor26 = _applyDecoratedDescriptor(_class2.prototype, "_textureAnimationModule", [ property ], {
       configurable: true,
       enumerable: true,
@@ -11235,7 +11235,7 @@
       initializer: function initializer() {
         return new _textureAnimation["default"]();
       }
-    }), _applyDecoratedDescriptor(_class2.prototype, "textureAnimationModule", [ _dec26 ], Object.getOwnPropertyDescriptor(_class2.prototype, "textureAnimationModule"), _class2.prototype), 
+    }), _applyDecoratedDescriptor(_class2.prototype, "textureAnimationModule", [ _dec27 ], Object.getOwnPropertyDescriptor(_class2.prototype, "textureAnimationModule"), _class2.prototype), 
     _descriptor27 = _applyDecoratedDescriptor(_class2.prototype, "_trailModule", [ property ], {
       configurable: true,
       enumerable: true,
@@ -11243,7 +11243,7 @@
       initializer: function initializer() {
         return new _trail["default"]();
       }
-    }), _applyDecoratedDescriptor(_class2.prototype, "trailModule", [ _dec27 ], Object.getOwnPropertyDescriptor(_class2.prototype, "trailModule"), _class2.prototype), 
+    }), _applyDecoratedDescriptor(_class2.prototype, "trailModule", [ _dec28 ], Object.getOwnPropertyDescriptor(_class2.prototype, "trailModule"), _class2.prototype), 
     _descriptor28 = _applyDecoratedDescriptor(_class2.prototype, "_renderMode", [ property ], {
       configurable: true,
       enumerable: true,
@@ -11251,7 +11251,7 @@
       initializer: function initializer() {
         return _enum.RenderMode.Billboard;
       }
-    }), _applyDecoratedDescriptor(_class2.prototype, "renderMode", [ _dec28 ], Object.getOwnPropertyDescriptor(_class2.prototype, "renderMode"), _class2.prototype), 
+    }), _applyDecoratedDescriptor(_class2.prototype, "renderMode", [ _dec29 ], Object.getOwnPropertyDescriptor(_class2.prototype, "renderMode"), _class2.prototype), 
     _descriptor29 = _applyDecoratedDescriptor(_class2.prototype, "_velocityScale", [ property ], {
       configurable: true,
       enumerable: true,
@@ -11259,7 +11259,7 @@
       initializer: function initializer() {
         return 1;
       }
-    }), _applyDecoratedDescriptor(_class2.prototype, "velocityScale", [ _dec29 ], Object.getOwnPropertyDescriptor(_class2.prototype, "velocityScale"), _class2.prototype), 
+    }), _applyDecoratedDescriptor(_class2.prototype, "velocityScale", [ _dec30 ], Object.getOwnPropertyDescriptor(_class2.prototype, "velocityScale"), _class2.prototype), 
     _descriptor30 = _applyDecoratedDescriptor(_class2.prototype, "_lengthScale", [ property ], {
       configurable: true,
       enumerable: true,
@@ -11267,7 +11267,7 @@
       initializer: function initializer() {
         return 1;
       }
-    }), _applyDecoratedDescriptor(_class2.prototype, "lengthScale", [ _dec30 ], Object.getOwnPropertyDescriptor(_class2.prototype, "lengthScale"), _class2.prototype), 
+    }), _applyDecoratedDescriptor(_class2.prototype, "lengthScale", [ _dec31 ], Object.getOwnPropertyDescriptor(_class2.prototype, "lengthScale"), _class2.prototype), 
     _descriptor31 = _applyDecoratedDescriptor(_class2.prototype, "_mesh", [ property ], {
       configurable: true,
       enumerable: true,
@@ -11275,10 +11275,10 @@
       initializer: function initializer() {
         return null;
       }
-    }), _applyDecoratedDescriptor(_class2.prototype, "mesh", [ _dec31 ], Object.getOwnPropertyDescriptor(_class2.prototype, "mesh"), _class2.prototype), 
-    _applyDecoratedDescriptor(_class2.prototype, "particleMaterial", [ _dec32 ], Object.getOwnPropertyDescriptor(_class2.prototype, "particleMaterial"), _class2.prototype), 
-    _applyDecoratedDescriptor(_class2.prototype, "trailMaterial", [ _dec33 ], Object.getOwnPropertyDescriptor(_class2.prototype, "trailMaterial"), _class2.prototype), 
-    _class2)) || _class) || _class) || _class) || _class);
+    }), _applyDecoratedDescriptor(_class2.prototype, "mesh", [ _dec32 ], Object.getOwnPropertyDescriptor(_class2.prototype, "mesh"), _class2.prototype), 
+    _applyDecoratedDescriptor(_class2.prototype, "particleMaterial", [ _dec33 ], Object.getOwnPropertyDescriptor(_class2.prototype, "particleMaterial"), _class2.prototype), 
+    _applyDecoratedDescriptor(_class2.prototype, "trailMaterial", [ _dec34 ], Object.getOwnPropertyDescriptor(_class2.prototype, "trailMaterial"), _class2.prototype), 
+    _class2)) || _class) || _class) || _class) || _class) || _class);
     exports["default"] = ParticleSystem3D;
     false;
     cc.ParticleSystem3D = ParticleSystem3D;
@@ -14483,7 +14483,7 @@
     exports.BoxCollider3D = void 0;
     var _instance = require("../../instance");
     var _colliderComponent = require("./collider-component");
-    var _dec, _dec2, _dec3, _dec4, _class, _class2, _descriptor;
+    var _dec, _dec2, _dec3, _dec4, _dec5, _class, _class2, _descriptor;
     function _initializerDefineProperty(target, property, descriptor, context) {
       if (!descriptor) return;
       Object.defineProperty(target, property, {
@@ -14550,12 +14550,13 @@
       }
       return desc;
     }
-    var _cc$_decorator = cc._decorator, ccclass = _cc$_decorator.ccclass, executeInEditMode = _cc$_decorator.executeInEditMode, executionOrder = _cc$_decorator.executionOrder, menu = _cc$_decorator.menu, property = _cc$_decorator.property;
+    var _cc$_decorator = cc._decorator, ccclass = _cc$_decorator.ccclass, executeInEditMode = _cc$_decorator.executeInEditMode, executionOrder = _cc$_decorator.executionOrder, menu = _cc$_decorator.menu, property = _cc$_decorator.property, help = _cc$_decorator.help;
     var Vec3 = cc.Vec3;
     var BoxCollider3D = (_dec = ccclass("cc.BoxCollider3D"), _dec2 = executionOrder(98), 
-    _dec3 = menu("i18n:MAIN_MENU.component.physics/Collider/Box 3D"), _dec4 = property({
+    _dec3 = menu("i18n:MAIN_MENU.component.physics/Collider/Box 3D"), _dec4 = help("i18n:COMPONENT.help_url.physics-collider"), 
+    _dec5 = property({
       type: cc.Vec3
-    }), _dec(_class = _dec2(_class = _dec3(_class = executeInEditMode(_class = (_class2 = (function(_Collider3D) {
+    }), _dec(_class = _dec2(_class = _dec3(_class = executeInEditMode(_class = _dec4(_class = (_class2 = (function(_Collider3D) {
       _inheritsLoose(BoxCollider3D, _Collider3D);
       function BoxCollider3D() {
         var _this;
@@ -14582,7 +14583,7 @@
         }
       } ]);
       return BoxCollider3D;
-    })(_colliderComponent.Collider3D), _applyDecoratedDescriptor(_class2.prototype, "size", [ _dec4 ], Object.getOwnPropertyDescriptor(_class2.prototype, "size"), _class2.prototype), 
+    })(_colliderComponent.Collider3D), _applyDecoratedDescriptor(_class2.prototype, "size", [ _dec5 ], Object.getOwnPropertyDescriptor(_class2.prototype, "size"), _class2.prototype), 
     _descriptor = _applyDecoratedDescriptor(_class2.prototype, "_size", [ property ], {
       configurable: true,
       enumerable: true,
@@ -14590,7 +14591,7 @@
       initializer: function initializer() {
         return new Vec3(1, 1, 1);
       }
-    }), _class2)) || _class) || _class) || _class) || _class);
+    }), _class2)) || _class) || _class) || _class) || _class) || _class);
     exports.BoxCollider3D = BoxCollider3D;
   }), {
     "../../instance": 77,
@@ -14839,7 +14840,7 @@
     exports.SphereCollider3D = void 0;
     var _instance = require("../../instance");
     var _colliderComponent = require("./collider-component");
-    var _dec, _dec2, _dec3, _class, _class2, _descriptor;
+    var _dec, _dec2, _dec3, _dec4, _class, _class2, _descriptor;
     function _initializerDefineProperty(target, property, descriptor, context) {
       if (!descriptor) return;
       Object.defineProperty(target, property, {
@@ -14906,9 +14907,10 @@
       }
       return desc;
     }
-    var _cc$_decorator = cc._decorator, ccclass = _cc$_decorator.ccclass, executeInEditMode = _cc$_decorator.executeInEditMode, executionOrder = _cc$_decorator.executionOrder, menu = _cc$_decorator.menu, property = _cc$_decorator.property;
+    var _cc$_decorator = cc._decorator, ccclass = _cc$_decorator.ccclass, executeInEditMode = _cc$_decorator.executeInEditMode, executionOrder = _cc$_decorator.executionOrder, menu = _cc$_decorator.menu, property = _cc$_decorator.property, help = _cc$_decorator.help;
     var SphereCollider3D = (_dec = ccclass("cc.SphereCollider3D"), _dec2 = executionOrder(98), 
-    _dec3 = menu("i18n:MAIN_MENU.component.physics/Collider/Sphere 3D"), _dec(_class = _dec2(_class = _dec3(_class = executeInEditMode(_class = (_class2 = (function(_Collider3D) {
+    _dec3 = menu("i18n:MAIN_MENU.component.physics/Collider/Sphere 3D"), _dec4 = help("i18n:COMPONENT.help_url.physics-collider"), 
+    _dec(_class = _dec2(_class = _dec3(_class = _dec4(_class = executeInEditMode(_class = (_class2 = (function(_Collider3D) {
       _inheritsLoose(SphereCollider3D, _Collider3D);
       function SphereCollider3D() {
         var _this;
@@ -14943,7 +14945,7 @@
       initializer: function initializer() {
         return .5;
       }
-    }), _class2)) || _class) || _class) || _class) || _class);
+    }), _class2)) || _class) || _class) || _class) || _class) || _class);
     exports.SphereCollider3D = SphereCollider3D;
   }), {
     "../../instance": 77,
@@ -14954,7 +14956,7 @@
     exports.__esModule = true;
     exports.ConstantForce = void 0;
     var _rigidBodyComponent = require("./rigid-body-component");
-    var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _class, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4;
+    var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _class, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4;
     function _initializerDefineProperty(target, property, descriptor, context) {
       if (!descriptor) return;
       Object.defineProperty(target, property, {
@@ -15021,19 +15023,19 @@
     function _initializerWarningHelper(descriptor, context) {
       throw new Error("Decorating class property failed. Please ensure that proposal-class-properties is enabled and runs after the decorators transform.");
     }
-    var _cc$_decorator = cc._decorator, ccclass = _cc$_decorator.ccclass, executeInEditMode = _cc$_decorator.executeInEditMode, executionOrder = _cc$_decorator.executionOrder, menu = _cc$_decorator.menu, property = _cc$_decorator.property, requireComponent = _cc$_decorator.requireComponent, disallowMultiple = _cc$_decorator.disallowMultiple;
+    var _cc$_decorator = cc._decorator, ccclass = _cc$_decorator.ccclass, executeInEditMode = _cc$_decorator.executeInEditMode, executionOrder = _cc$_decorator.executionOrder, menu = _cc$_decorator.menu, property = _cc$_decorator.property, requireComponent = _cc$_decorator.requireComponent, disallowMultiple = _cc$_decorator.disallowMultiple, help = _cc$_decorator.help;
     var Vec3 = cc.Vec3;
     var ConstantForce = (_dec = ccclass("cc.ConstantForce"), _dec2 = executionOrder(98), 
     _dec3 = requireComponent(_rigidBodyComponent.RigidBody3D), _dec4 = menu("i18n:MAIN_MENU.component.physics/Constant Force 3D"), 
-    _dec5 = property({
+    _dec5 = help("i18n:COMPONENT.help_url.constantforce"), _dec6 = property({
       displayOrder: 0
-    }), _dec6 = property({
-      displayOrder: 1
     }), _dec7 = property({
-      displayOrder: 2
+      displayOrder: 1
     }), _dec8 = property({
+      displayOrder: 2
+    }), _dec9 = property({
       displayOrder: 3
-    }), _dec(_class = _dec2(_class = _dec3(_class = _dec4(_class = disallowMultiple(_class = executeInEditMode(_class = (_class2 = (function(_cc$Component) {
+    }), _dec(_class = _dec2(_class = _dec3(_class = _dec4(_class = _dec5(_class = disallowMultiple(_class = executeInEditMode(_class = (_class2 = (function(_cc$Component) {
       _inheritsLoose(ConstantForce, _cc$Component);
       function ConstantForce() {
         var _this;
@@ -15134,11 +15136,11 @@
       initializer: function initializer() {
         return new Vec3();
       }
-    }), _applyDecoratedDescriptor(_class2.prototype, "force", [ _dec5 ], Object.getOwnPropertyDescriptor(_class2.prototype, "force"), _class2.prototype), 
-    _applyDecoratedDescriptor(_class2.prototype, "localForce", [ _dec6 ], Object.getOwnPropertyDescriptor(_class2.prototype, "localForce"), _class2.prototype), 
-    _applyDecoratedDescriptor(_class2.prototype, "torque", [ _dec7 ], Object.getOwnPropertyDescriptor(_class2.prototype, "torque"), _class2.prototype), 
-    _applyDecoratedDescriptor(_class2.prototype, "localTorque", [ _dec8 ], Object.getOwnPropertyDescriptor(_class2.prototype, "localTorque"), _class2.prototype), 
-    _class2)) || _class) || _class) || _class) || _class) || _class) || _class);
+    }), _applyDecoratedDescriptor(_class2.prototype, "force", [ _dec6 ], Object.getOwnPropertyDescriptor(_class2.prototype, "force"), _class2.prototype), 
+    _applyDecoratedDescriptor(_class2.prototype, "localForce", [ _dec7 ], Object.getOwnPropertyDescriptor(_class2.prototype, "localForce"), _class2.prototype), 
+    _applyDecoratedDescriptor(_class2.prototype, "torque", [ _dec8 ], Object.getOwnPropertyDescriptor(_class2.prototype, "torque"), _class2.prototype), 
+    _applyDecoratedDescriptor(_class2.prototype, "localTorque", [ _dec9 ], Object.getOwnPropertyDescriptor(_class2.prototype, "localTorque"), _class2.prototype), 
+    _class2)) || _class) || _class) || _class) || _class) || _class) || _class) || _class);
     exports.ConstantForce = ConstantForce;
   }), {
     "./rigid-body-component": 75
@@ -15148,7 +15150,7 @@
     exports.__esModule = true;
     exports.RigidBody3D = void 0;
     var _instance = require("../instance");
-    var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _dec10, _dec11, _class, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, _descriptor8;
+    var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _dec10, _dec11, _dec12, _class, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, _descriptor8;
     function _initializerDefineProperty(target, property, descriptor, context) {
       if (!descriptor) return;
       Object.defineProperty(target, property, {
@@ -15215,26 +15217,27 @@
       }
       return desc;
     }
-    var _cc$_decorator = cc._decorator, ccclass = _cc$_decorator.ccclass, disallowMultiple = _cc$_decorator.disallowMultiple, executeInEditMode = _cc$_decorator.executeInEditMode, executionOrder = _cc$_decorator.executionOrder, menu = _cc$_decorator.menu, property = _cc$_decorator.property;
+    var _cc$_decorator = cc._decorator, ccclass = _cc$_decorator.ccclass, disallowMultiple = _cc$_decorator.disallowMultiple, executeInEditMode = _cc$_decorator.executeInEditMode, executionOrder = _cc$_decorator.executionOrder, menu = _cc$_decorator.menu, property = _cc$_decorator.property, help = _cc$_decorator.help;
     var Vec3 = cc.Vec3;
     var RigidBody3D = (_dec = ccclass("cc.RigidBody3D"), _dec2 = executionOrder(99), 
-    _dec3 = menu("i18n:MAIN_MENU.component.physics/Rigid Body 3D"), _dec4 = property({
+    _dec3 = menu("i18n:MAIN_MENU.component.physics/Rigid Body 3D"), _dec4 = help("i18n:COMPONENT.help_url.physics-rigidbody"), 
+    _dec5 = property({
       displayOrder: 0
-    }), _dec5 = property({
-      displayOrder: 1
     }), _dec6 = property({
-      displayOrder: 2
+      displayOrder: 1
     }), _dec7 = property({
-      displayOrder: 3
+      displayOrder: 2
     }), _dec8 = property({
-      displayOrder: 4
+      displayOrder: 3
     }), _dec9 = property({
-      displayOrder: 5
+      displayOrder: 4
     }), _dec10 = property({
-      displayOrder: 6
+      displayOrder: 5
     }), _dec11 = property({
+      displayOrder: 6
+    }), _dec12 = property({
       displayOrder: 7
-    }), _dec(_class = _dec2(_class = _dec3(_class = executeInEditMode(_class = disallowMultiple(_class = (_class2 = (function(_cc$Component) {
+    }), _dec(_class = _dec2(_class = _dec3(_class = _dec4(_class = executeInEditMode(_class = disallowMultiple(_class = (_class2 = (function(_cc$Component) {
       _inheritsLoose(RigidBody3D, _cc$Component);
       function RigidBody3D() {
         var _this;
@@ -15428,14 +15431,14 @@
         }
       } ]);
       return RigidBody3D;
-    })(cc.Component), _applyDecoratedDescriptor(_class2.prototype, "mass", [ _dec4 ], Object.getOwnPropertyDescriptor(_class2.prototype, "mass"), _class2.prototype), 
-    _applyDecoratedDescriptor(_class2.prototype, "linearDamping", [ _dec5 ], Object.getOwnPropertyDescriptor(_class2.prototype, "linearDamping"), _class2.prototype), 
-    _applyDecoratedDescriptor(_class2.prototype, "angularDamping", [ _dec6 ], Object.getOwnPropertyDescriptor(_class2.prototype, "angularDamping"), _class2.prototype), 
-    _applyDecoratedDescriptor(_class2.prototype, "isKinematic", [ _dec7 ], Object.getOwnPropertyDescriptor(_class2.prototype, "isKinematic"), _class2.prototype), 
-    _applyDecoratedDescriptor(_class2.prototype, "useGravity", [ _dec8 ], Object.getOwnPropertyDescriptor(_class2.prototype, "useGravity"), _class2.prototype), 
-    _applyDecoratedDescriptor(_class2.prototype, "fixedRotation", [ _dec9 ], Object.getOwnPropertyDescriptor(_class2.prototype, "fixedRotation"), _class2.prototype), 
-    _applyDecoratedDescriptor(_class2.prototype, "linearFactor", [ _dec10 ], Object.getOwnPropertyDescriptor(_class2.prototype, "linearFactor"), _class2.prototype), 
-    _applyDecoratedDescriptor(_class2.prototype, "angularFactor", [ _dec11 ], Object.getOwnPropertyDescriptor(_class2.prototype, "angularFactor"), _class2.prototype), 
+    })(cc.Component), _applyDecoratedDescriptor(_class2.prototype, "mass", [ _dec5 ], Object.getOwnPropertyDescriptor(_class2.prototype, "mass"), _class2.prototype), 
+    _applyDecoratedDescriptor(_class2.prototype, "linearDamping", [ _dec6 ], Object.getOwnPropertyDescriptor(_class2.prototype, "linearDamping"), _class2.prototype), 
+    _applyDecoratedDescriptor(_class2.prototype, "angularDamping", [ _dec7 ], Object.getOwnPropertyDescriptor(_class2.prototype, "angularDamping"), _class2.prototype), 
+    _applyDecoratedDescriptor(_class2.prototype, "isKinematic", [ _dec8 ], Object.getOwnPropertyDescriptor(_class2.prototype, "isKinematic"), _class2.prototype), 
+    _applyDecoratedDescriptor(_class2.prototype, "useGravity", [ _dec9 ], Object.getOwnPropertyDescriptor(_class2.prototype, "useGravity"), _class2.prototype), 
+    _applyDecoratedDescriptor(_class2.prototype, "fixedRotation", [ _dec10 ], Object.getOwnPropertyDescriptor(_class2.prototype, "fixedRotation"), _class2.prototype), 
+    _applyDecoratedDescriptor(_class2.prototype, "linearFactor", [ _dec11 ], Object.getOwnPropertyDescriptor(_class2.prototype, "linearFactor"), _class2.prototype), 
+    _applyDecoratedDescriptor(_class2.prototype, "angularFactor", [ _dec12 ], Object.getOwnPropertyDescriptor(_class2.prototype, "angularFactor"), _class2.prototype), 
     _descriptor = _applyDecoratedDescriptor(_class2.prototype, "_mass", [ property ], {
       configurable: true,
       enumerable: true,
@@ -15492,7 +15495,7 @@
       initializer: function initializer() {
         return new Vec3(1, 1, 1);
       }
-    }), _class2)) || _class) || _class) || _class) || _class) || _class);
+    }), _class2)) || _class) || _class) || _class) || _class) || _class) || _class);
     exports.RigidBody3D = RigidBody3D;
   }), {
     "../instance": 77
@@ -22424,6 +22427,7 @@
       ".image": downloadImage,
       ".pvr": downloadArrayBuffer,
       ".pkm": downloadArrayBuffer,
+      ".astc": downloadArrayBuffer,
       ".mp3": downloadAudio,
       ".ogg": downloadAudio,
       ".wav": downloadAudio,
@@ -22575,6 +22579,7 @@
       ".image": createTexture,
       ".pvr": createTexture,
       ".pkm": createTexture,
+      ".astc": createTexture,
       ".mp3": createAudioClip,
       ".ogg": createAudioClip,
       ".wav": createAudioClip,
@@ -23246,6 +23251,67 @@
           onComplete && onComplete(err, out);
         };
       })(),
+      parseASTCTex: (function() {
+        var ASTC_MAGIC = 1554098963;
+        var ASTC_HEADER_LENGTH = 16;
+        var ASTC_HEADER_MAGIC = 4;
+        var ASTC_HEADER_BLOCKDIM = 3;
+        var ASTC_HEADER_SIZE_X_BEGIN = 7;
+        var ASTC_HEADER_SIZE_Y_BEGIN = 10;
+        var ASTC_HEADER_SIZE_Z_BEGIN = 13;
+        function getASTCFormat(xdim, ydim) {
+          if (4 === xdim) return cc.Texture2D.PixelFormat.RGBA_ASTC_4x4;
+          if (5 === xdim) {
+            if (4 === ydim) return cc.Texture2D.PixelFormat.RGBA_ASTC_5x4;
+            return cc.Texture2D.PixelFormat.RGBA_ASTC_5x5;
+          }
+          if (6 === xdim) {
+            if (5 === ydim) return cc.Texture2D.PixelFormat.RGBA_ASTC_6x5;
+            return cc.Texture2D.PixelFormat.RGBA_ASTC_6x6;
+          }
+          if (8 === xdim) {
+            if (5 === ydim) return cc.Texture2D.PixelFormat.RGBA_ASTC_8x5;
+            if (6 === ydim) return cc.Texture2D.PixelFormat.RGBA_ASTC_8x6;
+            return cc.Texture2D.PixelFormat.RGBA_ASTC_8x8;
+          }
+          if (10 === xdim) {
+            if (5 === ydim) return cc.Texture2D.PixelFormat.RGBA_ASTC_10x5;
+            if (6 === ydim) return cc.Texture2D.PixelFormat.RGBA_ASTC_10x6;
+            if (8 === ydim) return cc.Texture2D.PixelFormat.RGBA_ASTC_10x8;
+            return cc.Texture2D.PixelFormat.RGBA_ASTC_10x10;
+          }
+          if (10 === ydim) return cc.Texture2D.PixelFormat.RGBA_ASTC_12x10;
+          return cc.Texture2D.PixelFormat.RGBA_ASTC_12x12;
+        }
+        return function(file, options, onComplete) {
+          var err = null, out = null;
+          try {
+            var buffer = file instanceof ArrayBuffer ? file : file.buffer;
+            var header = new Uint8Array(buffer);
+            var magicval = header[0] + (header[1] << 8) + (header[2] << 16) + (header[3] << 24);
+            if (magicval !== ASTC_MAGIC) return new Error("Invalid magic number in ASTC header");
+            var xdim = header[ASTC_HEADER_MAGIC];
+            var ydim = header[ASTC_HEADER_MAGIC + 1];
+            var zdim = header[ASTC_HEADER_MAGIC + 2];
+            if ((xdim < 3 || xdim > 6 || ydim < 3 || ydim > 6 || zdim < 3 || zdim > 6) && (xdim < 4 || 7 === xdim || 9 === xdim || 11 === xdim || xdim > 12 || ydim < 4 || 7 === ydim || 9 === ydim || 11 === ydim || ydim > 12 || 1 !== zdim)) return new Error("Invalid block number in ASTC header");
+            var format = getASTCFormat(xdim, ydim);
+            var xsize = header[ASTC_HEADER_SIZE_X_BEGIN] + (header[ASTC_HEADER_SIZE_X_BEGIN + 1] << 8) + (header[ASTC_HEADER_SIZE_X_BEGIN + 2] << 16);
+            var ysize = header[ASTC_HEADER_SIZE_Y_BEGIN] + (header[ASTC_HEADER_SIZE_Y_BEGIN + 1] << 8) + (header[ASTC_HEADER_SIZE_Y_BEGIN + 2] << 16);
+            var zsize = header[ASTC_HEADER_SIZE_Z_BEGIN] + (header[ASTC_HEADER_SIZE_Z_BEGIN + 1] << 8) + (header[ASTC_HEADER_SIZE_Z_BEGIN + 2] << 16);
+            var astcData = new Uint8Array(buffer, ASTC_HEADER_LENGTH);
+            out = {
+              _data: astcData,
+              _compressed: true,
+              width: xsize,
+              height: ysize,
+              format: format
+            };
+          } catch (e) {
+            err = e;
+          }
+          onComplete(err, out);
+        };
+      })(),
       parsePlist: function parsePlist(file, options, onComplete) {
         var err = null;
         var result = plistParser.parse(file);
@@ -23292,6 +23358,7 @@
       ".image": parser.parseImage,
       ".pvr": parser.parsePVRTex,
       ".pkm": parser.parsePKMTex,
+      ".astc": parser.parseASTCTex,
       ".mp3": parser.parseAudio,
       ".ogg": parser.parseAudio,
       ".wav": parser.parseAudio,
@@ -25243,7 +25310,21 @@
       RGB_ETC1: _gfx["default"].TEXTURE_FMT_RGB_ETC1,
       RGBA_ETC1: CUSTOM_PIXEL_FORMAT++,
       RGB_ETC2: _gfx["default"].TEXTURE_FMT_RGB_ETC2,
-      RGBA_ETC2: _gfx["default"].TEXTURE_FMT_RGBA_ETC2
+      RGBA_ETC2: _gfx["default"].TEXTURE_FMT_RGBA_ETC2,
+      RGBA_ASTC_4x4: _gfx["default"].TEXTURE_FMT_RGBA_ASTC_4X4,
+      RGBA_ASTC_5x4: _gfx["default"].TEXTURE_FMT_RGBA_ASTC_5X4,
+      RGBA_ASTC_5x5: _gfx["default"].TEXTURE_FMT_RGBA_ASTC_5X5,
+      RGBA_ASTC_6x5: _gfx["default"].TEXTURE_FMT_RGBA_ASTC_6X5,
+      RGBA_ASTC_6x6: _gfx["default"].TEXTURE_FMT_RGBA_ASTC_6X6,
+      RGBA_ASTC_8x5: _gfx["default"].TEXTURE_FMT_RGBA_ASTC_8X5,
+      RGBA_ASTC_8x6: _gfx["default"].TEXTURE_FMT_RGBA_ASTC_8X6,
+      RGBA_ASTC_8x8: _gfx["default"].TEXTURE_FMT_RGBA_ASTC_8X8,
+      RGBA_ASTC_10x5: _gfx["default"].TEXTURE_FMT_RGBA_ASTC_10X5,
+      RGBA_ASTC_10x6: _gfx["default"].TEXTURE_FMT_RGBA_ASTC_10X6,
+      RGBA_ASTC_10x8: _gfx["default"].TEXTURE_FMT_RGBA_ASTC_10X8,
+      RGBA_ASTC_10x10: _gfx["default"].TEXTURE_FMT_RGBA_ASTC_10X10,
+      RGBA_ASTC_12x10: _gfx["default"].TEXTURE_FMT_RGBA_ASTC_12X10,
+      RGBA_ASTC_12x12: _gfx["default"].TEXTURE_FMT_RGBA_ASTC_12X12
     });
     var WrapMode = cc.Enum({
       REPEAT: GL_REPEAT,
@@ -25342,7 +25423,7 @@
         WrapMode: WrapMode,
         Filter: Filter,
         _FilterIndex: FilterIndex,
-        extnames: [ ".png", ".jpg", ".jpeg", ".bmp", ".webp", ".pvr", ".pkm" ],
+        extnames: [ ".png", ".jpg", ".jpeg", ".bmp", ".webp", ".pvr", ".pkm", ".astc" ],
         _parseExt: function _parseExt(extIdStr, defaultFormat) {
           var device = cc.renderer.device;
           var extIds = extIdStr.split("_");
@@ -25358,6 +25439,7 @@
             var index = SupportTextureFormats.indexOf(tmpExt);
             if (-1 !== index && index < bestIndex) {
               var tmpFormat = extFormat[1] ? parseInt(extFormat[1]) : defaultFormat;
+              if (".astc" === tmpExt && !device.ext("WEBGL_compressed_texture_astc")) continue;
               if (".pvr" === tmpExt && !device.ext("WEBGL_compressed_texture_pvrtc")) continue;
               if (!(tmpFormat !== PixelFormat.RGB_ETC1 && tmpFormat !== PixelFormat.RGBA_ETC1 || device.ext("WEBGL_compressed_texture_etc1"))) continue;
               if (!(tmpFormat !== PixelFormat.RGB_ETC2 && tmpFormat !== PixelFormat.RGBA_ETC2 || device.ext("WEBGL_compressed_texture_etc"))) continue;
@@ -33926,6 +34008,7 @@
       },
       onEnable: function onEnable() {
         this._super();
+        this._validateRender();
         this._spriteFrame && this._spriteFrame.isValid && this._spriteFrame.ensureLoadTexture();
         this.node.on(cc.Node.EventType.SIZE_CHANGED, this.setVertsDirty, this);
         this.node.on(cc.Node.EventType.ANCHOR_CHANGED, this.setVertsDirty, this);
@@ -41245,6 +41328,7 @@
       mixins: [ cc.Collider.Box ],
       editor: {
         menu: false,
+        help: "i18n:COMPONENT.help_url.edit-collider-component",
         requireComponent: cc.RigidBody
       },
       _createShape: function _createShape(scale) {
@@ -41272,6 +41356,7 @@
       editor: {
         menu: false,
         inspector: false,
+        help: "i18n:COMPONENT.help_url.edit-collider-component",
         requireComponent: cc.RigidBody
       },
       properties: {
@@ -41315,6 +41400,7 @@
       mixins: [ cc.Collider.Circle ],
       editor: {
         menu: false,
+        help: "i18n:COMPONENT.help_url.edit-collider-component",
         requireComponent: cc.RigidBody
       },
       _createShape: function _createShape(scale) {
@@ -41519,6 +41605,7 @@
       editor: {
         menu: false,
         inspector: false,
+        help: "i18n:COMPONENT.help_url.edit-collider-component",
         requireComponent: cc.RigidBody
       },
       _createShape: function _createShape(scale) {
@@ -44006,7 +44093,7 @@
         cc.RotateTo && cc.RotateBy && (cc.RotateTo._reverse = cc.RotateBy._reverse = value);
       }
     });
-    var SUPPORT_TEXTURE_FORMATS = [ ".pkm", ".pvr", ".webp", ".jpg", ".jpeg", ".bmp", ".png" ];
+    var SUPPORT_TEXTURE_FORMATS = [ ".astc", ".pkm", ".pvr", ".webp", ".jpg", ".jpeg", ".bmp", ".png" ];
     cc.macro.SUPPORT_TEXTURE_FORMATS = SUPPORT_TEXTURE_FORMATS;
     cc.macro.KEY = {
       none: 0,
@@ -44556,6 +44643,7 @@
       sys.LANGUAGE_ROMANIAN = "ro";
       sys.LANGUAGE_BULGARIAN = "bg";
       sys.LANGUAGE_UNKNOWN = "unknown";
+      sys.OS_OPENHARMONY = "OpenHarmony";
       sys.OS_IOS = "iOS";
       sys.OS_ANDROID = "Android";
       sys.OS_WINDOWS = "Windows";
@@ -44580,6 +44668,7 @@
       sys.TIZEN = 9;
       sys.WINRT = 10;
       sys.WP8 = 11;
+      sys.OPENHARMONY = 12;
       sys.MOBILE_BROWSER = 100;
       sys.DESKTOP_BROWSER = 101;
       sys.EDITOR_PAGE = 102;
@@ -44601,6 +44690,7 @@
       sys.BYTEDANCE_GAME_SUB = 118;
       sys.LINKSURE = 119;
       sys.TAOBAO = 120;
+      sys.TAOBAO_MINIGAME = 121;
       sys.BROWSER_TYPE_WECHAT = "wechat";
       sys.BROWSER_TYPE_ANDROID = "androidbrowser";
       sys.BROWSER_TYPE_IE = "ie";
@@ -44668,7 +44758,7 @@
         var platform;
         platform = isVivoGame ? sys.VIVO_GAME : isOppoGame ? sys.OPPO_GAME : isHuaweiGame ? sys.HUAWEI_GAME : isJKWGame ? sys.JKW_GAME : isQttGame ? sys.QTT_GAME : isLinkSure ? sys.LINKSURE : __getPlatform();
         sys.platform = platform;
-        sys.isMobile = platform === sys.ANDROID || platform === sys.IPAD || platform === sys.IPHONE || platform === sys.WP8 || platform === sys.TIZEN || platform === sys.BLACKBERRY || platform === sys.XIAOMI_GAME || isVivoGame || isOppoGame || isHuaweiGame || isJKWGame || isQttGame;
+        sys.isMobile = platform === sys.ANDROID || platform === sys.IPAD || platform === sys.IPHONE || platform === sys.WP8 || platform === sys.TIZEN || platform === sys.BLACKBERRY || platform === sys.XIAOMI_GAME || platform === sys.OPENHARMONY || isVivoGame || isOppoGame || isHuaweiGame || isJKWGame || isQttGame;
         sys.os = __getOS();
         sys.language = __getCurrentLanguage();
         var languageCode;
@@ -45180,7 +45270,7 @@
         this._setupStyle(view, w, h);
         var devicePixelRatio = view._devicePixelRatio = 1;
         true;
-        devicePixelRatio = view._devicePixelRatio = window.devicePixelRatio;
+        devicePixelRatio = globalThis.oh ? view._devicePixelRatio = globalThis.oh.devicePixelRatio : view._devicePixelRatio = window.devicePixelRatio;
         locCanvas.width = w * devicePixelRatio;
         locCanvas.height = h * devicePixelRatio;
       },
@@ -53110,8 +53200,8 @@
         this._layout.init(comp);
         this._cfg = new DataView(this._layout._cfg);
         this._layoutInfo = new DataView(this._layout._layout);
-        this._cfgFields = jsb.LabelRenderer._cfgFields;
-        this._layoutFields = jsb.LabelRenderer._layoutFields;
+        this._cfgFields = "string" == typeof jsb.LabelRenderer._cfgFields ? JSON.parse(jsb.LabelRenderer._cfgFields) : jsb.LabelRenderer._cfgFields;
+        this._layoutFields = "string" == typeof jsb.LabelRenderer._layoutFields ? JSON.parse(jsb.LabelRenderer._layoutFields) : jsb.LabelRenderer._layoutFields;
         this._layout.bindNodeProxy(comp.node._proxy);
         this._bindMaterial(comp);
       };
@@ -66186,6 +66276,34 @@
       TEXTURE_FMT_D24S8: 27,
       TEXTURE_FMT_RGB_ETC2: 28,
       TEXTURE_FMT_RGBA_ETC2: 29,
+      TEXTURE_FMT_RGBA_ASTC_4X4: 30,
+      TEXTURE_FMT_RGBA_ASTC_5X4: 31,
+      TEXTURE_FMT_RGBA_ASTC_5X5: 32,
+      TEXTURE_FMT_RGBA_ASTC_6X5: 33,
+      TEXTURE_FMT_RGBA_ASTC_6X6: 34,
+      TEXTURE_FMT_RGBA_ASTC_8X5: 35,
+      TEXTURE_FMT_RGBA_ASTC_8X6: 36,
+      TEXTURE_FMT_RGBA_ASTC_8X8: 37,
+      TEXTURE_FMT_RGBA_ASTC_10X5: 38,
+      TEXTURE_FMT_RGBA_ASTC_10X6: 39,
+      TEXTURE_FMT_RGBA_ASTC_10X8: 40,
+      TEXTURE_FMT_RGBA_ASTC_10X10: 41,
+      TEXTURE_FMT_RGBA_ASTC_12X10: 42,
+      TEXTURE_FMT_RGBA_ASTC_12X12: 43,
+      TEXTURE_FMT_SRGBA_ASTC_4X4: 44,
+      TEXTURE_FMT_SRGBA_ASTC_5X4: 45,
+      TEXTURE_FMT_SRGBA_ASTC_5X5: 46,
+      TEXTURE_FMT_SRGBA_ASTC_6X5: 47,
+      TEXTURE_FMT_SRGBA_ASTC_6X6: 48,
+      TEXTURE_FMT_SRGBA_ASTC_8X5: 49,
+      TEXTURE_FMT_SRGBA_ASTC_8X6: 50,
+      TEXTURE_FMT_SRGBA_ASTC_8X8: 51,
+      TEXTURE_FMT_SRGBA_ASTC_10X5: 52,
+      TEXTURE_FMT_SRGBA_ASTC_10X6: 53,
+      TEXTURE_FMT_SRGBA_ASTC_10X8: 54,
+      TEXTURE_FMT_SRGBA_ASTC_10X10: 55,
+      TEXTURE_FMT_SRGBA_ASTC_12X10: 56,
+      TEXTURE_FMT_SRGBA_ASTC_12X12: 57,
       DS_FUNC_NEVER: 512,
       DS_FUNC_LESS: 513,
       DS_FUNC_EQUAL: 514,
@@ -66488,6 +66606,34 @@
       GFXFormat[GFXFormat["PVRTC_RGBA4"] = 89] = "PVRTC_RGBA4";
       GFXFormat[GFXFormat["PVRTC2_2BPP"] = 90] = "PVRTC2_2BPP";
       GFXFormat[GFXFormat["PVRTC2_4BPP"] = 91] = "PVRTC2_4BPP";
+      GFXFormat[GFXFormat["ASTC_RGBA_4x4"] = 92] = "ASTC_RGBA_4x4";
+      GFXFormat[GFXFormat["ASTC_RGBA_5x4"] = 92] = "ASTC_RGBA_5x4";
+      GFXFormat[GFXFormat["ASTC_RGBA_5x5"] = 92] = "ASTC_RGBA_5x5";
+      GFXFormat[GFXFormat["ASTC_RGBA_6x5"] = 92] = "ASTC_RGBA_6x5";
+      GFXFormat[GFXFormat["ASTC_RGBA_6x6"] = 92] = "ASTC_RGBA_6x6";
+      GFXFormat[GFXFormat["ASTC_RGBA_8x5"] = 92] = "ASTC_RGBA_8x5";
+      GFXFormat[GFXFormat["ASTC_RGBA_8x6"] = 92] = "ASTC_RGBA_8x6";
+      GFXFormat[GFXFormat["ASTC_RGBA_8x8"] = 92] = "ASTC_RGBA_8x8";
+      GFXFormat[GFXFormat["ASTC_RGBA_10x5"] = 92] = "ASTC_RGBA_10x5";
+      GFXFormat[GFXFormat["ASTC_RGBA_10x6"] = 92] = "ASTC_RGBA_10x6";
+      GFXFormat[GFXFormat["ASTC_RGBA_10x8"] = 92] = "ASTC_RGBA_10x8";
+      GFXFormat[GFXFormat["ASTC_RGBA_10x10"] = 92] = "ASTC_RGBA_10x10";
+      GFXFormat[GFXFormat["ASTC_RGBA_12x10"] = 92] = "ASTC_RGBA_12x10";
+      GFXFormat[GFXFormat["ASTC_RGBA_12x12"] = 92] = "ASTC_RGBA_12x12";
+      GFXFormat[GFXFormat["ASTC_SRGBA_4x4"] = 92] = "ASTC_SRGBA_4x4";
+      GFXFormat[GFXFormat["ASTC_SRGBA_5x4"] = 92] = "ASTC_SRGBA_5x4";
+      GFXFormat[GFXFormat["ASTC_SRGBA_5x5"] = 92] = "ASTC_SRGBA_5x5";
+      GFXFormat[GFXFormat["ASTC_SRGBA_6x5"] = 92] = "ASTC_SRGBA_6x5";
+      GFXFormat[GFXFormat["ASTC_SRGBA_6x6"] = 92] = "ASTC_SRGBA_6x6";
+      GFXFormat[GFXFormat["ASTC_SRGBA_8x5"] = 92] = "ASTC_SRGBA_8x5";
+      GFXFormat[GFXFormat["ASTC_SRGBA_8x6"] = 92] = "ASTC_SRGBA_8x6";
+      GFXFormat[GFXFormat["ASTC_SRGBA_8x8"] = 92] = "ASTC_SRGBA_8x8";
+      GFXFormat[GFXFormat["ASTC_SRGBA_10x5"] = 92] = "ASTC_SRGBA_10x5";
+      GFXFormat[GFXFormat["ASTC_SRGBA_10x6"] = 92] = "ASTC_SRGBA_10x6";
+      GFXFormat[GFXFormat["ASTC_SRGBA_10x8"] = 92] = "ASTC_SRGBA_10x8";
+      GFXFormat[GFXFormat["ASTC_SRGBA_10x10"] = 92] = "ASTC_SRGBA_10x10";
+      GFXFormat[GFXFormat["ASTC_SRGBA_12x10"] = 92] = "ASTC_SRGBA_12x10";
+      GFXFormat[GFXFormat["ASTC_SRGBA_12x12"] = 92] = "ASTC_SRGBA_12x12";
     })(GFXFormat || (GFXFormat = {}));
     var GFXBufferUsageBit;
     (function(GFXBufferUsageBit) {
@@ -71048,8 +71194,8 @@
         video.addEventListener("pause", cbs.pause);
         video.addEventListener("click", cbs.click);
         function onCanPlay() {
-          if (self._loaded || self._playing) return;
           var video = self._video;
+          if (self._loaded || !video) return;
           if (video.readyState === READY_STATE.HAVE_ENOUGH_DATA || video.readyState === READY_STATE.HAVE_METADATA) {
             video.currentTime = 0;
             self._loaded = true;
@@ -73653,7 +73799,7 @@
         return cc.Material.getBuiltinMaterial("2d-spine");
       },
       _updateMaterial: function _updateMaterial() {
-        var useTint = this.useTint;
+        var useTint = this.useTint || this.isAnimationCached() && false;
         var baseMaterial = this.getMaterial(0);
         if (baseMaterial) {
           var isMultiSupport = baseMaterial.material.isMultiSupport();
@@ -73681,7 +73827,7 @@
       _updateUseTint: function _updateUseTint() {
         var baseMaterial = this.getMaterial(0);
         if (baseMaterial) {
-          var useTint = this.useTint;
+          var useTint = this.useTint || this.isAnimationCached() && false;
           baseMaterial.material.isMultiSupport() ? this._defineMaterialTint(baseMaterial, useTint) : baseMaterial.define("USE_TINT", useTint);
         }
         this._materialCache = {};
@@ -75178,7 +75324,7 @@
         var baseMaterial = comp._materials[0];
         if (!baseMaterial) return;
         _useMulti = baseMaterial.material.isMultiSupport();
-        _useTint = comp.useTint;
+        _useTint = comp.useTint || comp.isAnimationCached();
         _vertexFormat = _useTint ? _useMulti ? VFTwoColorTexId : VFTwoColor : _useMulti ? VFOneColorTexId : comp.isAnimationCached() ? VFTwoColor : VFOneColor;
         _perVertexSize = _useTint ? _useMulti ? 7 : 6 : _useMulti ? 6 : comp.isAnimationCached() ? 6 : 5;
         _node = comp.node;
@@ -97898,7 +98044,7 @@
     defineDeprecatedMacroGetter("CC_QQPLAY", QQPLAY);
     true;
     cc._Test = {};
-    var engineVersion = "2.4.10";
+    var engineVersion = "2.4.12";
     _global["CocosEngine"] = cc.ENGINE_VERSION = engineVersion;
   }), {} ]
 }, {}, [ 464 ]);
