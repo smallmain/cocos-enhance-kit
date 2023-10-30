@@ -124,3 +124,19 @@ hide_title: true
 这是你没有替换引擎的 `jsb-adapter` 部分，或者说没有重启以生效。
 
 注意：原生平台构建时可能需要先删除原有的 build 文件，替换操作才会生效。
+
+### 使用模拟器预览时出现各种问题
+
+可能是因为模拟器没有重新编译导致的，请按照官方的 [引擎定制文档](https://docs.cocos.com/creator/2.4/manual/zh/advanced-topics/engine-customization.html#25-%E7%BC%96%E8%AF%91%E6%A8%A1%E6%8B%9F%E5%99%A8) 重新编译模拟器即可。
+
+### Spine 组件出现 Uncaught TypeError: Cannot read property ‘load’ of null, location: src/cocos2d-jsb.b5158.js 等问题
+
+这是引擎自身的问题，由于释放 Spine 资源，然后再次加载相同 Spine 资源时导致，具体请看：
+
+[问题讨论](https://forum.cocos.org/t/topic/137649/148)
+
+截止 v2.4.12，引擎仍未修复此问题，暂时的解决方案有三种：
+
+1. 引擎已经有一个修复此问题的 PR，但还未合入，可自行合入：[PR #4307](https://github.com/cocos/engine-native/pull/4307)
+2. 需要进行释放的 spine 资源，不让其参与动态合图（通过控制 Spine 组件的合图开关）。
+3. 不释放需要参与动态合图的 spine 资源。
