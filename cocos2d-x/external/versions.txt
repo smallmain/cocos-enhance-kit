@@ -3,46 +3,54 @@ websockets
     win32: 2.1.0 
     ios: 2.1.0
     android: 2.1.0
+    openharmony: 2.4.2
 
 openssl
     mac: 1.1.0c
     win32: 1.1.0c
     ios: 1.1.0c
-    android: 1.1.0c
-    
+    android: 1.1.0q
+    openharmony: 1.1.1t
+
 curl
     mac: 7.52.1
     win32: 7.52.1
+    openharmony: 8.0.1
 
 png
     mac: 1.6.21
     win32: 1.6.16
     ios: --
     android: 1.6.21
+    openharmony: 1.6.21
 
 jpeg
     mac: v9
     win32: v9
     ios: --
     android: v9
+    openharmony: v9
 
 tiff
     mac: 4.0.6
     win32: 4.0.3
     ios: 4.0.6
     android: 4.0.6
+    openharmony: 4.0.6
 
 freetype2
     mac: 2.6.3
     win32: 2.5.5
     ios: 2.6.3
     android: 2.6.3
+    openharmony: 2.6.3
 
 libz
     mac: 1.2.8
     win32: 1.2.5
     ios: --
     android: 1.2.8
+    openharmony: 1.2.13
 
 spidermonkey
     mac: v52
@@ -75,3 +83,6 @@ v8
 libuv
     win32: 1.13.1
     android: 1.13.1
+
+sqlite3
+    openharmony: 3.34.1

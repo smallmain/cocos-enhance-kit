@@ -46,6 +46,10 @@ function inject () {
         configurable: true
     });
 
+    if (globalThis.oh) {
+        globalThis.oh.devicePixelRatio = jsb.device.getDevicePixelRatio();
+    }
+
     window.addEventListener = function(eventName, listener, options) {
         window.__canvas.addEventListener(eventName, listener, options);
     };

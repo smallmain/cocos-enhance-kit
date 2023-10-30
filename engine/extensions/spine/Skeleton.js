@@ -480,7 +480,7 @@ sp.Skeleton = cc.Class({
 
     // override base class _updateMaterial to set define value and clear material cache
     _updateMaterial () {
-        let useTint = this.useTint;
+        let useTint = this.useTint || (this.isAnimationCached() && !CC_NATIVERENDERER);
         let baseMaterial = this.getMaterial(0);
         if (baseMaterial) {
             const isMultiSupport = baseMaterial.material.isMultiSupport();
@@ -535,7 +535,7 @@ sp.Skeleton = cc.Class({
     _updateUseTint () {
         let baseMaterial = this.getMaterial(0);
         if (baseMaterial) {
-            let useTint = this.useTint;
+            let useTint = this.useTint || (this.isAnimationCached() && !CC_NATIVERENDERER);
             if (baseMaterial.material.isMultiSupport()) {
                 this._defineMaterialTint(baseMaterial, useTint);
             } else {

@@ -42,11 +42,12 @@ public class Cocos2dxAccelerometer implements SensorEventListener {
     // Fields
     // ===========================================================
     private final Context mContext;
-    private final SensorManager mSensorManager;
-    private final Sensor mAcceleration;
-    private final Sensor mAccelerationIncludingGravity;
-    private final Sensor mGyroscope;
+    private SensorManager mSensorManager;
+    private Sensor mAcceleration;
+    private Sensor mAccelerationIncludingGravity;
+    private Sensor mGyroscope;
     private int mSamplingPeriodUs = SensorManager.SENSOR_DELAY_GAME;
+    private boolean mEnableSensor = false;
 
     class Acceleration {
         public float x = 0.0f;
@@ -74,24 +75,39 @@ public class Cocos2dxAccelerometer implements SensorEventListener {
 
     public Cocos2dxAccelerometer(final Context context) {
         mContext = context;
-
-        mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
-        mAcceleration = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mAccelerationIncludingGravity = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-        mGyroscope = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
     }
 
     // ===========================================================
     // Getter & Setter
     // ===========================================================
     public void enable() {
-        mSensorManager.registerListener(this, mAcceleration, mSamplingPeriodUs);
-        mSensorManager.registerListener(this, mAccelerationIncludingGravity, mSamplingPeriodUs);
-        mSensorManager.registerListener(this, mGyroscope, mSamplingPeriodUs);
+        if (mEnableSensor) {
+            if (null == mSensorManager) {
+                mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
+                mAcceleration = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+                mAccelerationIncludingGravity = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+                mGyroscope = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+            }
+
+            mSensorManager.registerListener(this, mAcceleration, mSamplingPeriodUs);
+            mSensorManager.registerListener(this, mAccelerationIncludingGravity, mSamplingPeriodUs);
+            mSensorManager.registerListener(this, mGyroscope, mSamplingPeriodUs);
+        }
+    }
+
+    public void enableAccelerometer(boolean enabled) {
+        mEnableSensor = enabled;
+        if (enabled) {
+            enable();
+        } else {
+            disable();
+        }
     }
 
     public void disable() {
-        this.mSensorManager.unregisterListener(this);
+        if (mEnableSensor && null != mSensorManager) {
+            this.mSensorManager.unregisterListener(this);
+        }
     }
 
     public void setInterval(float interval) {

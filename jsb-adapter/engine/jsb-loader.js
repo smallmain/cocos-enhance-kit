@@ -59,7 +59,11 @@ function downloadScript (url, options, onComplete) {
     if (loadedScripts[url]) return onComplete && onComplete();
 
     download(url, function (src, options, onComplete) {
+        if (globalThis.oh) {
+            globalThis.oh.loadModule(src);
+        } else {
         window.require(src);
+        }
         loadedScripts[url] = true;
         onComplete && onComplete(null);
     }, options, options.onFileProgress, onComplete);
@@ -247,6 +251,7 @@ function parsePlist (url, options, onComplete) {
 
 parser.parsePVRTex = downloader.downloadDomImage;
 parser.parsePKMTex = downloader.downloadDomImage;
+parser.parseASTCTex = downloader.downloadDomImage;
 downloader.downloadScript = downloadScript;
 
 downloader.register({
@@ -266,6 +271,7 @@ downloader.register({
     '.image' : downloadAsset,
     '.pvr' : downloadAsset,
     '.pkm' : downloadAsset,
+    '.astc': downloadAsset,
 
     // Audio
     '.mp3' : downloadAsset,
@@ -328,6 +334,7 @@ parser.register({
     // compressed texture
     '.pvr': downloader.downloadDomImage,
     '.pkm': downloader.downloadDomImage,
+    '.astc': downloader.downloadDomImage,
 
     '.binary' : parseArrayBuffer,
     '.bin' : parseArrayBuffer,

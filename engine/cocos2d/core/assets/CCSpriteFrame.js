@@ -228,7 +228,7 @@ let SpriteFrame = cc.Class(/** @lends cc.SpriteFrame# */{
         return this._texture && this._texture.loaded;
     },
 
-    onTextureLoaded (callback, target) {
+    onTextureLoaded: function (callback, target) {
         if (this.textureLoaded()) {
             callback.call(target);
         }
@@ -259,8 +259,9 @@ let SpriteFrame = cc.Class(/** @lends cc.SpriteFrame# */{
      */
     setRotated: function (bRotated) {
         this._rotated = bRotated;
-        if (this._texture)
+        if (this._texture) {
             this._calculateUV();
+        }
     },
 
     /**
@@ -327,8 +328,9 @@ let SpriteFrame = cc.Class(/** @lends cc.SpriteFrame# */{
      */
     setRect: function (rect) {
         this._rect = rect;
-        if (this._texture)
+        if (this._texture) {
             this._calculateUV();
+        }
     },
     
     /**
@@ -366,7 +368,7 @@ let SpriteFrame = cc.Class(/** @lends cc.SpriteFrame# */{
         return this._texture;
     },
 
-    _textureLoadedCallback () {
+    _textureLoadedCallback: function () {
         let self = this;
         let texture = this._texture;
         if (!texture) {
@@ -546,7 +548,7 @@ let SpriteFrame = cc.Class(/** @lends cc.SpriteFrame# */{
         }
     },
 
-    _flipXY (uvs) {
+    _flipXY: function (uvs) {
         if (this._flipX) {
             let tempVal = uvs[0];
             uvs[0] = uvs[1];
@@ -568,7 +570,7 @@ let SpriteFrame = cc.Class(/** @lends cc.SpriteFrame# */{
         }
     },
 
-    _calculateSlicedUV () {
+    _calculateSlicedUV: function () {
         let rect = this._rect;
         let atlasWidth = this._texture.width;
         let atlasHeight = this._texture.height;
@@ -629,7 +631,7 @@ let SpriteFrame = cc.Class(/** @lends cc.SpriteFrame# */{
         }
     },
 
-    _setDynamicAtlasFrame (frame) {
+    _setDynamicAtlasFrame: function (frame) {
         if (!frame) return;
 
         this._original = {
@@ -644,7 +646,7 @@ let SpriteFrame = cc.Class(/** @lends cc.SpriteFrame# */{
         this._calculateUV();
     },
 
-    _resetDynamicAtlasFrame () {
+    _resetDynamicAtlasFrame: function () {
         if (!this._original) return;
         this._rect.x = this._original._x;
         this._rect.y = this._original._y;
@@ -658,7 +660,7 @@ let SpriteFrame = cc.Class(/** @lends cc.SpriteFrame# */{
         this.emit("_resetDynamicAtlasFrame");
     },
 
-    _calculateUV () {
+    _calculateUV: function () {
         let rect = this._rect,
             texture = this._texture,
             uv = this.uv,

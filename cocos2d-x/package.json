@@ -1,6 +1,6 @@
 {
   "name": "cocos2d-x-lite",
-  "version": "2.4.10-rc.1",
+  "version": "2.4.12",
   "description": "Cocos2d-x, compact version",
   "main": "gulpfile.js",
   "devDependencies": {
@@ -9,7 +9,7 @@
     "download": "^6.2.5",
     "fs-extra": "0.30.0",
     "ftp": "0.3.10",
-    "gulp": "4.0.2",
+    "gulp": "3.9.1",
     "gulp-sequence": "0.4.5",
     "gulp-zip": "3.2.0",
     "tree-kill": "^1.2.0"

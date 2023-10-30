@@ -46,7 +46,12 @@ jsb.onResume = function () {
 
 jsb.onResize = function (size) {
     if (size.width === 0 || size.height === 0) return;
+    if (globalThis.oh) {
+      size.width /= globalThis.oh.devicePixelRatio;
+      size.height /= globalThis.oh.devicePixelRatio;
+    } else {
     size.width /= window.devicePixelRatio;
     size.height /= window.devicePixelRatio;
+    }
     window.resize(size.width, size.height);
 };

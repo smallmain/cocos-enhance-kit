@@ -188,6 +188,11 @@ function initSys () {
     sys.LANGUAGE_UNKNOWN = "unknown";
 
     /**
+     * @property {String} OS_OPENHARMONY
+     * @readOnly
+     */
+    sys.OS_OPENHARMONY = "OpenHarmony";
+    /**
      * @property {String} OS_IOS
      * @readOnly
      */
@@ -322,6 +327,12 @@ function initSys () {
      */
     sys.WP8 = 11;
     /**
+     * @property {Number} OPENHARMONY
+     * @readOnly
+     * @default 12
+     */
+    sys.OPENHARMONY = 12;
+    /**
      * @property {Number} MOBILE_BROWSER
      * @readOnly
      * @default 100
@@ -450,6 +461,14 @@ function initSys () {
      * @default 120
      */
     sys.TAOBAO = 120;
+
+    /**
+     * @property {Number} TAOBAO_MINIGAME
+     * @readOnly
+     * @default 121
+     */
+     sys.TAOBAO_MINIGAME = 121;
+
     /**
      * BROWSER_TYPE_WECHAT
      * @property {String} BROWSER_TYPE_WECHAT
@@ -720,6 +739,7 @@ function initSys () {
                         platform === sys.TIZEN ||
                         platform === sys.BLACKBERRY ||
                         platform === sys.XIAOMI_GAME ||
+                        platform === sys.OPENHARMONY ||
                         isVivoGame ||
                         isOppoGame ||
                         isHuaweiGame ||
@@ -1008,7 +1028,9 @@ function initSys () {
                 imageBitmap.close && imageBitmap.close();
             }).catch(err => {});
         }
-        if (docEle['ontouchstart'] !== undefined || doc['ontouchstart'] !== undefined || nav.msPointerEnabled)
+        // NOTE: '__wxjs_environment' is defined in wechat miniprogram webview environment
+        // developpers would embed builded web project in a webview component on wechat miniprogram, so that we need to handle this situation.
+        if (docEle['ontouchstart'] !== undefined || doc['ontouchstart'] !== undefined || nav.msPointerEnabled || (typeof __wxjs_environment === 'string' && __wxjs_environment === 'miniprogram'))
             capabilities["touches"] = true;
         if (docEle['onmouseup'] !== undefined)
             capabilities["mouse"] = true;

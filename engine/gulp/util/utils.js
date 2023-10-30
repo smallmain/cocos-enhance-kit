@@ -36,7 +36,13 @@ exports.getMacros = function (platform, flags) {
     // debug macros
     res['CC_DEV'] = res['CC_EDITOR'] || res['CC_PREVIEW'] || res['CC_TEST'];
     res['CC_DEBUG'] = res['CC_DEBUG'] || res['CC_DEV'];
+    // openHarmony does not support Funtion ,therefore this macro variable is temporarily set to false
+    //res['CC_SUPPORT_JIT'] = false;
+    if (typeof flags.force_setting_support_jit !== 'undefined') {
+        res['CC_SUPPORT_JIT'] = flags.force_setting_support_jit;
+    } else {
     res['CC_SUPPORT_JIT'] = !(res['CC_RUNTIME'] || res['CC_MINIGAME']);
+    }
     res['CC_NATIVERENDERER'] = res['CC_JSB'] && true;
     return res;
 };

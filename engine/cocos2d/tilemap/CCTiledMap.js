@@ -296,6 +296,7 @@ let TiledMap = cc.Class({
     editor: CC_EDITOR && {
         executeInEditMode: true,
         menu: 'i18n:MAIN_MENU.component.renderers/TiledMap',
+        help: 'i18n:COMPONENT.help_url.tiledmap'
     },
 
     ctor () {
@@ -432,7 +433,7 @@ let TiledMap = cc.Class({
      * !#en enable or disable culling
      * !#zh 开启或关闭裁剪。
      * @method enableCulling
-     * @param value
+     * @param {boolean} value
      */
     enableCulling (value) {
         let layers = this._layers;

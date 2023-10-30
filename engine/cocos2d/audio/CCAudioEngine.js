@@ -43,6 +43,9 @@ let recycleAudio = function (audio) {
     audio.off('ended');
     audio.off('stop');
     audio.src = null;
+    if (cc.sys.platform === cc.sys.ALIPAY_GAME) {
+        audio.destroy();
+    } else {
     // In case repeatly recycle audio
     if (!_audioPool.includes(audio)) {
         if (_audioPool.length < audioEngine._maxPoolSize) {
@@ -50,6 +53,7 @@ let recycleAudio = function (audio) {
         }
         else {
             audio.destroy();
+            }
         }
     }
     audio._shouldRecycleOnEnded = false;

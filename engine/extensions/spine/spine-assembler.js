@@ -925,7 +925,7 @@ export default class SpineAssembler extends Assembler {
         if (!baseMaterial) return;
 
         _useMulti = baseMaterial.material.isMultiSupport();
-        _useTint = comp.useTint;
+        _useTint = comp.useTint || comp.isAnimationCached();
         _vertexFormat = _useTint ? (_useMulti ? VFTwoColorTexId : VFTwoColor) : (_useMulti ? VFOneColorTexId : (comp.isAnimationCached() ? VFTwoColor : VFOneColor));
         // x y u v color1 color2 or x y u v color
         _perVertexSize = _useTint ? (_useMulti ? 7 : 6) : (_useMulti ? 6 : (comp.isAnimationCached() ? 6 : 5));
