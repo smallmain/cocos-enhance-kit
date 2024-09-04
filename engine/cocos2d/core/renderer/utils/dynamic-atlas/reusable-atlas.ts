@@ -623,6 +623,8 @@ export class Atlas {
 
     /**
      * 销毁
+     *
+     * 请勿直接调用
      */
     destroy() {
         this.reset();

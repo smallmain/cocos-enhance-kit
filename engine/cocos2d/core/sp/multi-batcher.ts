@@ -61,10 +61,11 @@ export class MultiBatcher {
 
 
     /**
-     * 重置多纹理材质数组，再次使用请先初始化
+     * 重置
      */
     reset() {
         this.handlers.length = 0;
+        this.nextHandler = null!;
     }
 
 }

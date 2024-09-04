@@ -366,6 +366,36 @@ let dynamicAtlasManager = {
             _atlases[i].update();
         }
     },
+
+    getUnusedAtlas() {
+        if (!this.enabled) return null;
+
+        for (let i = 0; i <= _atlasIndex; i++) {
+            if (_atlases[i].isEmpty()) {
+                return _atlases[i];
+            }
+        }
+
+        return null;
+    },
+
+    deleteAtlas(index) {
+        if (!this.enabled) return;
+
+        _atlases[index].destroy();
+        _atlases.splice(index, 1);
+        _atlasIndex--;
+    },
+
+    destroyUnusedAtlases() {
+        if (!this.enabled) return;
+
+        for (let i = 0; i <= _atlasIndex; i++) {
+            if (_atlases[i].isEmpty()) {
+                _atlases[i].destroy();
+            }
+        }
+    },
 };
 
 /**
