@@ -35,7 +35,7 @@
     var _topLeft = new vec3();
     var _bottomRight = new vec3();
 
-    let kWebViewTag = 0;
+    let kVideoTag = 0;
     let videoPlayers = [];
     const VideoEvent = {
         PLAYING: 0,
@@ -143,6 +143,16 @@
             video.setVisible(false)
 
             let cbs = this.__eventListeners;
+            
+            video.removeEventListener("loadedmetadata", cbs.loadedmetadata);
+            video.removeEventListener("ended", cbs.ended);
+            video.removeEventListener("play", cbs.play);
+            video.removeEventListener("pause", cbs.pause);
+            video.removeEventListener("click", cbs.click);
+            video.removeEventListener("canplay", cbs.onCanPlay);
+            video.removeEventListener("canplaythrough", cbs.onCanPlay);
+            video.removeEventListener("suspend", cbs.onCanPlay);
+            
             cbs.loadedmetadata = null;
             cbs.ended = null;
             cbs.play = null;
@@ -218,7 +228,7 @@
         let video = this._video;
         if (!video || !this._visible) return;
         // TODO(qgh) : In the openharmony platform, there is no stop event when the video stops, instead a pause event is sent. 
-	// We can't ignore the pause event here.
+        // We can't ignore the pause event here.
         // this._ignorePause = true;
         video.seekTo(0);
         video.stop();
@@ -480,7 +490,7 @@
             this._events = {};
             this._currentTime = 0;
             this._duration = 0;
-            this._videoIndex = kWebViewTag++;
+            this._videoIndex = kVideoTag++;
             this._matViewProj_temp = new mat4();
             window.oh.postMessage("createVideo", this._videoIndex);
             videoPlayers.push(this);

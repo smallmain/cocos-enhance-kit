@@ -1,4 +1,5 @@
-globalThis.oh = {};
+globalThis.oh = {} as any;
+
 function boot() {
   const cc = globalThis.cc;
   var settings = globalThis._CCSettings;
@@ -74,8 +75,8 @@ function boot() {
     }
   }
 
-  globalThis.oh.loadJsList(settings.jsList,cb);
-  
+  globalThis.oh.loadJsList(settings.jsList, cb);
+
   for (var i = 0; i < bundleRoot.length; i++) {
     cc.assetManager.loadBundle(bundleRoot[i], cb);
   }

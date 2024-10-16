@@ -50,7 +50,7 @@ namespace spine {
     
     /** Draws a skeleton.
      */
-    class SkeletonRenderer: public cocos2d::middleware::IMiddleware, public cocos2d::Ref {
+    class SkeletonRenderer: public cocos2d::Ref, public cocos2d::middleware::IMiddleware {
     public:
         static SkeletonRenderer* create ();
         static SkeletonRenderer* createWithSkeleton(Skeleton* skeleton, bool ownsSkeleton = false, bool ownsSkeletonData = false);
@@ -99,7 +99,7 @@ namespace spine {
         void setUseTint(bool enabled);
 
         void setUseMulti(bool enabled);
-
+        
         /* Sets the vertex effect to be used, set to 0 to disable vertex effects */
         void setVertexEffectDelegate(VertexEffectDelegate* effectDelegate);
         /* Sets the range of slots that should be rendered. Use -1, -1 to clear the range */
@@ -126,6 +126,7 @@ namespace spine {
         virtual void stopSchedule();
         void onEnable();
         void onDisable();
+        virtual void destroy();
         
     CC_CONSTRUCTOR_ACCESS:
         SkeletonRenderer ();

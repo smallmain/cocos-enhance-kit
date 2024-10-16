@@ -6,7 +6,7 @@
 	#endif
 #endif
 
-#define LWS_INSTALL_DATADIR "/home/cloud_dragon/lsy/lycium/usr/libwebsockets-arm64-v8a-install/share"
+#define LWS_INSTALL_DATADIR "/Users/cocos/Github/cocos2d-x-3rd-party-libs-src/contrib/install-android/arm64/share"
 
 /* Define to 1 to use wolfSSL/CyaSSL as a replacement for OpenSSL.
  * LWS_OPENSSL_SUPPORT needs to be set also for this to work. */
@@ -35,7 +35,7 @@
 #define LWS_LIBRARY_VERSION_NUMBER (LWS_LIBRARY_VERSION_MAJOR*1000000)+(LWS_LIBRARY_VERSION_MINOR*1000)+LWS_LIBRARY_VERSION_PATCH
 
 /* The current git commit hash that we're building from */
-/* #undef LWS_BUILD_HASH */
+#define LWS_BUILD_HASH "cocos@cocoss-MacBook-Pro.local-v3.4-182-g408ba56"
 
 /* Build with OpenSSL support */
 #define LWS_OPENSSL_SUPPORT
@@ -83,16 +83,16 @@
 /* #undef LWS_MINGW_SUPPORT */
 
 /* Use the BSD getifaddrs that comes with libwebsocket, for uclibc support */
-/* #undef LWS_BUILTIN_GETIFADDRS */
+#define LWS_BUILTIN_GETIFADDRS
 
 /* use SHA1() not internal libwebsockets_SHA1 */
 /* #undef LWS_SHA1_USE_OPENSSL_NAME */
 
 /* SSL server using ECDH certificate */
 /* #undef LWS_SSL_SERVER_WITH_ECDH_CERT */
-#define LWS_HAVE_SSL_CTX_set1_param
-#define LWS_HAVE_X509_VERIFY_PARAM_set1_host
-#define LWS_HAVE_RSA_SET0_KEY
+/* #undef LWS_HAVE_SSL_CTX_set1_param */
+/* #undef LWS_HAVE_X509_VERIFY_PARAM_set1_host */
+/* #undef LWS_HAVE_RSA_SET0_KEY */
 
 /* #undef LWS_HAVE_UV_VERSION_H */
 
@@ -147,9 +147,9 @@
 
 /* OpenSSL various APIs */
 
-#define LWS_HAVE_TLS_CLIENT_METHOD
-#define LWS_HAVE_TLSV1_2_CLIENT_METHOD
-#define LWS_HAVE_SSL_SET_INFO_CALLBACK
+/* #undef LWS_HAVE_TLS_CLIENT_METHOD */
+/* #undef LWS_HAVE_TLSV1_2_CLIENT_METHOD */
+/* #undef LWS_HAVE_SSL_SET_INFO_CALLBACK */
 
 #define LWS_HAS_INTPTR_T
 

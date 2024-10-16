@@ -63,6 +63,11 @@ namespace spine {
     }
     
     SkeletonCacheAnimation::~SkeletonCacheAnimation () {
+        destroy();
+    }
+
+    void SkeletonCacheAnimation::destroy() {
+        stopSchedule();
         if (_skeletonCache) {
             _skeletonCache->release();
             _skeletonCache = nullptr;
@@ -73,9 +78,8 @@ namespace spine {
             delete ani;
         }
         CC_SAFE_RELEASE_NULL(_attachUtil);
-        CC_SAFE_RELEASE(_nodeProxy);
-        CC_SAFE_RELEASE(_effect);
-        stopSchedule();
+        CC_SAFE_RELEASE_NULL(_nodeProxy);
+        CC_SAFE_RELEASE_NULL(_effect);
     }
     
     void SkeletonCacheAnimation::update(float dt) {
@@ -207,13 +211,13 @@ namespace spine {
 
         return multiSegments;
     }
-
+    
     void SkeletonCacheAnimation::render(float dt) {
         if (_useMulti) {
             renderMulti(dt);
             return;
         }
-
+        
         if (!_nodeProxy || !_effect) {
             return;
         }
@@ -826,7 +830,7 @@ namespace spine {
     void SkeletonCacheAnimation::setUseMulti(bool enabled) {
         _useMulti = enabled;
     }
-
+    
     void SkeletonCacheAnimation::setAnimation (const std::string& name, bool loop) {
         _playTimes = loop ? 0 : 1;
         _animationName = name;

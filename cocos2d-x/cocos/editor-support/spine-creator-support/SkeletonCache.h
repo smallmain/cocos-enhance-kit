@@ -76,7 +76,7 @@ namespace spine {
             bool inEffect = false;
             std::vector<TextureMultiData> textureDatas;
         };
-
+        
         struct BoneData {
             cocos2d::Mat4 globalTransformMatrix;
         };

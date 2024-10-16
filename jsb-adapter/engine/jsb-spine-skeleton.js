@@ -354,8 +354,8 @@ const cacheManager = require('./jsb-cache-manager');
         }
 
         if (this._nativeSkeleton) {
-            this._nativeSkeleton.stopSchedule();
             this._nativeSkeleton._comp = null;
+            this._nativeSkeleton.destroy();
             this._nativeSkeleton = null;
         }
 
@@ -763,8 +763,8 @@ const cacheManager = require('./jsb-cache-manager');
             this.animation = this.defaultAnimation;
         } else {
             if (this._nativeSkeleton) {
-                this._nativeSkeleton.stopSchedule();
                 this._nativeSkeleton._comp = null;
+                this._nativeSkeleton.destroy();
                 this._nativeSkeleton = null;
             }
         }
@@ -774,8 +774,8 @@ const cacheManager = require('./jsb-cache-manager');
     skeleton.onDestroy = function(){
         _onDestroy.call(this);
         if (this._nativeSkeleton) {
-            this._nativeSkeleton.stopSchedule();
             this._nativeSkeleton._comp = null;
+            this._nativeSkeleton.destroy();
             this._nativeSkeleton = null;
         }
         this._stateData = null;

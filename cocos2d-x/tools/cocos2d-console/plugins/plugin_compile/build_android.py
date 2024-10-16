@@ -525,6 +525,12 @@ class AndroidBuilder(object):
                 if match:
                     package = match.group(1)
                     break
+                else :
+                    pattern = r'namespace[ \t]+[\'\"](.*)[\'\"]'
+                    match = re.match(pattern, line_str)
+                    if match:
+                        package = match.group(1)
+                        break
         if package is None:
             # get package name from AndroidManifest.xml
             package = self._xml_attr(manifest_path, 'AndroidManifest.xml', 'manifest', 'package')

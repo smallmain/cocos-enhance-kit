@@ -39,7 +39,7 @@ namespace spine {
     
     class CacheModeAttachUtil;
     
-    class SkeletonCacheAnimation : public cocos2d::middleware::IMiddleware, public cocos2d::Ref {
+    class SkeletonCacheAnimation : public cocos2d::Ref, public cocos2d::middleware::IMiddleware {
     public:
         SkeletonCacheAnimation (const std::string& uuid, bool isShare);
         virtual ~SkeletonCacheAnimation ();
@@ -47,7 +47,7 @@ namespace spine {
         virtual void update(float dt) override;
         virtual void render(float dt) override;
         virtual uint32_t getRenderOrder() const override;
-
+        
         void renderMulti(float dt);
         std::vector<spine::SkeletonCache::SegmentMultiData> toMultiSegments(
             const std::vector<spine::SkeletonCache::SegmentData*>& segments);
@@ -83,7 +83,7 @@ namespace spine {
         void onDisable();
         void setUseTint(bool enabled);
         void setUseMulti(bool enabled);
-
+        
         void setAnimation (const std::string& name, bool loop);
         void addAnimation (const std::string& name, bool loop, float delay = 0);
         Animation* findAnimation(const std::string& name) const;
@@ -98,6 +98,7 @@ namespace spine {
         void setToSetupPose ();
         void setBonesToSetupPose ();
         void setSlotsToSetupPose ();
+        void destroy();
     private:
         float _timeScale = 1;
         bool _paused = false;
@@ -124,7 +125,7 @@ namespace spine {
         std::string _animationName = "";
         bool _useTint = false;
         bool _useMulti = false;
-
+        
         struct AniQueueData {
             std::string animationName = "";
             bool loop = false;

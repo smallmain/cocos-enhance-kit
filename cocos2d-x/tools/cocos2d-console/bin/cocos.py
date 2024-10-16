@@ -404,7 +404,7 @@ class CCPlugin(object):
         if os.path.isdir(cocos2dx_path):
             return cocos2dx_path
 
-        if cls.get_cocos2d_mode() is not "distro":
+        if cls.get_cocos2d_mode() != "distro":
             # In 'distro' mode this is not a warning since
             # the source code is not expected to be installed
             Logging.warning(MultiLanguage.get_string('COCOS_WARNING_ENGINE_NOT_FOUND'))
@@ -940,7 +940,7 @@ def _check_python_version():
         ret = False
 
     if not ret:
-        print(MultiLanguage.get_string('COCOS_PYTHON_VERSION_TIP_FMT') % (major_ver, minor_ver))
+        print(str('COCOS PYTHON VERSION DOES NOT MATCH: %d.%d, WHILE 2.7+ IS REQUIRED') % (major_ver, minor_ver))
 
     return ret
 

@@ -46,6 +46,15 @@ xcuserdata/
 DerivedData/
 .idea/*
 
+# Ignore the files from download
+bin/sdkbox*
+plugins/plugin_compile/build_web/bin
+plugins/plugin_jscompile/
+plugins/plugin_luacompile/bin/msvcr110.dll
+plugins/plugin_generate/proj_modifier/plutil-win32/
+version.json
+v*-console-*.zip
+
 # vim
 *~
 
