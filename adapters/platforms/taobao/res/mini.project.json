@@ -1,0 +1,8 @@
+{
+    "include": [
+        "**/assets/**/*",
+        "**/remote/**/*"
+    ],
+    "enableAppxNg": true,
+    "component2": true
+}

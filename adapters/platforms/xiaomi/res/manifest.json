@@ -1,0 +1,15 @@
+{
+  "package": "",
+  "name": "",
+  "icon": "",
+  "versionName": "",
+  "versionCode": "",
+  "minPlatformVersion": "",
+  "orientation": "landscape",
+  "type": "game",
+  "config": {
+    "logLevel": "log",
+    "debug": true
+  },
+  "display": {}
+}

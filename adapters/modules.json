@@ -1,0 +1,59 @@
+{
+  "Core": [],
+  "Canvas": [],
+  "Sprite": [],
+  "Label": [
+    "./platforms/alipay/wrapper/engine/Label.js"
+  ],
+  "Audio": [
+    "./common/engine/Audio.js",
+    "./common/engine/AudioEngine.js",
+    "./platforms/alipay/wrapper/engine/AudioEngine.js"
+  ],
+  "AudioSource": [],
+  "Action": [],
+  "Animation": [],
+  "Button": [],
+  "Canvas Renderer": [],
+  "Collider": [],
+  "Dynamic Atlas": [],
+  "DragonBones": [],
+  "EditBox": [
+    "./common/engine/Editbox.js"
+  ],
+  "Graphics": [],
+  "Geom Utils": [],
+  "Intersection": [],
+  "Layout": [],
+  "Label Effect": [],
+  "Mask": [],
+  "Mesh": [],
+  "MotionStreak": [],
+  "NodePool": [],
+  "Native Socket": [],
+  "Physics": [],
+  "PageView": [],
+  "PageViewIndicator": [],
+  "ProgressBar": [],
+  "ParticleSystem": [],
+  "RichText": [],
+  "Renderer Texture": [],
+  "Slider": [],
+  "ScrollBar": [],
+  "ScrollView": [],
+  "Spine Skeleton": [],
+  "StudioComponent": [],
+  "Toggle": [],
+  "TiledMap": [],
+  "VideoPlayer": [
+    "./platforms/wechat/wrapper/engine/VideoPlayer.js"
+  ],
+  "Widget": [],
+  "WebView": [],
+  "WebGL Renderer": [],
+  "3D": [],
+  "3D Primitive": [],
+  "WechatSubContext": [],
+  "SwanSubContext": [],
+  "TypeScript Polyfill": []
+}

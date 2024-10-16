@@ -1,0 +1,10 @@
+require('./Audio');
+require('./AudioEngine');
+require('./DeviceMotionEvent');
+require('./Editbox');
+require('./Game');
+require('./InputManager');
+require('./AssetManager');
+require('./Screen');
+require('./Texture2D');
+require('./misc');

@@ -1,0 +1,16 @@
+{
+  "deviceOrientation": "portrait",
+  "window": {
+    "allowsBounceVertical": "NO",
+    "transparentTitle": "always",
+    "enableAudioAlign": true,
+    "enableMultiAudio": true
+  },
+  "plugins": {
+    "cocos": {
+      "pluginId": "3000000085619513",
+      "pluginVersion": "",
+      "path": "cocos"
+    }
+  }
+}
