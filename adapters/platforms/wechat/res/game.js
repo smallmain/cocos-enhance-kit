@@ -1,3 +1,4 @@
+const initWorker = require('./worker_adapter/index.js');
 require('adapter-js-path');
 __globalAdapter.init();
 require('cocos2d-js-path');
@@ -17,4 +18,6 @@ if (cc.sys.platform !== cc.sys.WECHAT_GAME_SUB) {
     cc.macro.CLEANUP_IMAGE_CACHE = true;
 }
 
-window.boot();
+initWorker(() => {
+    window.boot();
+});

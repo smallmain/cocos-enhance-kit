@@ -1,4 +1,4 @@
-const cacheManager = require('../cache-manager');
+const cacheManager = CC_WORKER_ASSET_PIPELINE ? require('../cache-manager-proxy') : require('../cache-manager');
 const { fs, downloadFile, readText, readArrayBuffer, readJson, loadSubpackage, getUserDataPath, exists } = window.fsUtils;
 
 const REGEX = /^https?:\/\/.*/;
@@ -29,25 +29,29 @@ function downloadScript (url, options, onComplete) {
     }
 }
 
-function handleZip (url, options, onComplete) {
-    let cachedUnzip = cacheManager.cachedFiles.get(url);
-    if (cachedUnzip) {
-        cacheManager.updateLastTime(url);
-        onComplete && onComplete(null, cachedUnzip.url);
+var handleZip = CC_WORKER_ASSET_PIPELINE
+    ? function handleZip(url, options, onComplete) {
+        cacheManager.handleZip(url, options, onComplete);
     }
-    else if (REGEX.test(url)) {
-        downloadFile(url, null, options.header, options.onFileProgress, function (err, downloadedZipPath) {
-            if (err) {
-                onComplete && onComplete(err);
-                return;
-            }
-            cacheManager.unzipAndCacheBundle(url, downloadedZipPath, options.__cacheBundleRoot__, onComplete);
-        });
+    : function handleZip(url, options, onComplete) {
+        let cachedUnzip = cacheManager.cachedFiles.get(url);
+        if (cachedUnzip) {
+            cacheManager.updateLastTime(url);
+            onComplete && onComplete(null, cachedUnzip.url);
+        }
+        else if (REGEX.test(url)) {
+            downloadFile(url, null, options.header, options.onFileProgress, function (err, downloadedZipPath) {
+                if (err) {
+                    onComplete && onComplete(err);
+                    return;
+                }
+                cacheManager.unzipAndCacheBundle(url, downloadedZipPath, options.__cacheBundleRoot__, onComplete);
+            });
+        }
+        else {
+            cacheManager.unzipAndCacheBundle(url, url, options.__cacheBundleRoot__, onComplete);
+        }
     }
-    else {
-        cacheManager.unzipAndCacheBundle(url, url, options.__cacheBundleRoot__, onComplete);
-    }
-}
 
 function downloadDomAudio (url, options, onComplete) {
     if (typeof options === 'function') {
@@ -68,36 +72,40 @@ function downloadDomAudio (url, options, onComplete) {
     onComplete && onComplete(null, dom);
 }
 
-function download (url, func, options, onFileProgress, onComplete) {
-    var result = transformUrl(url, options);
-    if (result.inLocal) {
-        func(result.url, options, onComplete);
+var download = CC_WORKER_ASSET_PIPELINE
+    ? function download(url, func, options, onFileProgress, onComplete) {
+        cacheManager.download(url, func, options, onFileProgress, onComplete);
     }
-    else if (result.inCache) {
-        cacheManager.updateLastTime(url);
-        func(result.url, options, function (err, data) {
-            if (err) {
-                cacheManager.removeCache(url);
-            }
-            onComplete(err, data);
-        });
-    }
-    else {
-        downloadFile(url, null, options.header, onFileProgress, function (err, path) {
-            if (err) {
-                onComplete(err, null);
-                return;
-            }
-            func(path, options, function (err, data) {
-                if (!err) {
-                    cacheManager.tempFiles.add(url, path);
-                    cacheManager.cacheFile(url, path, options.cacheEnabled, options.__cacheBundleRoot__, true);
+    : function download(url, func, options, onFileProgress, onComplete) {
+        var result = transformUrl(url, options);
+        if (result.inLocal) {
+            func(result.url, options, onComplete);
+        }
+        else if (result.inCache) {
+            cacheManager.updateLastTime(url);
+            func(result.url, options, function (err, data) {
+                if (err) {
+                    cacheManager.removeCache(url);
                 }
                 onComplete(err, data);
             });
-        });
+        }
+        else {
+            downloadFile(url, null, options.header, onFileProgress, function (err, path) {
+                if (err) {
+                    onComplete(err, null);
+                    return;
+                }
+                func(path, options, function (err, data) {
+                    if (!err) {
+                        cacheManager.tempFiles.add(url, path);
+                        cacheManager.cacheFile(url, path, options.cacheEnabled, options.__cacheBundleRoot__, true);
+                    }
+                    onComplete(err, data);
+                });
+            });
+        }
     }
-}
 
 function parseArrayBuffer (url, options, onComplete) {
     readArrayBuffer(url, onComplete);
@@ -131,7 +139,11 @@ var loadFont = !isSubDomain ? function (url, options, onComplete) {
     onComplete(null, 'Arial');
 }
 
-function doNothing (content, options, onComplete) {
+function doNothing(content, options, onComplete) {
+    if (CC_WORKER_ASSET_PIPELINE) {
+        onComplete(null, content); 
+        return;
+    }
     exists(content, (existence) => {
         if (existence) {
             onComplete(null, content); 
@@ -402,6 +414,9 @@ parser.register({
 });
 
 var transformUrl = !isSubDomain ? function (url, options) {
+    if (CC_WORKER_ASSET_PIPELINE) {
+        console.error('transformUrl should not be called when the macro CC_WORKER_ASSET_PIPELINE is enabled.');
+    }
     var inLocal = false;
     var inCache = false;
     var isInUserDataPath = url.startsWith(getUserDataPath());
