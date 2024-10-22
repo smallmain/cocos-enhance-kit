@@ -1,6 +1,6 @@
 # Cocos Enhance Kit
 
-![logo](/media/logo-round@0.25x.png)
+![logo](/media/logo-round@0.5x.png)
 
 这是 [Cocos Creator](https://www.cocos.com/creator) v2.x 社区分叉版本，**提供了大量的新特性、性能改进与修复**。
 
