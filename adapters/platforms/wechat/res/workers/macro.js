@@ -2,7 +2,7 @@
 globalThis.CC_WORKER_SCHEDULER = true;
 
 // 是否启用 Worker 调试模式
-globalThis.CC_WORKER_DEBUG = true;
+globalThis.CC_WORKER_DEBUG = false;
 
 // --- 以下从主线程同步值 ---
 
@@ -11,3 +11,6 @@ globalThis.CC_WORKER_FS_SYNC = null;
 
 // 是否启用 Worker 驱动资源管线（下载、缓存）
 globalThis.CC_WORKER_ASSET_PIPELINE = null;
+
+// 是否启用 Worker 驱动资源管线（加载）
+globalThis.CC_WORKER_ASSET_PIPELINE_INCLUDE_LOAD = null;

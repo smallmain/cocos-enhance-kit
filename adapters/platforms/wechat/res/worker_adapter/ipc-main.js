@@ -96,6 +96,7 @@ const ipcMain = {
             _handlers,
             CC_WORKER_FS_SYNC,
             CC_WORKER_ASSET_PIPELINE,
+            CC_WORKER_ASSET_PIPELINE_INCLUDE_LOAD,
         ]);
     },
 

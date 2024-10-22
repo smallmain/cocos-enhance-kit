@@ -9,11 +9,14 @@ const hasWorker = sdkVersion[0] > 2 || (sdkVersion[0] === 2 && (sdkVersion[1] > 
 // 是否启用 Worker 驱动资源管线（下载、缓存）
 globalThis.CC_WORKER_ASSET_PIPELINE = false;
 
+// 是否启用 Worker 驱动资源管线（加载）
+globalThis.CC_WORKER_ASSET_PIPELINE_INCLUDE_LOAD = false;
+
 // 是否启用 Worker
 globalThis.CC_USE_WORKER = (CC_WORKER_ASSET_PIPELINE) && hasWorker && !isSubContext;
 
 // 是否启用 Worker 调试模式
-globalThis.CC_WORKER_DEBUG = true;
+globalThis.CC_WORKER_DEBUG = false;
 
 // 是否启用 Worker 调度模式，这也许能减少通信次数带来的性能消耗（必须一致）
 globalThis.CC_WORKER_SCHEDULER = true;
