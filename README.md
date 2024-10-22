@@ -6,11 +6,17 @@
 
 </br>
 
-这是 [Cocos Creator](https://www.cocos.com/creator) v2.x 社区分叉版本，**提供了大量的新特性、性能改进与修复**。
+<p align="center">
+这是 <a herf="https://www.cocos.com/creator">Cocos Creator</a> v2.x 社区分叉版本，<b>提供了大量的新特性、性能改进与修复</b>。
+</p>
 
-未来将继续秉持着**完全开源、完全兼容**的理念提供新特性、优化与修复。
+<p align="center">
+未来将继续秉持着<b>完全开源、完全兼容</b>的理念提供新特性、优化与修复。
+</p>
 
+<p align="center">
 非常欢迎，并且希望你能和我们一起来完善这个项目！
+</p>
 
 ## 主要特性
 
