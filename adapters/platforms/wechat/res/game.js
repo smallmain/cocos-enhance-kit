@@ -1,5 +1,6 @@
-const initWorker = require('./worker_adapter/index.js');
+const { init: initWorker, onInited: onWorkerInited } = require('./worker_adapter/index.js');
 require('adapter-js-path');
+initWorker();
 __globalAdapter.init();
 require('cocos2d-js-path');
 require('physics-js-path');
@@ -18,6 +19,8 @@ if (cc.sys.platform !== cc.sys.WECHAT_GAME_SUB) {
     cc.macro.CLEANUP_IMAGE_CACHE = true;
 }
 
-initWorker(() => {
+const t = Date.now();
+onWorkerInited(() => {
+    console.log("worker waiting time:", Date.now() - t);
     window.boot();
 });
