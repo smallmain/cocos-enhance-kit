@@ -1,6 +1,8 @@
 <h1 align="center">Cocos Enhance Kit</h1>
 
-<img align="center" src="/media/logo-round@0.5x.png"></img>
+<p align="center">
+	<img src="/media/logo-round.png" width="200"></img>
+</p>
 
 </br>
 
