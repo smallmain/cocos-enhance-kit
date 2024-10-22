@@ -5,7 +5,7 @@ description: "了解如何手动进行多纹理合批。"
 
 # 多纹理合批
 
-在 [新 UI 渲染批次合并指南](../../start-guide/batcher-guide.md#充分利用动态合图) 中提到了动态合图与多纹理渲染结合后，能让多张图集纹理在同一批次渲染。
+在 [提升项目性能](../../best-practices/batcher-guide.md) 中提到了动态合图与多纹理渲染结合后，能让多张图集纹理在同一批次渲染。
 
 如果你阅读过 [多纹理材质](./multi-material.md) 文档的话，肯定知道能使用 `MultiHandler` 的接口来动态设置材质的纹理插槽来实现。
 
@@ -122,4 +122,4 @@ batcher.reset();
 
 ### 它的用途
 
-在 [进阶合批指南](../../start-guide/advance-batcher-guide.md) 中有提供一些常见的使用案例。
+在 [进阶合批指南](../../best-practices/advance-batcher-guide.md) 中有提供一些常见的使用案例。

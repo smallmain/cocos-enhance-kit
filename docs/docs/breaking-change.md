@@ -1,5 +1,5 @@
 ---
-sidebar_position: 4
+sidebar_position: 5
 description: "一般情况下都不需要了解。"
 ---
 
@@ -35,7 +35,7 @@ cc.macro.ENABLE_NATIVE_TTF_RENDERER = false;
 
 这不意味着你不能手动调整了，而是建议你阅读新动态图集和新 Char 缓存模式相关的文档后再考虑是否有必要进行调整。
 
-关于这个你可以从 [新 UI 渲染批次合并指南](./batcher-guide.md) 进行了解。
+关于这个你可以查看 [提升项目性能](./best-practices/batcher-guide.md) 了解。
 
 - **动态图集重复纹理的判断从 `texture._id` 改为使用 `texture._uuid`**
 
@@ -56,7 +56,7 @@ cc.macro.ENABLE_NATIVE_TTF_RENDERER = false;
 
 - **暂不支持自定义材质**
 
-如果项目中有组件在使用 Char 缓存模式并且设置了自定义材质则可能会失效，具体原因可前往 [新的 Char 缓存模式](../user-guide/text-render/text-char-mode.md) 文档进行了解。
+如果项目中有组件在使用 Char 缓存模式并且设置了自定义材质则可能会失效，具体原因可前往 [新的 Char 缓存模式](./user-guide/text-render/text-char-mode.md) 文档进行了解。
 
 - **如果你的项目依赖 Char 缓存模式的内部实现细节，请重新检查相关代码**
 

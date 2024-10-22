@@ -88,4 +88,4 @@ const clonedSkeletonData = skeletonData.clone();
 使用以上代码克隆 SkeletonData 后再进行换装，赋值给 Spine 组件，那么替换操作就只会对这个 Spine 组件生效。
 
 ---
-以上所有用法你可以在 [演示项目](https://smallmain.gitee.io/cocos-enhance-kit/demo/v1.0.0/web-desktop/index.html) 中找到示范代码。
+以上所有用法你可以在演示项目中找到示范代码。

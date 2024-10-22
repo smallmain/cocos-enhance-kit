@@ -1,20 +1,20 @@
-import React from 'react';
-import clsx from 'clsx';
-import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import styles from './index.module.css';
 import HomepageFeatures from '@site/src/components/HomepageFeatures';
-import Rocket from '../../static/img/rocket.svg';
+import Layout from '@theme/Layout';
+import clsx from 'clsx';
+import React from 'react';
+import styles from './index.module.css';
 
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
   return (
     // 
-    <header className={clsx('hero', styles.heroBanner)} style={{ height: "60vh" }}>
+    <header className={clsx('hero', styles.heroBanner)} style={{ height: "70vh" }}>
       <div className="container">
         <div class="row" style={{ justifyContent: "center" }}>
-          <h1 className="hero__title" style={{ marginLeft: 0, fontWeight: "500", letterSpacing: 3 }}>{siteConfig.title}</h1>
+          <img src={useBaseUrl("/img/logo.png")} alt="logo" style={{ height: "400px" }} />
         </div>
         <div class="row" style={{ justifyContent: "center" }}>
           <p className="hero__subtitle" style={{ fontSize: "18px" }}>{siteConfig.tagline}</p>
@@ -30,7 +30,11 @@ function HomepageHeader() {
             </Link>
             <Link
               className="button button--outline button--primary button--lg"
-              href='https://smallmain.gitee.io/cocos-enhance-kit/demo/v1.0.0/web-desktop/index.html'
+              href={
+                window.innerWidth > 768
+                  ? 'https://smallmain.github.io/cocos-enhance-kit/demo/v1.0.0/web-desktop/index.html'
+                  : 'https://smallmain.github.io/cocos-enhance-kit/demo/v1.0.0/web-mobile/index.html'
+              }
               style={{ marginRight: 20 }}
             >
               查看演示

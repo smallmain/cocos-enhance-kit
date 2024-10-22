@@ -1,5 +1,5 @@
-import React from 'react';
 import clsx from 'clsx';
+import React from 'react';
 import styles from './styles.module.css';
 
 type FeatureItem = {
@@ -10,18 +10,26 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: '性能提升',
+    title: '增强特性',
     description: (
       <>
-        众多特性让你无需任何改动即可让项目的性能得到提升，并且能通过手动优化达到更好的效果。
+        新增文本高 DPI 渲染、Spine 换装等实用特性，让你的游戏开发更加省时省力省心。
       </>
     ),
   },
   {
-    title: '完全开源',
+    title: '性能提升',
     description: (
       <>
-        增强包是完全开源的项目，包括对原生引擎、JavaScript 引擎的改动都附有详细的原理文档。
+        多纹理渲染、动态合图、Label 增强等众多优化让你的游戏性能得到成倍的提升！
+      </>
+    ),
+  },
+  {
+    title: '开箱即用',
+    description: (
+      <>
+        本项目代码完全开源，包括对原生引擎、JavaScript 引擎的改动都附有详细的使用文档。
       </>
     ),
   },
@@ -29,21 +37,13 @@ const FeatureList: FeatureItem[] = [
     title: '原生体验',
     description: (
       <>
-        所有特性都通过自定义引擎实现，这种深度整合能带来其他方式所没有的 “原生” 的使用体验。
-      </>
-    ),
-  },
-  {
-    title: '增强特性',
-    description: (
-      <>
-        文本高 DPI 渲染、Spine 换装等实用特性的加入，让你的游戏开发更加省时省力省心。
+        所有特性都通过自定义引擎实现，这种深度整合能带来前所未有的 “原生” 使用体验。
       </>
     ),
   },
 ];
 
-function Feature({title, Svg, description}: FeatureItem) {
+function Feature({ title, Svg, description }: FeatureItem) {
   return (
     <div className={clsx('col col--3')}>
       {/* <div className="text--center">

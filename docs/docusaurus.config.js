@@ -7,7 +7,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Cocos Enhance Kit',
-  tagline: '提供 Cocos Creator 引擎特性增强、修复与优化的开源非官方增强包',
+  tagline: '这是 Cocos Creator v2.x 社区分叉版本，提供了大量的新特性、性能改进与修复。',
   url: 'https://smallmain.github.io',
   baseUrl: '/cocos-enhance-kit/',
   onBrokenLinks: 'throw',
@@ -36,17 +36,6 @@ const config = {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
           includeCurrentVersion: true,
-          versions: {
-            "1.2.0": {
-              label: "v1.2.0",
-            },
-            "1.1.0": {
-              label: "v1.1.0",
-            },
-            "1.0.0": {
-              label: "v1.0.0",
-            }
-          }
         },
         blog: {
           showReadingTime: true,
@@ -64,10 +53,7 @@ const config = {
       navbar: {
         title: 'Cocos Enhance Kit',
         // style: 'primary',
-        logo: {
-          alt: 'Cocos Enhance Kit',
-          src: 'img/logo.png',
-        },
+
         items: [
           {
             to: '/',
@@ -82,7 +68,7 @@ const config = {
             label: '文档',
           },
           {
-            href: 'https://smallmain.gitee.io/cocos-enhance-kit/demo/v1.0.0/web-desktop/index.html',
+            href: 'https://smallmain.github.io/cocos-enhance-kit/demo/v1.0.0/web-desktop/index.html',
             label: '演示',
             position: 'right',
           },
@@ -95,7 +81,7 @@ const config = {
           // { to: '/blog', label: 'Blog', position: 'left' },
           {
             href: 'https://github.com/smallmain/cocos-enhance-kit',
-            label: '加星鼓励',
+            label: 'Github',
             position: 'right',
             className: 'header-github-link',
           },
