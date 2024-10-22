@@ -16,11 +16,8 @@ var assetManagerWorkerAdapter = {
     },
     // 添加缓存文件记录
     addCachedFiles(args, cmdId, callback) {
-        const addedFiles = args[0];
-        for (let i = 0, l = addedFiles.length; i < l; i++) {
-            const [id, cacheBundleRoot, localPath, time] = addedFiles[i];
-            cc.assetManager.cacheManager.cachedFiles.add(id, { bundle: cacheBundleRoot, url: localPath, lastTime: time });
-        }
+        const [id, cacheBundleRoot, localPath, time] = args[0];
+        cc.assetManager.cacheManager.cachedFiles.add(id, { bundle: cacheBundleRoot, url: localPath, lastTime: time });
     },
 };
 

@@ -189,7 +189,7 @@ var cacheManager_worker = {
                     self.cachedFiles[id] = { bundle: cacheBundleRoot, url: localPath, lastTime: time };
                     delete self.cacheQueue[id];
                     self.writeCacheFile();
-                    // TODO             main.assetManager.addCachedFiles([[id, cacheBundleRoot, localPath, time]]);
+                    main.assetManager.addCachedFiles([id, cacheBundleRoot, localPath, time]);
                     if (_callback) _callback(id, cacheBundleRoot, localPath, time);
                 }
                 if (!isEmptyObject(self.cacheQueue)) {
@@ -334,7 +334,7 @@ var cacheManager_worker = {
             }
             self.cachedFiles[id] = { bundle: cacheBundleRoot, url: targetPath, lastTime: time };
             self.writeCacheFile();
-            main.assetManager.addCachedFiles([[id, cacheBundleRoot, targetPath, time]]);
+            main.assetManager.addCachedFiles([id, cacheBundleRoot, targetPath, time]);
             onComplete && onComplete(null, targetPath);
         });
     },
