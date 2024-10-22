@@ -4,8 +4,6 @@
 	<img src="/media/logo-round.png" width="200"></img>
 </p>
 
-</br>
-
 <p align="center">
 这是 <a herf="https://www.cocos.com/creator">Cocos Creator</a> v2.x 社区分叉版本，<b>提供了大量的新特性、性能改进与修复</b>。
 </p>
@@ -15,7 +13,7 @@
 </p>
 
 <p align="center">
-非常欢迎，并且希望你能和我们一起来完善这个项目！
+非常欢迎你能和我们一起来完善这个项目！
 </p>
 
 ## 主要特性
