@@ -16,14 +16,8 @@ const ipcMain = {
     init(callback) {
         this._initCallback = callback;
 
-        this.worker = wx.createWorker("workers/index.js", { useExperimentalWorker: true });
-
-        this.worker.onProcessKilled(() => {
-            console.warn("worker has been killed");
-            this.worker.terminate();
-            this.worker = null;
-            // TODO 这里还未正确处理，还需要重新 init cacheManager 等等，把这边对属性的修改同步过来
-        });
+        // NOTE { useExperimentalWorker: true } 会让有状态的 Worker 处理很复杂，暂时不使用
+        this.worker = wx.createWorker("workers/index.js");
 
         this.worker.onMessage(
             CC_WORKER_SCHEDULER
