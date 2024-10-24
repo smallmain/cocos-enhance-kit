@@ -32,9 +32,9 @@ function getSettings() {
     const isUninstalled = minigameVersion === "";
     const isSupported = !isUninstalled && Number(minigameVersion.split(".")[0]) >= 2;
     if (isUninstalled) {
-        return { code: -1, errMsg: "请先安装增强包。" };
+        return { code: -1, errMsg: "请先安装社区版。" };
     } else if (!isSupported) {
-        return { code: -2, errMsg: "需安装版本 >= 2.0.0 的增强包，以支持设置面板功能。" };
+        return { code: -2, errMsg: "安装的社区版版本需 >= 2.0.0 ，以支持设置面板功能。" };
     } else {
         const content = fs.readFileSync(engineWechatMinigameWorkerMainMacroPath, { encoding: "utf-8" });
 
@@ -96,10 +96,10 @@ function checkAndModifyWorkerFiles() {
         if (result.CC_WORKER_ASSET_PIPELINE || result.CC_WORKER_AUDIO_SYSTEM) {
             // 没有 Worker 目录与配置的话提醒用户重新安装
             if (!(gameJson.workers && fs.existsSync(workerDir))) {
-                Editor.error("你启用了增强包的多线程特性，但未检测到正确的 workers 目录与 game.json 字段，请重新安装增强包，详情请查看文档：TODO");
+                Editor.error("你启用了社区版的多线程特性，但未检测到正确的 workers 目录与 game.json 字段，请重新安装社区版，详情请查看文档：TODO");
             }
         } else {
-            Editor.warn("你禁用了增强包的多线程特性，可以手动删除相关文件以减少包体大小，详情请查看文档：TODO");
+            Editor.warn("你禁用了社区版的多线程特性，可以手动删除相关文件以减少包体大小，详情请查看文档：TODO");
         }
     }
 }

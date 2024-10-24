@@ -1,4 +1,4 @@
 module.exports = {
-    'settingsmenuname': '增强包设置...',
-    'settings_title': '增强包设置',
+    'settingsmenuname': '社区版设置...',
+    'settings_title': '社区版设置',
 };
