@@ -10,27 +10,38 @@ const hasWorker = sdkVersion[0] > 2 || (sdkVersion[0] === 2 && (sdkVersion[1] > 
 const useSubpackage = sdkVersion[0] > 2 || (sdkVersion[0] === 2 && (sdkVersion[1] > 27 || (sdkVersion[1] === 27 && sdkVersion[2] >= 3)));
 
 // 是否启用 Worker 驱动资源管线
-globalThis.CC_WORKER_ASSET_PIPELINE = false;
+if (!("CC_WORKER_ASSET_PIPELINE" in globalThis)) {
+    globalThis.CC_WORKER_ASSET_PIPELINE = false;
+    // NOTE 截止 2024.10.22，微信未修复 iOS、Windows、Mac 上仅文件系统 API 可以正常使用的问题
+    globalThis.CC_WORKER_ASSET_PIPELINE = (isAndroid || isDevtools) && globalThis.CC_WORKER_ASSET_PIPELINE;
+}
 
 // 是否启用 Worker 驱动音频系统
-globalThis.CC_WORKER_AUDIO_SYSTEM = false;
-
-// NOTE 截止 2024.10.22，微信未修复 iOS、Windows、Mac 上仅文件系统 API 可以正常使用的问题
-globalThis.CC_WORKER_ASSET_PIPELINE = (isAndroid || isDevtools) && globalThis.CC_WORKER_ASSET_PIPELINE;
+if (!("CC_WORKER_AUDIO_SYSTEM" in globalThis)) {
+    globalThis.CC_WORKER_AUDIO_SYSTEM = false;
+}
 
 // 是否启用 Worker
-globalThis.CC_USE_WORKER = (CC_WORKER_ASSET_PIPELINE) && hasWorker && !isSubContext;
+if (!("CC_USE_WORKER" in globalThis)) {
+    globalThis.CC_USE_WORKER = (CC_WORKER_ASSET_PIPELINE) && hasWorker && !isSubContext;
+}
 
 // 是否启用 Worker 调试模式
-globalThis.CC_WORKER_DEBUG = false;
+if (!("CC_WORKER_DEBUG" in globalThis)) {
+    globalThis.CC_WORKER_DEBUG = false;
+}
 
 // 是否启用 Worker 调度模式，这也许能减少通信次数带来的性能消耗（必须一致）
 globalThis.CC_WORKER_SCHEDULER = true;
 
 // 是否启用 Worker 使用同步版本的文件系统 API
 // NOTE: IOS 不支持 async 文件系统 API，Android 不支持部分 sync 文件系统 API，其余系统暂不确定
-globalThis.CC_WORKER_FS_SYNC = !isAndroid && !isDevtools;
+if (!("CC_WORKER_FS_SYNC" in globalThis)) {
+    globalThis.CC_WORKER_FS_SYNC = !isAndroid && !isDevtools;
+}
 
 // 是否启用 Worker 子包
-// NOTE 截止 2024.10.22，部分安卓机型声明使用子包 Worker 会报 java.string 错误
-globalThis.CC_WORKER_SUB_PACKAGE = false;
+if (!("CC_WORKER_SUB_PACKAGE" in globalThis)) {
+    // NOTE 截止 2024.10.22，部分安卓机型声明使用子包 Worker 会报 java.string 错误
+    globalThis.CC_WORKER_SUB_PACKAGE = false;   // useSubpackage
+}
