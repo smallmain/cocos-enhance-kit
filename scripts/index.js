@@ -4,7 +4,6 @@ import gracefulFs from "graceful-fs";
 import { Octokit } from 'octokit';
 import { basename, extname, join } from "path";
 import { cwd, env } from "process";
-import { maxSatisfying } from "semver";
 import { Client } from 'ssh2';
 import { Zip } from 'zip-lib';
 const { createReadStream, copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } = gracefulFs;
@@ -151,28 +150,8 @@ if (!DRYRUN) {
 }
 console.log("更新文件", spjsPath);
 
-// 确保存在相应版本的支持性扩展
-const supportPath = join(masterPath, "extension", `v${kitVersion}`, "enhance-kit-support");
-if (!existsSync(supportPath)) {
-    const versions = readdirSync(join(masterPath, "extension"));
-    const latestVersion = maxSatisfying(versions, "*");
-    const needCopy = await confirm({
-        message: `未发现 v${kitVersion} 版本的支持性扩展，是否从 ${latestVersion} 拷贝?`,
-        default: true,
-    });
-    if (needCopy) {
-        const src = join(masterPath, "extension", latestVersion);
-        const dest = join(masterPath, "extension", `v${kitVersion}`);
-
-        if (!DRYRUN) {
-            copyDirectory(src, dest);
-        }
-
-        console.log("拷贝目录", src, "->", dest);
-    }
-}
-
 // 确保支持性扩展 package.json 版本号正确
+const supportPath = join(sourcePath, "extension");
 const supportPackageJsonPath = join(supportPath, "package.json");
 const supportPackageJson = JSON.parse(readFileSync(supportPackageJsonPath, { encoding: "utf-8" }));
 supportPackageJson.version = kitVersion;
@@ -235,7 +214,7 @@ if (!DRYRUN) {
     console.log("正在压缩", minigamePath);
     sourceZipFile.addFolder(minigamePath, "adapters");
     console.log("正在压缩", supportPath);
-    sourceZipFile.addFolder(supportPath, "enhance-kit-support");
+    sourceZipFile.addFolder(supportPath, "extension");
     console.log("正在压缩", dtsPath);
     sourceZipFile.addFile(dtsPath);
     await sourceZipFile.archive(zipPath);

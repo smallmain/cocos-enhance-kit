@@ -23,7 +23,7 @@ description: "需掌握一定的自定义引擎知识。"
 - `cocos2d-x`（Cocos2d-x engine）
 - `jsb-adapter`（JSB adpater）
 - `adapters`（Minigame adpaters）
-- `enhance-kit-support`（支持性引擎扩展）
+- `extension`（支持性引擎扩展）
 - `creator-sp.d.ts`（社区版类型文件）
 
 ## 替换自定义引擎
@@ -44,7 +44,7 @@ description: "需掌握一定的自定义引擎知识。"
 
 ## 安装支持性引擎扩展
 
-按照官方的 [扩展安装](https://docs.cocos.com/creator/2.4/manual/zh/extension/install-and-share.html) 文档将压缩包内的 `enhance-kit-support` 目录放到项目的 `packages` 目录即可。
+按照官方的 [扩展安装](https://docs.cocos.com/creator/2.4/manual/zh/extension/install-and-share.html) 文档将压缩包内的 `extension` 目录放到项目的 `packages` 目录即可。
 
 :::caution 注意
 

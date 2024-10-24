@@ -12,11 +12,11 @@
 - `adapters` 小游戏平台适配器
 - `cocos2d-x` C++ 原生平台引擎
 - `creator-sp.d.ts` 引擎 TypeScript 类型提示
+- `extension` 支持性引擎扩展（v2.0 以上，之前版本的扩展源码请直接下载压缩包获取）
 
 在 `master` 分支下：
 
 - `src` 只留一份指向源码分支的说明文档
-- `extension` 支持性引擎扩展
 - `docs` 存放着文档网站源码，使用 Docusaurus 开发
 - `demo` 存放着 Cocos Creator 演示项目源码
 - `scripts` 工具脚本
@@ -58,7 +58,7 @@
 - 删除 `engine` 目录中的 `node_modules` 目录，可能导致解压失败。
 - 编译 JavaScript 引擎。
 - 编译原生模拟器。
-- 将几个源码目录、类型提示文件、`enhance-kit-support` 放到压缩包根目录内。
+- 将几个源码目录、类型提示文件、`extension` 放到压缩包根目录内。
 
 ### 更新 DEMO
 

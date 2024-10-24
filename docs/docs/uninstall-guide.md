@@ -42,4 +42,4 @@ sidebar_position: 6
 
 点击 Cocos Creator 主界面右上角的 **编辑器** 按钮，进入到编辑器的资源目录。
 
-然后使用未修改过的 `jsb-adapter` 替换掉编辑器的 `Resources/builtin/jsb-adapter` 目录，最后将增强包的引擎扩展（比如 `enhance-kit-support` 目录）删除。
+然后使用未修改过的 `jsb-adapter` 替换掉编辑器的 `Resources/builtin/jsb-adapter` 目录，最后将增强包的引擎扩展（比如 `extension` 目录）删除。
