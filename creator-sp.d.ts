@@ -790,6 +790,34 @@ declare module cc {
 
 }
 
+declare namespace cc.AssetManager {
+    interface CacheManager {
+        /**
+        !#en
+        Get temporary path with origin url, this method only works on mini-game platforms
+
+        Use 'getTempAsync' if multithreading is enabled.
+
+        !#zh
+        通过原始 url 获取临时文件的路径，此方法只在小游戏平台有效
+
+        如果启用了多线程特性，请使用 `getTempAsync`.
+        @param originUrl originUrl 
+        */
+        getTemp(originUrl: string): string;
+        /**
+        !#en
+        Get temporary path with origin url, this method only works on mini-game platforms
+    	
+        !#zh
+        通过原始 url 获取临时文件的路径，此方法只在小游戏平台有效
+        @param originUrl originUrl 
+        @param callback 回调函数，参数是返回的路径 
+        */
+        getTempAsync(originUrl: string, callback: (path: string) => void): void;
+    }
+}
+
 declare module sp {
 
     /**
