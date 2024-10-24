@@ -9,8 +9,8 @@ globalThis.CC_WORKER_DEBUG = false;
 // 是否启用 Worker 使用同步版本的文件系统 API
 globalThis.CC_WORKER_FS_SYNC = null;
 
-// 是否启用 Worker 驱动资源管线（下载、缓存）
+// 是否启用 Worker 驱动资源管线
 globalThis.CC_WORKER_ASSET_PIPELINE = null;
 
-// 是否启用 Worker 驱动资源管线（加载）
-globalThis.CC_WORKER_ASSET_PIPELINE_INCLUDE_LOAD = null;
+// 是否启用 Worker 驱动音频系统
+globalThis.CC_WORKER_AUDIO_SYSTEM = null;

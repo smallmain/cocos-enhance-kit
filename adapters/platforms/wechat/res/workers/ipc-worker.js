@@ -144,7 +144,7 @@ function _initFromWorker(id, meta) {
         wrappers,
         CC_WORKER_FS_SYNC,
         CC_WORKER_ASSET_PIPELINE,
-        CC_WORKER_ASSET_PIPELINE_INCLUDE_LOAD,
+        CC_WORKER_AUDIO_SYSTEM,
     ] = meta;
 
     for (const wrapper of wrappers) {
@@ -159,7 +159,7 @@ function _initFromWorker(id, meta) {
 
     globalThis.CC_WORKER_FS_SYNC = CC_WORKER_FS_SYNC;
     globalThis.CC_WORKER_ASSET_PIPELINE = CC_WORKER_ASSET_PIPELINE;
-    globalThis.CC_WORKER_ASSET_PIPELINE_INCLUDE_LOAD = CC_WORKER_ASSET_PIPELINE_INCLUDE_LOAD;
+    globalThis.CC_WORKER_AUDIO_SYSTEM = CC_WORKER_AUDIO_SYSTEM;
 
     _inited = true;
     if (_initCallback) _initCallback();

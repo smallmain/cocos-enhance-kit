@@ -1,12 +1,9 @@
-require("./macro.js");
+require("./macro");
 require("./ipc-main.js");
 require("./handlers.js");
 
-let inited = false;
-let _callback = null;
-
 module.exports = {
-    init() {
+    init(callback) {
         if (CC_USE_WORKER) {
             var t = Date.now();
             ipcMain.init(() => {
@@ -15,25 +12,15 @@ module.exports = {
                     CC_USE_WORKER,
                     CC_WORKER_DEBUG,
                     CC_WORKER_ASSET_PIPELINE,
-                    CC_WORKER_ASSET_PIPELINE_INCLUDE_LOAD,
+                    CC_WORKER_AUDIO_SYSTEM,
                     CC_WORKER_SCHEDULER,
                     CC_WORKER_FS_SYNC,
+                    CC_WORKER_SUB_PACKAGE,
                 });
-                inited = true;
-                _callback && _callback();
-                _callback = null;
+                callback && callback();
             });
         } else {
-            inited = true;
-            _callback && _callback();
-            _callback = null;
-        }
-    },
-    onInited(callback) {
-        if (inited) {
-            callback();
-        } else {
-            _callback = callback;
+            callback && callback();
         }
     },
 };

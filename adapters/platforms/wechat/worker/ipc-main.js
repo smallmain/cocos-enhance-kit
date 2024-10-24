@@ -16,25 +16,44 @@ const ipcMain = {
     init(callback) {
         this._initCallback = callback;
 
-        // NOTE { useExperimentalWorker: true } 会让有状态的 Worker 处理很复杂，暂时不使用
-        this.worker = wx.createWorker("workers/index.js");
-
-        this.worker.onMessage(
-            CC_WORKER_SCHEDULER
-                ? msgs => {
-                    for (let index = 0; index < msgs.length; index++) {
-                        const msg = msgs[index];
-                        this._handleWorkerMessage(msg);
+        const loadSrc = (cb) => {
+            if (CC_WORKER_SUB_PACKAGE) {
+                wx.preDownloadSubpackage({
+                    packageType: "workers",
+                    success() {
+                        cb();
+                    },
+                    fail(res) {
+                        console.error("load worker fail:", res);
+                        loadSrc(cb);
                     }
-                }
-                : this._handleWorkerMessage.bind(this)
-        );
+                });
+            } else {
+                cb();
+            }
+        };
 
-        if (CC_WORKER_SCHEDULER) {
-            sendScheduler.init(this);
-        }
+        loadSrc(() => {
+            // NOTE { useExperimentalWorker: true } 会让有状态的 Worker 处理很复杂，暂时不使用
+            this.worker = wx.createWorker("workers/index.js");
 
-        this._init();
+            this.worker.onMessage(
+                CC_WORKER_SCHEDULER
+                    ? msgs => {
+                        for (let index = 0; index < msgs.length; index++) {
+                            const msg = msgs[index];
+                            this._handleWorkerMessage(msg);
+                        }
+                    }
+                    : this._handleWorkerMessage.bind(this)
+            );
+
+            if (CC_WORKER_SCHEDULER) {
+                sendScheduler.init(this);
+            }
+
+            this._init();
+        });
     },
 
     _handleWorkerMessage(msg) {
@@ -90,7 +109,7 @@ const ipcMain = {
             _handlers,
             CC_WORKER_FS_SYNC,
             CC_WORKER_ASSET_PIPELINE,
-            CC_WORKER_ASSET_PIPELINE_INCLUDE_LOAD,
+            CC_WORKER_AUDIO_SYSTEM,
         ]);
     },
 

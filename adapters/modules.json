@@ -8,7 +8,8 @@
   "Audio": [
     "./common/engine/Audio.js",
     "./common/engine/AudioEngine.js",
-    "./platforms/alipay/wrapper/engine/AudioEngine.js"
+    "./platforms/alipay/wrapper/engine/AudioEngine.js",
+    "./platforms/wechat/worker/audio.js"
   ],
   "AudioSource": [],
   "Action": [],
