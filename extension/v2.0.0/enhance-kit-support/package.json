@@ -1,0 +1,16 @@
+{
+  "name": "enhance-kit",
+  "version": "2.0.0",
+  "description": "This extension provides support for cocos enhance kit.",
+  "author": "SmallMain",
+  "main": "main.js",
+  "runtime-resource": {
+    "path": "resources",
+    "name": "resources"
+  },
+  "reload": {
+    "ignore": [
+      "resources/**/*"
+    ]
+  }
+}
