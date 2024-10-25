@@ -17,7 +17,7 @@ Editor.Panel.extend({
         <p class="desc">该特性仅在微信小游戏平台下有效。</p>
         <hr />
         <div class="sub">
-            <p class="subdesc">请注意，以下为全局设置，会影响所有项目，并在重新安装升级或卸载后丢失所有设置。</p>
+            <p class="subdesc">请注意，以下为全局设置，改动会影响到所有项目，并且在重新安装、升级或卸载社区版后丢失所有设置。</p>
             <ui-prop id="td" tabindex="-1" name="调试模式" tooltip="启用后将会输出详细日志以便进行调试，这可能会大幅降低性能。">
                 <ui-checkbox id="tdc" tabindex="-1"></ui-checkbox>
             </ui-prop>
