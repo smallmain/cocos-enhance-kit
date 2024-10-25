@@ -96,15 +96,23 @@ Label 一直是项目优化的最难点，因为它完全不能和其它的渲�
 
 现在在满足条件的情况下可以复用 Culling 数据，以减少项目 CPU 的性能消耗。
 
+### 多线程支持
+
+现在，引擎的部分系统增加了多线程支持，启用后可以释放其对主线程的占用，减少卡顿现象。
+
 ## 演示
 
 [Web Desktop](https://smallmain.github.io/cocos-enhance-kit/demo/v1.0.0/web-desktop/index.html)
 
 [Web Mobile](https://smallmain.github.io/cocos-enhance-kit/demo/v1.0.0/web-mobile/index.html)（请将设备横屏）
 
+## 文档
+
+请前往 [文档](https://smallmain.github.io/cocos-enhance-kit/docs/intro)。
+
 ## 使用方法
 
-请阅读 [文档](https://smallmain.github.io/cocos-enhance-kit/docs/installation/installation-auto) 进行安装。
+请阅读文档的 [一键安装](https://smallmain.github.io/cocos-enhance-kit/docs/installation/installation-auto)。
 
 ## 更新日志
 

@@ -97,3 +97,9 @@ Spine 组件现在不仅可以参与动态合图，还能与其他渲染组件�
 社区版新增了在满足一定条件的情况下可以复用 Culling 数据的特性，以减少 CPU 的性能消耗。
 
 可前往 [复用 Culling 数据](../user-guide/tiledmap/tiledmap-culling.md) 文档了解更多详情。
+
+## 启用多线程支持
+
+社区版为引擎的部分系统增加了多线程支持，启用后可以释放其对主线程的占用，减少卡顿现象。
+
+详情请阅读文档：[多线程支持](../user-guide/multithread/thread-intro)。

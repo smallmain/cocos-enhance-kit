@@ -74,3 +74,5 @@ description: "需掌握一定的自定义引擎知识。"
 ![installedconsole](./assets/installed-console.png)
 
 接下来推荐你继续阅读文档中剩下的内容以了解你能够使用的新特性！
+
+如果编辑器输出了一条有关包体大小的警告，请阅读 [多线程支持](../user-guide/multithread/thread-intro#注意事项) 了解详情。
