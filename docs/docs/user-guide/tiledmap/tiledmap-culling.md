@@ -5,7 +5,7 @@ description: "像其它渲染组件一样在 Spine 组件上使用动态合图�
 
 # 复用 Culling 数据
 
-一个 TiledMap 可能会有很多 TiledLayer，如果开启了 Culling，那这些 Layer 都需要单独计算 Culling 数据，增强包新增了在满足一定条件的情况下可以复用 Culling 数据的特性，以减少 CPU 的性能消耗。
+一个 TiledMap 可能会有很多 TiledLayer，如果开启了 Culling，那这些 Layer 都需要单独计算 Culling 数据，社区版新增了在满足一定条件的情况下可以复用 Culling 数据的特性，以减少 CPU 的性能消耗。
 
 ## 大致原理
 

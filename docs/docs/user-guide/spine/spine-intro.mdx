@@ -3,7 +3,7 @@ import {useCurrentSidebarCategory} from '@docusaurus/theme-common';
 
 # Spine
 
-增强包解决了 Spine 在 Cocos Creator 中的三大痛点：
+社区版解决了 Spine 在之前的三大痛点：
 
 - 不参与动态合图
 - 无法与其它组件合批
@@ -12,11 +12,3 @@ import {useCurrentSidebarCategory} from '@docusaurus/theme-common';
 你可以阅读下面的文档了解详情：
 
 <DocCardList items={useCurrentSidebarCategory().items}/>
-
-:::caution 注意
-
-由于引擎这部分的 C++ 实现与 JavaScript 实现在一些细节上不太一样，比如一些内部函数的执行时机。
-
-所以当你在 Web 平台上测试得出的一些结论请不要想当然地以为在原生平台上也一样，具体实现差异请阅读 Spine 的原理文档。
-
-:::

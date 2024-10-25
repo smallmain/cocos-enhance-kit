@@ -5,7 +5,7 @@ import {useCurrentSidebarCategory} from '@docusaurus/theme-common';
 
 :::tip 提示
 
-多纹理渲染属于底层设施，如果你不是准备手动使用多纹理材质或者多纹理合批管理器的话，请跳过本特性文档。
+多纹理渲染属于底层设施，若你不准备手动使用多纹理材质或者多纹理合批管理器的话，请跳过本特性文档。
 
 :::
 
@@ -15,7 +15,7 @@ import {useCurrentSidebarCategory} from '@docusaurus/theme-common';
 
 其根本原因是纹理是使用 uniform 变量传给着色器的，而需要合并批次的话不允许每次渲染都拥有不同的 uniform 变量值。
 
-增强包实现的是先设置多个 uniform 变量，比如将 8 张纹理写入到 "texture1" "texture2" "texture3"... 的 8 个 uniform 变量中，然后在着色器里再判断应该在渲染时使用哪个 uniform 变量。
+社区版现在的实现是先设置多个 uniform 变量，比如将 8 张纹理写入到 "texture1" "texture2" "texture3"... 的 8 个 uniform 变量中，然后在着色器里再判断应该在渲染时使用哪个 uniform 变量。
 
 这样的话如果所有渲染都只用这 8 张纹理，就都能合并为 1 个批次。
 

@@ -13,11 +13,7 @@ description: "了解调校动态合图的方式。"
 
 这样就只需要使用 1 个材质，也就是能在 1 Draw Call 里完成所有参与动态合图的纹理（包括 Bitmap 缓存模式 Label）与 Char 缓存模式 Label 的渲染。
 
-一般情况下不推荐直接修改 `maxAtlasCount`，请参考 [新的 Char 缓存模式](../text-render/text-char-mode.md#与动态图集合批的注意事项) 文档。
-
-> 难道真正的原因是...
-> 
-> ![7的意志](./assets/7.png)
+一般情况下不推荐直接修改 `maxAtlasCount`，请参考 [Char 缓存模式](../text-render/text-char-mode.md#与动态图集合批的注意事项) 文档。
 
 ---
 ## 控制纹理是否参与动态合图

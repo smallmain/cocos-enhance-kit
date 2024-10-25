@@ -46,6 +46,8 @@ description: "需掌握一定的自定义引擎知识。"
 
 按照官方的 [扩展安装](https://docs.cocos.com/creator/2.4/manual/zh/extension/install-and-share.html) 文档将压缩包内的 `extension` 目录放到项目的 `packages` 目录即可。
 
+建议将 `extension` 目录重命名成一个更有意义的名字，比如 `enhance-kit`。
+
 :::caution 注意
 
 - 请勿将此引擎扩展与 [一键安装](./installation-auto) 中的付费引擎扩展混淆！

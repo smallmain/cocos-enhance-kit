@@ -4,18 +4,16 @@ description: "一行代码开启高清文本渲染。"
 ---
 # 高 DPI 支持
 
-可阅读 [上手其它新特性](../../best-practices/new-features.md#高-dpi-文本渲染) 了解基本的使用方法，除了注意性能以外，没有其它的注意事项。
+可阅读 [提升游戏质量](../../best-practices/quality-guide) 了解基本的使用方法。
 
----
 ## 调整全局开关
 
-使用下面的代码控制组件是否默认开启高 DPI 支持：
+使用下面的代码控制所有组件是否默认开启高 DPI 支持：
 
 ```js
 cc.sp.enableLabelRetina = false;
 ```
 
----
 ## 调整渲染缩放比例
 
 使用下面的代码调整内部渲染的缩放倍数：
@@ -24,7 +22,6 @@ cc.sp.enableLabelRetina = false;
 cc.sp.labelRetinaScale = 2;
 ```
 
----
 ## 控制单个组件开关
 
 ![reinasettings](./assets/reina-settings.png)

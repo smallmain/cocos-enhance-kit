@@ -79,7 +79,7 @@ a.getRegion(slotName, attachmentName);
 
 如果你只想替换其中一个组件，那么就可以克隆这个 SkeletonData 让每个组件都使用不同的 SkeletonData 实例进行渲染。
 
-增强包提供了一个克隆数据的接口来实现这个需求：
+社区版提供了一个克隆数据的接口来实现这个需求：
 
 ```js
 const clonedSkeletonData = skeletonData.clone();
