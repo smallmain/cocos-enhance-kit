@@ -49877,6 +49877,21 @@
       update: function update() {
         if (!this.enabled) return;
         for (var i = 0; i <= _atlasIndex; i++) _atlases[i].update();
+      },
+      getUnusedAtlas: function getUnusedAtlas() {
+        if (!this.enabled) return null;
+        for (var i = 0; i <= _atlasIndex; i++) if (_atlases[i].isEmpty()) return _atlases[i];
+        return null;
+      },
+      deleteAtlas: function deleteAtlas(index) {
+        if (!this.enabled) return;
+        _atlases[index].destroy();
+        _atlases.splice(index, 1);
+        _atlasIndex--;
+      },
+      destroyUnusedAtlases: function destroyUnusedAtlases() {
+        if (!this.enabled) return;
+        for (var i = 0; i <= _atlasIndex; i++) _atlases[i].isEmpty() && _atlases[i].destroy();
       }
     };
     module.exports = cc.dynamicAtlasManager = dynamicAtlasManager;
@@ -56830,6 +56845,7 @@
       };
       _proto.reset = function reset() {
         this.handlers.length = 0;
+        this.nextHandler = null;
       };
       return MultiBatcher;
     })();
@@ -56912,7 +56928,7 @@
     "use strict";
     cc.sp = {
       inited: false,
-      version: "1.2.0",
+      version: "2.0.0",
       MAX_MULTITEXTURE_NUM: -1,
       autoSwitchMaterial: true,
       allowDynamicAtlas: true,
@@ -73799,7 +73815,7 @@
         return cc.Material.getBuiltinMaterial("2d-spine");
       },
       _updateMaterial: function _updateMaterial() {
-        var useTint = this.useTint || this.isAnimationCached() && false;
+        var useTint = this.useTint;
         var baseMaterial = this.getMaterial(0);
         if (baseMaterial) {
           var isMultiSupport = baseMaterial.material.isMultiSupport();
@@ -73827,7 +73843,7 @@
       _updateUseTint: function _updateUseTint() {
         var baseMaterial = this.getMaterial(0);
         if (baseMaterial) {
-          var useTint = this.useTint || this.isAnimationCached() && false;
+          var useTint = this.useTint;
           baseMaterial.material.isMultiSupport() ? this._defineMaterialTint(baseMaterial, useTint) : baseMaterial.define("USE_TINT", useTint);
         }
         this._materialCache = {};
@@ -75324,7 +75340,7 @@
         var baseMaterial = comp._materials[0];
         if (!baseMaterial) return;
         _useMulti = baseMaterial.material.isMultiSupport();
-        _useTint = comp.useTint || comp.isAnimationCached();
+        _useTint = comp.useTint;
         _vertexFormat = _useTint ? _useMulti ? VFTwoColorTexId : VFTwoColor : _useMulti ? VFOneColorTexId : comp.isAnimationCached() ? VFTwoColor : VFOneColor;
         _perVertexSize = _useTint ? _useMulti ? 7 : 6 : _useMulti ? 6 : comp.isAnimationCached() ? 6 : 5;
         _node = comp.node;
@@ -98044,7 +98060,7 @@
     defineDeprecatedMacroGetter("CC_QQPLAY", QQPLAY);
     true;
     cc._Test = {};
-    var engineVersion = "2.4.12";
+    var engineVersion = "2.4.13";
     _global["CocosEngine"] = cc.ENGINE_VERSION = engineVersion;
   }), {} ]
 }, {}, [ 464 ]);
