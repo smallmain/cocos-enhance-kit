@@ -2,11 +2,11 @@ import { confirm, input } from "@inquirer/prompts";
 import { $ } from "execa";
 import gracefulFs from "graceful-fs";
 import { Octokit } from 'octokit';
-import { basename, extname, join } from "path";
+import { basename, dirname, extname, join } from "path";
 import { cwd, env } from "process";
 import { Client } from 'ssh2';
 import { Zip } from 'zip-lib';
-const { createReadStream, copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } = gracefulFs;
+const { renameSync, createReadStream, copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } = gracefulFs;
 
 // 公共函数
 const $$ = $({ stdout: 'inherit', stderr: 'inherit' });
@@ -29,7 +29,7 @@ function copyDirectory(sourceDir, targetDir) {
             copyFileSync(sourcePath, targetPath);
         } else {
             // 如果是子目录，则递归调用copyDir函数进行拷贝
-            copyDir(sourcePath, targetPath);
+            copyDirectory(sourcePath, targetPath);
         }
     });
 }
@@ -46,27 +46,38 @@ async function uploadBySFTP(host, port, username, password, filePath, targetFile
                     client.end();
                     return;
                 }
-                sftp.exists(targetFilePath, hasErr => {
-                    if (!hasErr) {
-                        resolve();
-                        client.end();
+
+                sftp.mkdir(dirname(targetFilePath), err => {
+                    if (err) {
+                        reject(err);
                         return;
                     }
 
-                    const readStream = createReadStream(filePath);
-                    const writeStream = sftp.createWriteStream(targetFilePath);
+                    sftp.writeFile(targetFilePath, readFileSync(filePath), err => {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
 
-                    writeStream.on('close', () => {
+                        client.end();
                         resolve();
-                        client.end();
-                    });
+                    })
 
-                    writeStream.on('error', (err) => {
-                        reject(err);
-                        client.end();
-                    });
+                    // const readStream = createReadStream(filePath);
+                    // const writeStream = sftp.createWriteStream(targetFilePath);
 
-                    readStream.pipe(writeStream);
+                    // writeStream.on('close', () => {
+                    //     resolve();
+                    //     client.end();
+                    // });
+
+                    // writeStream.on('error', (err) => {
+                    //     reject(err);
+                    //     sftp.writeFile(remotePath, data, options)
+                    //     client.end();
+                    // });
+
+                    // readStream.pipe(writeStream);
                 });
             });
         });
@@ -85,10 +96,12 @@ async function uploadBySFTP(host, port, username, password, filePath, targetFile
 }
 
 // 试运行
-const DRYRUN = true;
+const DRYRUN = false;
+const COMPILING_SIMULATOR = false;
 
 // 目录
 const masterPath = cwd();
+const masterTempPath = join(masterPath, "temp");
 const sourcePath = await input({
     message: "请输入源码分支目录：",
     required: true,
@@ -168,14 +181,8 @@ const jsNpmPath = join(jsPath, "node_modules");
 const jsbPath = join(sourcePath, "jsb-adapter");
 const minigamePath = join(sourcePath, "adapters");
 const dtsPath = join(sourcePath, "creator-sp.d.ts");
-const zipPath = join(masterPath, `cocos-enhance-kit-v${kitVersion}-v${engineVersion}.zip`);
+const zipPath = join(masterTempPath, `cocos-enhance-kit-v${kitVersion}-v${engineVersion}.zip`);
 
-if (!DRYRUN) {
-    rmSync(cppBuildPath, { force: true, recursive: true });
-    rmSync(jsNpmPath, { force: true, recursive: true });
-}
-console.log("删除目录", cppBuildPath);
-console.log("删除目录", jsNpmPath);
 if (!DRYRUN) {
     console.log("开始编译 JavaScript 引擎");
     try {
@@ -188,7 +195,7 @@ if (!DRYRUN) {
     }
 }
 console.log("已编译 JavaScript 引擎");
-if (!DRYRUN) {
+if (!DRYRUN && COMPILING_SIMULATOR) {
     console.log("开始编译当前平台的原生模拟器");
     try {
         await $$({ cwd: cppPath })`gulp gen-simulator`;
@@ -201,6 +208,24 @@ if (!DRYRUN) {
     }
 }
 console.log("已编译当前平台的原生模拟器");
+const tempCppBuildPath = join(masterTempPath, "cpp/build");
+const tempJsNpmPath = join(masterTempPath, "js/node_modules");
+if (!DRYRUN) {
+    try {
+        mkdirSync(dirname(tempCppBuildPath), { recursive: true });
+        renameSync(cppBuildPath, tempCppBuildPath);
+    } catch (error) {
+
+    }
+    try {
+        mkdirSync(dirname(tempJsNpmPath), { recursive: true });
+        renameSync(jsNpmPath, tempJsNpmPath);
+    } catch (error) {
+
+    }
+}
+console.log("移动目录", cppBuildPath, "->", tempCppBuildPath);
+console.log("移动目录", jsNpmPath, "->", tempJsNpmPath);
 
 // 创建压缩包
 if (!DRYRUN) {
@@ -224,7 +249,7 @@ console.log("已压缩至文件", zipPath);
 // [付费扩展]
 if (extensionPath) {
     // 创建压缩包
-    const payZipPath = join(masterPath, `${kitVersion}.zip`);
+    const payZipPath = join(masterTempPath, `${kitVersion}.zip`);
     if (!DRYRUN) {
         const sourceZipFile = new Zip();
         console.log("正在压缩", jsPath);
@@ -245,14 +270,22 @@ if (extensionPath) {
     const payZipUrl = `http://downloadcdn.smallmain.com/cocos-enhance-kit/${engineVersion}/${kitVersion}.zip`;
     if (!DRYRUN) {
         console.log("正在上传文件", payZipPath);
-        await uploadBySFTP(
-            env.HOST,
-            env.PORT,
-            env.USERNAME,
-            env.PASSWORD,
-            payZipPath,
-            `/www/wwwroot/download.smallmain.com/cocos-enhance-kit/${engineVersion}/${kitVersion}.zip`,
-        );
+        try {
+            await uploadBySFTP(
+                env.HOST,
+                env.PORT,
+                env.USERNAME,
+                env.PASSWORD,
+                payZipPath,
+                `/www/wwwroot/download.smallmain.com/cocos-enhance-kit/${engineVersion}/${kitVersion}.zip`,
+            );
+        } catch (error) {
+            console.error(error);
+            await confirm({
+                message: `自动上传 zip 失败，请手动上传后继续`,
+                default: true,
+            });
+        }
     }
     console.log("已上传文件", payZipUrl);
 
@@ -270,7 +303,7 @@ if (extensionPath) {
 
     // 压缩为扩展 zip 文件
     const extensionVersion = JSON.parse(readFileSync(join(extensionPath, "package.json"), { encoding: "utf-8" })).version;
-    const extensionZipPath = join(masterPath, `cocos-enhance-kit-extension-v${extensionVersion}.zip`);
+    const extensionZipPath = join(masterTempPath, `cocos-enhance-kit-extension-v${extensionVersion}.zip`);
     if (!DRYRUN) {
         const sourceZipFile = new Zip();
         readdirSync(extensionPath, { withFileTypes: true })
@@ -312,50 +345,71 @@ if (extensionPath) {
     });
 }
 
-// 更新 Demo
-const demoBuildPath = join(masterPath, "demo/build");
-const demoDesktopBuildPath = join(demoBuildPath, "web-desktop");
-const demoMobileBuildPath = join(demoBuildPath, "web-mobile");
-const demoTargetPath = join(masterPath, "docs/static/demo", `v${kitVersion}`);
-const demoDesktopTargetPath = join(demoTargetPath, "web-desktop");
-const demoMobileTargetPath = join(demoTargetPath, "web-mobile");
-if (!existsSync(demoTargetPath)) {
-    await confirm({
-        message: `请测试并编译 Demo 项目，然后继续操作`,
-        default: true,
-    });
-    if (!DRYRUN) {
-        copyDirectory(demoDesktopBuildPath, demoDesktopTargetPath);
-        copyDirectory(demoMobileBuildPath, demoMobileTargetPath);
+// 将目录移回
+if (!DRYRUN) {
+    try {
+        renameSync(tempCppBuildPath, cppBuildPath);
+    } catch (error) {
+
     }
-    console.log("拷贝目录", demoDesktopBuildPath, "->", demoDesktopTargetPath);
-    console.log("拷贝目录", demoMobileBuildPath, "->", demoMobileTargetPath);
+    try {
+        renameSync(tempJsNpmPath, jsNpmPath);
+    } catch (error) {
+
+    }
 }
-readdirSync(masterPath, {
-    recursive: true,
-    encoding: "utf-8",
-})
-    .filter(path => [".ts", ".tsx", ".js", ".jsx", ".md", ".mdx"].includes(extname(path)))
-    .forEach(path => {
-        const filePath = join(masterPath, path);
+console.log("移动目录", tempCppBuildPath, "->", cppBuildPath);
+console.log("移动目录", tempJsNpmPath, "->", jsNpmPath);
 
-        if (!statSync(filePath).isFile()) {
-            return;
-        }
-
-        const content = readFileSync(filePath, { encoding: "utf-8" });
-        const regexDesktop = /https:\/\/smallmain\.github\.io\/cocos-enhance-kit\/demo\/(v\d+\.\d+\.\d+)\/web-desktop\/index\.html/g;
-        const regexMobile = /https:\/\/smallmain\.github\.io\/cocos-enhance-kit\/demo\/(v\d+\.\d+\.\d+)\/web-mobile\/index\.html/g;
-
+// 更新 Demo
+const needUpdateDemo = await confirm({
+    message: `是否需要更新 Demo 项目？`,
+    default: true,
+});
+if (needUpdateDemo) {
+    const demoBuildPath = join(masterPath, "demo/build");
+    const demoDesktopBuildPath = join(demoBuildPath, "web-desktop");
+    const demoMobileBuildPath = join(demoBuildPath, "web-mobile");
+    const demoTargetPath = join(masterPath, "docs/static/demo", `v${kitVersion}`);
+    const demoDesktopTargetPath = join(demoTargetPath, "web-desktop");
+    const demoMobileTargetPath = join(demoTargetPath, "web-mobile");
+    if (!existsSync(demoTargetPath)) {
+        await confirm({
+            message: `请测试并编译 Demo 项目，然后继续操作`,
+            default: true,
+        });
         if (!DRYRUN) {
-            writeFileSync(filePath, content.replace(regexDesktop, `https://smallmain.github.io/cocos-enhance-kit/demo/${targetVersion}/web-desktop/index.html`).replace(regexMobile, `https://smallmain.github.io/cocos-enhance-kit/demo/${targetVersion}/web-mobile/index.html`));
+            copyDirectory(demoDesktopBuildPath, demoDesktopTargetPath);
+            copyDirectory(demoMobileBuildPath, demoMobileTargetPath);
         }
+        console.log("拷贝目录", demoDesktopBuildPath, "->", demoDesktopTargetPath);
+        console.log("拷贝目录", demoMobileBuildPath, "->", demoMobileTargetPath);
+    }
+    readdirSync(masterPath, {
+        recursive: true,
+        encoding: "utf-8",
+    })
+        .filter(path => [".ts", ".tsx", ".js", ".jsx", ".md", ".mdx"].includes(extname(path)))
+        .forEach(path => {
+            const filePath = join(masterPath, path);
 
-        if (regexDesktop.test(content) || regexMobile.test(content)) {
-            console.log("更新文件", filePath);
-        }
-    });
+            if (!statSync(filePath).isFile()) {
+                return;
+            }
 
+            const content = readFileSync(filePath, { encoding: "utf-8" });
+            const regexDesktop = /https:\/\/smallmain\.github\.io\/cocos-enhance-kit\/demo\/(v\d+\.\d+\.\d+)\/web-desktop\/index\.html/g;
+            const regexMobile = /https:\/\/smallmain\.github\.io\/cocos-enhance-kit\/demo\/(v\d+\.\d+\.\d+)\/web-mobile\/index\.html/g;
+
+            if (!DRYRUN) {
+                writeFileSync(filePath, content.replace(regexDesktop, `https://smallmain.github.io/cocos-enhance-kit/demo/${targetVersion}/web-desktop/index.html`).replace(regexMobile, `https://smallmain.github.io/cocos-enhance-kit/demo/${targetVersion}/web-mobile/index.html`));
+            }
+
+            if (regexDesktop.test(content) || regexMobile.test(content)) {
+                console.log("更新文件", filePath);
+            }
+        });
+}
 
 // 上传到 Github Release
 const tag = `v${kitVersion}`;
@@ -420,6 +474,8 @@ if (needPublish) {
 
 // 手动发布新版本文档
 await confirm({
-    message: `请使用命令 npm run docusaurus docs:version 1.1.0 创建新版本文档，并在 docs 目录执行 npm run deploy 发布`,
+    message: `请使用命令 npm run docusaurus docs:version 1.1.0 创建新版本文档，并在 docs 目录执行 GIT_USER=<user_name> npm run deploy 发布`,
     default: true,
 });
+
+rmSync(masterTempPath, { recursive: true, force: true });

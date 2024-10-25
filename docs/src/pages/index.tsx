@@ -1,3 +1,4 @@
+import BrowserOnly from '@docusaurus/BrowserOnly';
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
@@ -28,17 +29,19 @@ function HomepageHeader() {
             >
               开始使用
             </Link>
-            <Link
-              className="button button--outline button--primary button--lg"
-              href={
-                window.innerWidth > 768
-                  ? 'https://smallmain.github.io/cocos-enhance-kit/demo/v1.0.0/web-desktop/index.html'
-                  : 'https://smallmain.github.io/cocos-enhance-kit/demo/v1.0.0/web-mobile/index.html'
-              }
-              style={{ marginRight: 20 }}
-            >
-              查看演示
-            </Link>
+            <BrowserOnly>
+              {() => <Link
+                className="button button--outline button--primary button--lg"
+                href={
+                  window.innerWidth > 768
+                    ? 'https://smallmain.github.io/cocos-enhance-kit/demo/v1.0.0/web-desktop/index.html'
+                    : 'https://smallmain.github.io/cocos-enhance-kit/demo/v1.0.0/web-mobile/index.html'
+                }
+                style={{ marginRight: 20 }}
+              >
+                查看演示
+              </Link>}
+            </BrowserOnly>
             <Link
               className="button button--secondary button--lg"
               href='https://github.com/smallmain/cocos-enhance-kit'>
