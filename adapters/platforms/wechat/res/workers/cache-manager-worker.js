@@ -209,7 +209,7 @@ var cacheManager_worker = {
     },
 
     cacheFile(callback, id, srcUrl, cacheEnabled, cacheBundleRoot, isCopy) {
-        cacheEnabled = cacheEnabled !== undefined ? cacheEnabled : this.cacheEnabled;
+        cacheEnabled = cacheEnabled != null ? cacheEnabled : this.cacheEnabled;
         if (!cacheEnabled || this.cacheQueue[id] || this.cachedFiles[id]) {
             if (callback) callback(null);
             return;
