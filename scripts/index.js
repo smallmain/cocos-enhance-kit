@@ -307,7 +307,7 @@ if (extensionPath) {
     if (!DRYRUN) {
         const sourceZipFile = new Zip();
         readdirSync(extensionPath, { withFileTypes: true })
-            .filter(v => v.name !== "packages")
+            .filter(v => v.name !== "packages" && v.name !== ".git")
             .forEach(v => {
                 const path = join(v.path, v.name);
                 console.log("正在压缩", path);
@@ -474,8 +474,8 @@ if (needPublish) {
 
 // 手动发布新版本文档
 await confirm({
-    message: `请使用命令 npm run docusaurus docs:version 1.1.0 创建新版本文档，并在 docs 目录执行 GIT_USER=<user_name> npm run deploy 发布`,
+    message: `请使用命令 npm run docusaurus docs:version 1.1.0 创建新版本文档，并在 docs 目录执行 USE_SSH=true GIT_USER=<user_name> npm run deploy 发布`,
     default: true,
 });
 
-rmSync(masterTempPath, { recursive: true, force: true });
+// rmSync(masterTempPath, { recursive: true, force: true });
