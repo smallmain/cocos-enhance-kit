@@ -1,11 +1,11 @@
 require("./macro");
 require("./ipc-main.js");
-require("./handlers.js");
 
 module.exports = {
     init(callback) {
         if (CC_USE_WORKER) {
             var t = Date.now();
+            require("./handlers.js");
             ipcMain.init(() => {
                 console.log("worker init cost:", Date.now() - t);
                 console.log("worker settings:", {
