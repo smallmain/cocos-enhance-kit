@@ -169,7 +169,7 @@ const ipcMain = {
             const desc = descs[key];
 
             if (typeof desc.value === "function") {
-                const cmd = ++this._cmd;
+                const cmd = --this._cmd;
                 this.handlers[cmd] = {
                     name,
                     key,
@@ -178,7 +178,7 @@ const ipcMain = {
                 };
             } else {
                 // getter/setter
-                const cmd1 = ++this._cmd;
+                const cmd1 = --this._cmd;
                 this.handlers[cmd1] = {
                     name,
                     key: "get_" + key,
@@ -187,7 +187,7 @@ const ipcMain = {
                     },
                     callback: null,
                 };
-                const cmd2 = ++this._cmd;
+                const cmd2 = --this._cmd;
                 this.handlers[cmd2] = {
                     name,
                     key: "set_" + key,
@@ -195,7 +195,7 @@ const ipcMain = {
                         obj[key] = args[0];
                     }
                 };
-                const cmd3 = ++this._cmd;
+                const cmd3 = --this._cmd;
                 this.handlers[cmd3] = {
                     name,
                     key: "write_" + key,

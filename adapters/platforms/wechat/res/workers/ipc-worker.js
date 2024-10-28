@@ -41,7 +41,7 @@ var handlers = {};
 
 function callToMain(cmd, args) {
     const id = ++_cmdId;
-    args.unshift(id, cmd);
+    const msg = [id, cmd, args];
 
     if (typeof args[args.length - 1] === "function") {
         const callback = args.pop();
@@ -49,13 +49,13 @@ function callToMain(cmd, args) {
     }
 
     if (CC_WORKER_DEBUG) {
-        console.log("worker send call:", args);
+        console.log("worker send call:", msg);
     }
 
     if (CC_WORKER_SCHEDULER) {
-        sendScheduler.send(args);
+        sendScheduler.send(msg);
     } else {
-        worker.postMessage(args);
+        worker.postMessage(msg);
     }
 }
 
