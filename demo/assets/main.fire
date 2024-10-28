@@ -3120,7 +3120,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 139.575,
+      "width": 107.6,
       "height": 40
     },
     "_anchorPoint": {
@@ -3170,8 +3170,8 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_string": "新的 Char 缓存模式",
-    "_N$string": "新的 Char 缓存模式",
+    "_string": "Label 组件增强",
+    "_N$string": "Label 组件增强",
     "_fontSize": 16,
     "_lineHeight": 40,
     "_enableWrapText": true,
