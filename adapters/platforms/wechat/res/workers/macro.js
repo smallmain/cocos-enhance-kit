@@ -14,3 +14,6 @@ globalThis.CC_WORKER_ASSET_PIPELINE = null;
 
 // 是否启用 Worker 驱动音频系统
 globalThis.CC_WORKER_AUDIO_SYSTEM = null;
+
+// Worker 音频系统同步音频属性的间隔时间（单位：毫秒）
+globalThis.CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL = null;

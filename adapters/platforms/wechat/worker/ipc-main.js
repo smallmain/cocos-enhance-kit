@@ -110,6 +110,7 @@ const ipcMain = {
             CC_WORKER_FS_SYNC,
             CC_WORKER_ASSET_PIPELINE,
             CC_WORKER_AUDIO_SYSTEM,
+            CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL,
         ]);
     },
 

@@ -19,11 +19,18 @@ if (!("CC_WORKER_ASSET_PIPELINE" in globalThis)) {
 // 是否启用 Worker 驱动音频系统
 if (!("CC_WORKER_AUDIO_SYSTEM" in globalThis)) {
     globalThis.CC_WORKER_AUDIO_SYSTEM = false;
+    // NOTE 截止 2024.10.22，微信未修复 iOS、Windows、Mac 上仅文件系统 API 可以正常使用的问题
+    globalThis.CC_WORKER_AUDIO_SYSTEM = (isAndroid || isDevtools) && globalThis.CC_WORKER_AUDIO_SYSTEM;
+}
+
+// Worker 音频系统同步音频属性的间隔时间（单位：毫秒）
+if (!("CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL" in globalThis)) {
+    globalThis.CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL = 500;
 }
 
 // 是否启用 Worker
 if (!("CC_USE_WORKER" in globalThis)) {
-    globalThis.CC_USE_WORKER = (CC_WORKER_ASSET_PIPELINE) && hasWorker && !isSubContext;
+    globalThis.CC_USE_WORKER = (CC_WORKER_ASSET_PIPELINE || CC_WORKER_AUDIO_SYSTEM) && hasWorker && !isSubContext;
 }
 
 // 是否启用 Worker 调试模式
