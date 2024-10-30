@@ -44,6 +44,7 @@ function getSettings() {
             CC_WORKER_ASSET_PIPELINE: getMacroBooleanValue(content, "CC_WORKER_ASSET_PIPELINE"),
             CC_WORKER_AUDIO_SYSTEM: getMacroBooleanValue(content, "CC_WORKER_AUDIO_SYSTEM"),
             CC_WORKER_SCHEDULER: getMacroBooleanValue(content, "CC_WORKER_SCHEDULER"),
+            CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL: getMacroIntegerValue(content, "CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL"),
         };
     }
 }
@@ -55,7 +56,7 @@ function syncSettingsToSubWorker() {
 
         for (const key in result) {
             if (key !== "code") {
-                content = setMacroBooleanValue(content, key, result[key]);
+                content = setMacroValue(content, key, result[key]);
             }
         }
 
@@ -66,7 +67,7 @@ function syncSettingsToSubWorker() {
 function setSettings(macro, value) {
     {
         const content = fs.readFileSync(engineWechatMinigameWorkerMainMacroPath, { encoding: "utf-8" });
-        fs.writeFileSync(engineWechatMinigameWorkerMainMacroPath, setMacroBooleanValue(content, macro, value));
+        fs.writeFileSync(engineWechatMinigameWorkerMainMacroPath, setMacroValue(content, macro, value));
     }
 
     checkAndModifyWorkerFiles();
@@ -79,10 +80,24 @@ function getMacroBooleanValue(text, macro) {
     return match ? match[1] === 'true' : null;
 }
 
-function setMacroBooleanValue(text, macro, value) {
-    const regex = new RegExp(`globalThis\\.${macro}\\s*=\\s*(true|false);`);
-    const replacement = `globalThis.${macro} = ${value};`;
-    return text.replace(regex, replacement);
+function getMacroIntegerValue(text, macro) {
+    const regex = new RegExp(`globalThis\\.${macro}\\s*=\\s*(\\d+);`);
+    const match = text.match(regex);
+    return match ? parseInt(match[1]) : null;
+}
+
+function setMacroValue(text, macro, value) {
+    if (typeof value === "number") {
+        const regex = new RegExp(`globalThis\\.${macro}\\s*=\\s*(\\d+);`);
+        const replacement = `globalThis.${macro} = ${value};`;
+        return text.replace(regex, replacement);
+    } else if (typeof value === "boolean") {
+        const regex = new RegExp(`globalThis\\.${macro}\\s*=\\s*(true|false);`);
+        const replacement = `globalThis.${macro} = ${value};`;
+        return text.replace(regex, replacement);
+    } else {
+        Editor.error(`setMacroValue: unknown value: ${value}`);
+    }
 }
 
 function checkAndModifyWorkerFiles() {

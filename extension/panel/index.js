@@ -24,8 +24,13 @@ Editor.Panel.extend({
             <ui-prop id="tap" tabindex="-1" name="多线程驱动资源管线" tooltip="启用后将资源管线移至线程中执行，减少由资源下载、缓存与加载导致的卡顿。">
                 <ui-checkbox id="tapc" tabindex="-1"></ui-checkbox>
             </ui-prop>
-            <ui-prop id="fs" tabindex="-1" name="多线程驱动音频系统" tooltip="启用后将音频耗时操作移至线程中执行，减少由音频 API 调用导致的卡顿。">
+            <ui-prop id="fs" tabindex="-1" name="多线程驱动音频系统" tooltip="启用后将音频耗时操作移至线程中执行，减少由音频 API 调用导致的卡顿。" foldable>
                 <ui-checkbox id="fsc" tabindex="-1"></ui-checkbox>
+                <div slot="child">
+                    <ui-prop id="fsi" tabindex="-1" name="属性同步间隔（毫秒）" tooltip="启用后将音频耗时操作移至线程中执行，减少由音频 API 调用导致的卡顿。" indent="1">
+                        <ui-num-input type="int" min="0" value="-1" id="fsii" tabindex="0"></ui-num-input>
+                    </ui-prop>
+                </div>
             </ui-prop>
             <ui-prop id="ts" tabindex="-1" name="线程通信调度器" tooltip="启用后将会对多次数据通信打包发送，这可能会减少因通信次数带来的性能消耗。">
                         <ui-checkbox id="tsc" tabindex="-1"></ui-checkbox>
@@ -44,6 +49,8 @@ Editor.Panel.extend({
         thread_asset_pipeline_checkbox: '#tapc',
         thread_audio_system: '#fs',
         thread_audio_system_checkbox: '#fsc',
+        thread_audio_system_interval: '#fsi',
+        thread_audio_system_interval_input: '#fsii',
         thread_scheduler: '#ts',
         thread_scheduler_checkbox: '#tsc',
     },
@@ -63,6 +70,7 @@ Editor.Panel.extend({
                 this.$thread_debug_checkbox.checked = data.CC_WORKER_DEBUG;
                 this.$thread_asset_pipeline_checkbox.checked = data.CC_WORKER_ASSET_PIPELINE;
                 this.$thread_audio_system_checkbox.checked = data.CC_WORKER_AUDIO_SYSTEM;
+                this.$thread_audio_system_interval_input.value = data.CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL;
                 this.$thread_scheduler_checkbox.checked = data.CC_WORKER_SCHEDULER;
 
                 this.$thread_debug_checkbox.addEventListener('change', () => {
@@ -73,8 +81,19 @@ Editor.Panel.extend({
                     this.setSettings("CC_WORKER_ASSET_PIPELINE", this.$thread_asset_pipeline_checkbox.checked);
                 });
 
+                const onAudioSystemEnableChange = (enabled) => {
+                    this.$thread_audio_system_interval_input.disabled = !enabled;
+                };
+                onAudioSystemEnableChange(this.$thread_asset_pipeline_checkbox.checked);
+
                 this.$thread_audio_system_checkbox.addEventListener('change', () => {
-                    this.setSettings("CC_WORKER_AUDIO_SYSTEM", this.$thread_audio_system_checkbox.checked);
+                    const enabled = this.$thread_audio_system_checkbox.checked;
+                    onAudioSystemEnableChange(enabled);
+                    this.setSettings("CC_WORKER_AUDIO_SYSTEM", enabled);
+                });
+
+                this.$thread_audio_system_interval_input.addEventListener('confirm', () => {
+                    this.setSettings("CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL", this.$thread_audio_system_interval_input.value);
                 });
 
                 this.$thread_scheduler_checkbox.addEventListener('change', () => {
