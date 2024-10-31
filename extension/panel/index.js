@@ -1,3 +1,7 @@
+function t(str) {
+    return Editor.T('enhance-kit.' + str);
+}
+
 Editor.Panel.extend({
     style: `
     :host { margin: 5px; }
@@ -10,29 +14,29 @@ Editor.Panel.extend({
 
     template: `
     <div id="unripe">
-        <p id="unripe_tip" class="desc">加载中...</p>
+        <p id="unripe_tip" class="desc">${t('loading')}</p>
     </div>
     <div id="ready" class="hidden">
-        <h1>多线程支持</h1>
-        <p class="desc">该特性仅在微信小游戏平台下有效。</p>
+        <h1>${t('thread_title')}</h1>
+        <p class="desc">${t('thread_desc')}</p>
         <hr />
         <div class="sub">
-            <p class="subdesc">请注意，以下为全局设置，改动会影响到所有项目，并且在重新安装、升级或卸载社区版后丢失所有设置。</p>
-            <ui-prop id="td" tabindex="-1" name="调试模式" tooltip="启用后将会输出详细日志以便进行调试，这可能会大幅降低性能。">
+            <p class="subdesc">${t('thread_desc2')}</p>
+            <ui-prop id="td" tabindex="-1" name="${t('thread_debug')}" tooltip="${t('thread_debug_desc')}">
                 <ui-checkbox id="tdc" tabindex="-1"></ui-checkbox>
             </ui-prop>
-            <ui-prop id="tap" tabindex="-1" name="多线程驱动资源管线" tooltip="启用后将资源管线移至线程中执行，减少由资源下载、缓存与加载导致的卡顿。">
+            <ui-prop id="tap" tabindex="-1" name="${t('thread_asset_pipeline')}" tooltip="${t('thread_asset_pipeline_desc')}">
                 <ui-checkbox id="tapc" tabindex="-1"></ui-checkbox>
             </ui-prop>
-            <ui-prop id="fs" tabindex="-1" name="多线程驱动音频系统" tooltip="启用后将音频耗时操作移至线程中执行，减少由音频 API 调用导致的卡顿。" foldable>
+            <ui-prop id="fs" tabindex="-1" name="${t('thread_audio_system')}" tooltip="${t('thread_audio_system_desc')}" foldable>
                 <ui-checkbox id="fsc" tabindex="-1"></ui-checkbox>
                 <div slot="child">
-                    <ui-prop id="fsi" tabindex="-1" name="属性同步间隔（毫秒）" tooltip="启用后将音频耗时操作移至线程中执行，减少由音频 API 调用导致的卡顿。" indent="1">
+                    <ui-prop id="fsi" tabindex="-1" name="${t('thread_audio_sync')}" tooltip="${t('thread_audio_sync_desc')}" indent="1">
                         <ui-num-input type="int" min="0" value="-1" id="fsii" tabindex="0"></ui-num-input>
                     </ui-prop>
                 </div>
             </ui-prop>
-            <ui-prop id="ts" tabindex="-1" name="线程通信调度器" tooltip="启用后将会对多次数据通信打包发送，这可能会减少因通信次数带来的性能消耗。">
+            <ui-prop id="ts" tabindex="-1" name="${t('thread_scheduler')}" tooltip="${t('thread_scheduler_desc')}">
                         <ui-checkbox id="tsc" tabindex="-1"></ui-checkbox>
             </ui-prop>
         </div>
@@ -58,7 +62,7 @@ Editor.Panel.extend({
     ready() {
         Editor.Ipc.sendToMain('enhance-kit:getSettings', (error, data) => {
             if (error) {
-                this.$unripe_tip.textContent = '发生错误：' + String(error);
+                this.$unripe_tip.textContent = 'Error:' + String(error);
                 this.$unripe_tip.style.color = 'red';
                 return;
             }

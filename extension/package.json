@@ -14,7 +14,7 @@
     "min-height": 600
   },
   "main-menu": {
-    "i18n:MAIN_MENU.project.title/i18n:enhance-kit.settingsmenuname": {
+    "i18n:MAIN_MENU.project.title/i18n:enhance-kit.settings_menu": {
       "message": "enhance-kit:openSettings"
     }
   },

@@ -32,9 +32,9 @@ function getSettings() {
     const isUninstalled = minigameVersion === "";
     const isSupported = !isUninstalled && Number(minigameVersion.split(".")[0]) >= 2;
     if (isUninstalled) {
-        return { code: -1, errMsg: "请先安装社区版。" };
+        return { code: -1, errMsg: t('not_install') };
     } else if (!isSupported) {
-        return { code: -2, errMsg: "安装的社区版版本需 >= 2.0.0 ，以支持设置面板功能。" };
+        return { code: -2, errMsg: t('version_not_2_0') };
     } else {
         const content = fs.readFileSync(engineWechatMinigameWorkerMainMacroPath, { encoding: "utf-8" });
 
@@ -111,10 +111,10 @@ function checkAndModifyWorkerFiles() {
         if (result.CC_WORKER_ASSET_PIPELINE || result.CC_WORKER_AUDIO_SYSTEM) {
             // 没有 Worker 目录与配置的话提醒用户重新安装
             if (!(gameJson.workers && fs.existsSync(workerDir))) {
-                Editor.error("你启用了社区版的多线程特性，但未检测到正确的 workers 目录与 game.json 字段，请重新安装社区版，详情请查看文档：https://smallmain.github.io/cocos-enhance-kit/docs/user-guide/multithread/thread-intro#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9");
+                Editor.error(t('thread_not_right_workers_dir'));
             }
         } else {
-            Editor.warn("你禁用了社区版的多线程特性，可以手动删除相关文件以减少微信小游戏的包体大小，详情请查看文档：https://smallmain.github.io/cocos-enhance-kit/docs/user-guide/multithread/thread-intro#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9");
+            Editor.warn(t('thread_need_delete_files'));
         }
     }
 }
