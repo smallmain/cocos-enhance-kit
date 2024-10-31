@@ -19,7 +19,7 @@ sidebar_position: 6
 
 以下内容仅针对付费引擎扩展编写，可查看 [一键安装](./installation/installation-auto.md) 了解详情。
 
-依次点击编辑器菜单栏 **扩展 - 社区版管理 - 卸载社区版** 即可。
+依次点击编辑器菜单栏 **扩展 - 社区版管理 - 卸载** 即可。
 
 ![plugin-uninstall](./assets/plugin-uninstall.png)
 
