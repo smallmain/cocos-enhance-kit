@@ -25,7 +25,9 @@ export default class Audio extends HTMLAudioElement {
     
     this.readyState = HAVE_NOTHING
 
-    const innerAudioContext = wx.createInnerAudioContext()
+    const innerAudioContext = CC_WORKER_AUDIO_SYSTEM
+      ? new WorkerAudio()
+      : wx.createInnerAudioContext()
 
     _innerAudioContextMap[this._$sn] = innerAudioContext
 

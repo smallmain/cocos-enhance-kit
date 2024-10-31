@@ -7,7 +7,9 @@ if (Audio) {
             let elem = this._src._nativeAsset;
             // Reuse dom audio element
             if (!this._element) {
-                this._element = __globalAdapter.createInnerAudioContext();
+                this._element = CC_WORKER_AUDIO_SYSTEM
+                    ? new WorkerAudio()
+                    : __globalAdapter.createInnerAudioContext();
             }
             this._element.src = elem.src;
         },
