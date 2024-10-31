@@ -68,6 +68,9 @@ var fsUtils = {
     downloadFile(remoteUrl, filePath, header, onProgress, onComplete) {
         var options = {
             url: remoteUrl,
+            useHighPerformanceMode: true,
+            enableHttp2: true,
+            enableQuic: true,
             success: function (res) {
                 if (res.statusCode === 200) {
                     onComplete && onComplete(null, res.tempFilePath || res.filePath);
