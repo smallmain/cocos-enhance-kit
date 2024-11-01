@@ -1,0 +1,9 @@
+{
+  "label": "多纹理渲染",
+  "position": 1,
+  "collapsed": true,
+  "link": {
+    "type": "doc",
+    "id": "multi-render-intro"
+  }
+}
