@@ -419,48 +419,55 @@ const needPublish = await confirm({
     default: true,
 });
 if (needPublish && !DRYRUN) {
-
-    const octokit = new Octokit({
-        auth: env.GITHUB_TOKEN,
-    });
-
-    console.log("创建 Release：", tag);
-
-    let releaseId = 0;
     try {
-        const { data } = await octokit.rest.repos.getReleaseByTag({
-            owner: "smallmain",
-            repo: "cocos-enhance-kit",
-            tag: tag,
+        const octokit = new Octokit({
+            auth: env.GITHUB_TOKEN,
         });
-        releaseId = data.id;
-        releaseUrl = data.html_url;
-    } catch (error) {
-        const { data } = await octokit.rest.repos.createRelease({
-            owner: "smallmain",
-            repo: "cocos-enhance-kit",
-            name: tag,
-            tag_name: tag,
-            body: `适配 Cocos Creator v${engineVersion} 版本\n\n> 注意，如果你需要使用模拟器预览，请按照官方的 [引擎定制文档](https://docs.cocos.com/creator/2.4/manual/zh/advanced-topics/engine-customization.html#25-%E7%BC%96%E8%AF%91%E6%A8%A1%E6%8B%9F%E5%99%A8) 重新编译原生模拟器。`,
-            prerelease: false,
-            make_latest: "legacy",
-        });
-        releaseId = data.id;
-        releaseUrl = data.html_url;
-    }
 
-    console.log("上传至 Release：", zipPath);
-    const fileContent = readFileSync(zipPath);
-    await octokit.rest.repos.uploadReleaseAsset({
-        owner: "smallmain",
-        repo: "cocos-enhance-kit",
-        release_id: releaseId,
-        data: fileContent,
-        name: basename(zipPath),
-        headers: {
-            'content-type': 'application/zip',
-        },
-    });
+        console.log("创建 Release：", tag);
+
+        let releaseId = 0;
+        try {
+            const { data } = await octokit.rest.repos.getReleaseByTag({
+                owner: "smallmain",
+                repo: "cocos-enhance-kit",
+                tag: tag,
+            });
+            releaseId = data.id;
+            releaseUrl = data.html_url;
+        } catch (error) {
+            const { data } = await octokit.rest.repos.createRelease({
+                owner: "smallmain",
+                repo: "cocos-enhance-kit",
+                name: tag,
+                tag_name: tag,
+                body: `适配 Cocos Creator v${engineVersion} 版本\n\n> 注意，如果你需要使用模拟器预览，请按照官方的 [引擎定制文档](https://docs.cocos.com/creator/2.4/manual/zh/advanced-topics/engine-customization.html#25-%E7%BC%96%E8%AF%91%E6%A8%A1%E6%8B%9F%E5%99%A8) 重新编译原生模拟器。`,
+                prerelease: false,
+                make_latest: "legacy",
+            });
+            releaseId = data.id;
+            releaseUrl = data.html_url;
+        }
+
+        console.log("上传至 Release：", zipPath);
+        const fileContent = readFileSync(zipPath);
+        await octokit.rest.repos.uploadReleaseAsset({
+            owner: "smallmain",
+            repo: "cocos-enhance-kit",
+            release_id: releaseId,
+            data: fileContent,
+            name: basename(zipPath),
+            headers: {
+                'content-type': 'application/zip',
+            },
+        });
+    } catch (error) {
+        console.error(error);
+        await confirm({
+            message: `自动上传至 Github Release 失败，请手动上传后继续`,
+            default: true,
+        });
+    }
 }
 console.log("已发布到 Github Release：", tag);
 
