@@ -1,4 +1,5 @@
 module.exports = {
+    'COCOS_CREATE_EXTENSION': 'Create a new extension...',
     'primary_menu': 'Enhance Kit Manage...',
     'settings_menu': 'Enhance Kit Settings...',
     'install_menu': 'Install...',
@@ -53,6 +54,8 @@ module.exports = {
     'thread_desc2': 'Please note that the following settings are global settings, and any changes will affect all projects. All settings will be lost after reinstalling, upgrading, or uninstalling the Enhance Kit.',
     'thread_debug': 'Debug Mode',
     'thread_debug_desc': 'When enabled, detailed logs will be output for debugging, which may significantly reduce performance.',
+    'thread_custom': 'Project multithreading extension',
+    'thread_custom_desc': 'This will activate the multithreading extension in the project\'s worker directory.',
     'thread_asset_pipeline': 'Multi-threaded Asset Pipeline',
     'thread_asset_pipeline_desc': 'When enabled, the asset pipeline will be executed in a separate thread, reducing stuttering caused by resource downloading, caching, and loading.',
     'thread_audio_system': 'Multi-threaded Audio System',
@@ -61,4 +64,12 @@ module.exports = {
     'thread_audio_sync_desc': 'How often the properties of audio instances (playback progress, total duration, etc.) are synchronized from the worker thread to the main thread. Too frequent updates may impact performance.',
     'thread_scheduler': 'Thread Communication Scheduler',
     'thread_scheduler_desc': 'When enabled, multiple data communications will be bundled and sent together, which may reduce performance overhead caused by frequent communications.',
+    'thread_compile_custom_thread_menu': 'Recompile the multithreading extension',
+    'thread_create_custom_thread_menu': 'Project multithreading extension',
+    'thread_custom_not_exists_1': 'You have the Enhance Kit project multithreading extension enabled, but there is no worker directory in the project, you can create one by clicking on the menu items ',
+    'thread_custom_not_exists_2': ' .',
+    'create_thread_custom_success': 'The project multithreading extension has been created in the worker directory.',
+    'refresh_thread_custom_success': 'The multithreading extension has been recompiled.',
+    'create_thread_custom_already_exists': 'The project already exists in the worker directory, just update creator-worker.d.ts to the latest version.',
+    'thread_custom_need_delete': 'There is a multithreading extension in the project, you can manually delete the worker directory in the project if it is no longer needed.',
 };

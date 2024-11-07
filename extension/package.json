@@ -4,6 +4,7 @@
   "description": "This extension provides support for cocos enhance kit.",
   "author": "SmallMain",
   "main": "main.js",
+  "scene-script": "scene.js",
   "panel": {
     "main": "panel/index.js",
     "type": "dockable",
@@ -16,6 +17,12 @@
   "main-menu": {
     "i18n:MAIN_MENU.project.title/i18n:enhance-kit.settings_menu": {
       "message": "enhance-kit:openSettings"
+    },
+    "i18n:MAIN_MENU.package.title/i18n:enhance-kit.COCOS_CREATE_EXTENSION/i18n:enhance-kit.thread_create_custom_thread_menu": {
+      "message": "enhance-kit:createThreadTemplate"
+    },
+    "i18n:MAIN_MENU.project.title/i18n:enhance-kit.thread_compile_custom_thread_menu": {
+      "message": "enhance-kit:refreshCustomThreadCode"
     }
   },
   "runtime-resource": {

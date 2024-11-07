@@ -1,4 +1,5 @@
 module.exports = {
+    'COCOS_CREATE_EXTENSION': '创建新扩展插件...',
     'primary_menu': '社区版管理...',
     'settings_menu': '社区版设置...',
     'install_menu': '安装...',
@@ -53,6 +54,8 @@ module.exports = {
     'thread_desc2': '请注意，以下为全局设置，改动会影响到所有项目，并且在重新安装、升级或卸载社区版后丢失所有设置。',
     'thread_debug': '调试模式',
     'thread_debug_desc': '启用后将会输出详细日志以便进行调试，这可能会大幅降低性能。',
+    'thread_custom': '项目多线程扩展',
+    'thread_custom_desc': '启用后将会激活项目 worker 目录下的自定义扩展。',
     'thread_asset_pipeline': '多线程驱动资源管线',
     'thread_asset_pipeline_desc': '启用后将资源管线移至线程中执行，减少由资源下载、缓存与加载导致的卡顿。',
     'thread_audio_system': '多线程驱动音频系统',
@@ -61,4 +64,12 @@ module.exports = {
     'thread_audio_sync_desc': '间隔多久从 Worker 线程将音频实例的属性（播放进度、总时长等）同步到主线程，太频繁可能会影响性能。',
     'thread_scheduler': '线程通信调度器',
     'thread_scheduler_desc': '启用后将多次数据通信打包发送，这可能会减少因通信次数带来的性能消耗。',
+    'thread_compile_custom_thread_menu': '重新编译多线程扩展',
+    'thread_create_custom_thread_menu': '项目多线程扩展',
+    'thread_custom_not_exists_1': '你启用了社区版的项目多线程扩展，但项目中不存在 worker 目录，可以通过依次点击菜单项 ',
+    'thread_custom_not_exists_2': ' 来创建扩展。',
+    'create_thread_custom_success': '已在 worker 目录创建项目多线程扩展。',
+    'refresh_thread_custom_success': '已重新编译多线程扩展。',
+    'create_thread_custom_already_exists': '项目已存在 worker 目录，仅更新 creator-worker.d.ts 至最新版本。',
+    'thread_custom_need_delete': '项目中存在多线程扩展，若不再需要可手动删除项目中的 worker 目录。',
 };

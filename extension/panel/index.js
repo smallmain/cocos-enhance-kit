@@ -25,8 +25,11 @@ Editor.Panel.extend({
             <ui-prop id="td" tabindex="-1" name="${t('thread_debug')}" tooltip="${t('thread_debug_desc')}">
                 <ui-checkbox id="tdc" tabindex="-1"></ui-checkbox>
             </ui-prop>
-            <ui-prop id="tap" tabindex="-1" name="${t('thread_asset_pipeline')}" tooltip="${t('thread_asset_pipeline_desc')}">
+                        <ui-prop id="tap" tabindex="-1" name="${t('thread_asset_pipeline')}" tooltip="${t('thread_asset_pipeline_desc')}">
                 <ui-checkbox id="tapc" tabindex="-1"></ui-checkbox>
+            </ui-prop>
+            <ui-prop id="tc" tabindex="-1" name="${t('thread_custom')}" tooltip="${t('thread_custom_desc')}">
+                <ui-checkbox id="tcc" tabindex="-1"></ui-checkbox>
             </ui-prop>
             <ui-prop id="fs" tabindex="-1" name="${t('thread_audio_system')}" tooltip="${t('thread_audio_system_desc')}" foldable>
                 <ui-checkbox id="fsc" tabindex="-1"></ui-checkbox>
@@ -51,6 +54,8 @@ Editor.Panel.extend({
         thread_debug_checkbox: '#tdc',
         thread_asset_pipeline: '#tap',
         thread_asset_pipeline_checkbox: '#tapc',
+        thread_custom: '#tc',
+        thread_custom_checkbox: '#tcc',
         thread_audio_system: '#fs',
         thread_audio_system_checkbox: '#fsc',
         thread_audio_system_interval: '#fsi',
@@ -72,6 +77,7 @@ Editor.Panel.extend({
                 this.$ready_area.classList.remove('hidden');
 
                 this.$thread_debug_checkbox.checked = data.CC_WORKER_DEBUG;
+                this.$thread_custom_checkbox.checked = data.CC_CUSTOM_WORKER;
                 this.$thread_asset_pipeline_checkbox.checked = data.CC_WORKER_ASSET_PIPELINE;
                 this.$thread_audio_system_checkbox.checked = data.CC_WORKER_AUDIO_SYSTEM;
                 this.$thread_audio_system_interval_input.value = data.CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL;
@@ -83,6 +89,10 @@ Editor.Panel.extend({
 
                 this.$thread_asset_pipeline_checkbox.addEventListener('change', () => {
                     this.setSettings("CC_WORKER_ASSET_PIPELINE", this.$thread_asset_pipeline_checkbox.checked);
+                });
+
+                this.$thread_custom_checkbox.addEventListener('change', () => {
+                    this.setSettings("CC_CUSTOM_WORKER", this.$thread_custom_checkbox.checked);
                 });
 
                 const onAudioSystemEnableChange = (enabled) => {
