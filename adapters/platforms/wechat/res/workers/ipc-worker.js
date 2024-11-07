@@ -7,10 +7,10 @@
 //      1.在 worker 端调用 registerHandler(name, obj) 注册处理对象。
 //      2.所有非函数属性会生成 `get_xxx()`、`set_xxx(v)`、`write_xxx(v)` 三个函数，
 //        其中，`write_` 函数会在设置完毕后回调到主线程。
-//      3.所有函数属性请确保第一个参数是 callback，用于回调到主线程，
+//      3.在函数被调用时，会在最后一个参数传入 callback，用于回调结果到主线程，
 //        用法是 callback(...args)。
 //      
-//      注册好函数后，在主线程通过 worker.name.key(args | null, (args)=>{}) 调用。
+//      注册好函数后，在主线程通过 worker.name.key(args, args => {}) 或 worker.name.key(args => {}) 调用。
 //      注意在主线程调用时传入和返回的都是参数数组。
 //
 // - 从 Worker 调用 主线程：
@@ -19,9 +19,9 @@
 //      1.在 main 端调用 registerHandler(name, obj) 注册处理对象。
 //      2.所有非函数属性会生成 `get_xxx()`、`set_xxx(v)`、`write_xxx(v)` 三个函数，
 //        其中，`write_` 函数会在设置完毕后回调到 Worker。
-//      3.所有函数属性请确保参数是 [args, cmdId, callback]，用于回调到 Worker，
+//      3.所有函数属性请确保参数是 [args, cmdId, callback]，callback 用于回调到 Worker，
 //        用法是 callback(cmdId, args)。
-//        注意在主线程回调时传入的是参数数组。
+//        注意主线程注册的函数、callback 传入的都是参数数组。
 //      
 //      注册好函数后，在 Worker 通过 main.name.key(...args, (...args)=>{}) 调用。
 //      最后一个参数如果是函数的话则会当作 callback 处理。
@@ -83,10 +83,10 @@ function registerHandler(name, obj) {
                 key,
                 func: (id, cmd, args) => {
                     obj[key](
+                        ...(args ? args : []),
                         (...args) => {
                             callbackToMain(id, cmd, args);
                         },
-                        ...(args ? args : []),
                     );
                 },
             };
@@ -232,5 +232,13 @@ const sendScheduler = {
 };
 
 const main = {};
+const ipcWorker = {
+    get inited() {
+        return _inited;  
+    },
+    main,
+    init,
+    registerHandler,
+};
 
-module.exports = { init, registerHandler, main };
+module.exports = ipcWorker;

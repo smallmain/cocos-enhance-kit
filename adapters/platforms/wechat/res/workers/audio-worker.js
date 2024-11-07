@@ -5,7 +5,7 @@ var audio_worker = {
     map: {},
     timer: null,
 
-    create(callback, id) {
+    create(id) {
         this.map[id] = {
             audio: worker.createInnerAudioContext({ useWebAudioImplement: true }),
             cache: {
@@ -20,7 +20,7 @@ var audio_worker = {
         }
     },
 
-    call(callback, id, type, arg) {
+    call(id, type, arg) {
         const audio = this.map[id].audio;
         switch (type) {
             case 0:
@@ -73,20 +73,20 @@ var audio_worker = {
         }
     },
 
-    on(callback, id, type) {
+    on(id, type) {
         const data = this.map[id];
         data.audio["on" + type]((data.callbacks[type] = data => {
             main.audioAdapter.onCallback(id, type, data);
         }));
     },
 
-    off(callback, id, type) {
+    off(id, type) {
         const data = this.map[id];
         data.audio["off" + type](data.callbacks[type]);
         delete data.callbacks[type];
     },
 
-    destroy(callback, id) {
+    destroy(id) {
         this.map[id].destroy();
         delete this.map[id];
     },

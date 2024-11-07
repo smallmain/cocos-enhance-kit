@@ -1,8 +1,11 @@
-// 是否启用 Worker 调度模式，这会减少通信次数（必须一致）
+// 是否启用 Worker 调度模式，这会减少通信次数
 globalThis.CC_WORKER_SCHEDULER = true;
 
 // 是否启用 Worker 调试模式
 globalThis.CC_WORKER_DEBUG = false;
+
+// 是否启用自定义 Worker
+globalThis.CC_CUSTOM_WORKER = false;
 
 // --- 以下从主线程同步值 ---
 

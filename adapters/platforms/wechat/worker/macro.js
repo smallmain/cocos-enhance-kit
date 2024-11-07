@@ -28,9 +28,14 @@ if (!("CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL" in globalThis)) {
     globalThis.CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL = 500;
 }
 
+// 是否启用自定义 Worker
+if (!("CC_CUSTOM_WORKER" in globalThis)) {
+    globalThis.CC_CUSTOM_WORKER = false;
+}
+
 // 是否启用 Worker
 if (!("CC_USE_WORKER" in globalThis)) {
-    globalThis.CC_USE_WORKER = (CC_WORKER_ASSET_PIPELINE || CC_WORKER_AUDIO_SYSTEM) && hasWorker && !isSubContext;
+    globalThis.CC_USE_WORKER = (CC_WORKER_ASSET_PIPELINE || CC_WORKER_AUDIO_SYSTEM || CC_CUSTOM_WORKER) && hasWorker && !isSubContext;
 }
 
 // 是否启用 Worker 调试模式
@@ -38,7 +43,7 @@ if (!("CC_WORKER_DEBUG" in globalThis)) {
     globalThis.CC_WORKER_DEBUG = false;
 }
 
-// 是否启用 Worker 调度模式，这也许能减少通信次数带来的性能消耗（必须一致）
+// 是否启用 Worker 调度模式，这也许能减少通信次数带来的性能消耗
 globalThis.CC_WORKER_SCHEDULER = true;
 
 // 是否启用 Worker 使用同步版本的文件系统 API

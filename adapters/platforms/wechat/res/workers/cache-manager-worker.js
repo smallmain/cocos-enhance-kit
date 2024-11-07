@@ -88,12 +88,12 @@ var cacheManager_worker = {
     },
 
     download(
-        callback,
         url,
         options_reload,
         options_header,
         options_cacheEnabled,
         options___cacheBundleRoot__,
+        callback,
     ) {
         var result = this.transformUrl(url, options_reload);
         if (result.inLocal) {
@@ -109,17 +109,17 @@ var cacheManager_worker = {
                     return;
                 }
                 this.tempFiles[url] = path;
-                this.cacheFile(null, url, path, options_cacheEnabled, options___cacheBundleRoot__, true);
+                this.cacheFile(url, path, options_cacheEnabled, options___cacheBundleRoot__, true);
                 callback(null, path);
             });
         }
     },
 
     handleZip(
-        callback,
         url,
         options_header,
         options___cacheBundleRoot__,
+        callback,
     ) {
         let cachedUnzip = this.cachedFiles[url];
         if (cachedUnzip) {
@@ -138,7 +138,7 @@ var cacheManager_worker = {
         }
     },
 
-    getTemp(callback, url) {
+    getTemp(url, callback) {
         callback(this.tempFiles.has(url) ? this.tempFiles.get(url) : '');
     },
 
@@ -208,7 +208,7 @@ var cacheManager_worker = {
         checkNextPeriod = false;
     },
 
-    cacheFile(callback, id, srcUrl, cacheEnabled, cacheBundleRoot, isCopy) {
+    cacheFile(id, srcUrl, cacheEnabled, cacheBundleRoot, isCopy, callback) {
         cacheEnabled = cacheEnabled != null ? cacheEnabled : this.cacheEnabled;
         if (!cacheEnabled || this.cacheQueue[id] || this.cachedFiles[id]) {
             if (callback) callback(null);
@@ -293,7 +293,7 @@ var cacheManager_worker = {
         });
     },
 
-    removeCache(callback, url) {
+    removeCache(url, callback) {
         if (this.cachedFiles[url]) {
             var self = this;
             var path = this.cachedFiles[url].url;

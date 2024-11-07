@@ -935,3 +935,54 @@ declare module sp {
 
 }
 
+/**
+ * 访问 Worker 的入口
+ */
+declare const worker: any;
+
+declare module ipcMain {
+    /**
+     * 注册 Worker 可以访问的入口
+     */
+    export function registerHandler(name: string, handler: object): Promise<void>;
+}
+
+/**
+ * 是否启用 Worker 驱动资源管线
+ */
+declare var CC_WORKER_ASSET_PIPELINE: boolean;
+
+/**
+ * 是否启用 Worker 驱动音频系统
+ */
+declare var CC_WORKER_AUDIO_SYSTEM: boolean;
+
+/**
+ * Worker 音频系统同步音频属性的间隔时间（单位：毫秒）
+ */
+declare var CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL: number;
+
+/**
+ * 是否启用自定义 Worker
+ */
+declare var CC_CUSTOM_WORKER: boolean;
+
+/**
+ * 是否启用 Worker 调试模式
+ */
+declare var CC_WORKER_DEBUG: boolean;
+
+/**
+ * 是否启用 Worker 使用同步版本的文件系统 API
+ */
+declare var CC_WORKER_FS_SYNC: boolean;
+
+/**
+ * 是否启用 Worker 子包
+ */
+declare var CC_WORKER_SUB_PACKAGE: boolean;
+
+/**
+ * 是否启用 Worker
+ */
+declare var CC_USE_WORKER: boolean;

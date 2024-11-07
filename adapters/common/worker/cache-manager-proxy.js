@@ -111,19 +111,19 @@ var cacheManager = {
 
     init() {
         this._cacheDir = getUserDataPath() + '/' + this.cacheDir;
-        worker.cacheManager.init(null, ([cachedFiles]) => {
+        worker.cacheManager.init(([cachedFiles]) => {
             this.cachedFiles = new cc.AssetManager.Cache(cachedFiles);
         });
     },
 
     clearCache() {
-        worker.cacheManager.clearCache(null, () => {
+        worker.cacheManager.clearCache(() => {
             this.cachedFiles.clear();
         });
     },
 
     clearLRU() {
-        worker.cacheManager.clearLRU(null, ([deletedFiles]) => {
+        worker.cacheManager.clearLRU(([deletedFiles]) => {
             for (let i = 0, l = deletedFiles.length; i < l; i++) {
                 this.cachedFiles.remove(deletedFiles[i]);
             }

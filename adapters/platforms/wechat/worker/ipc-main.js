@@ -121,7 +121,11 @@ const ipcMain = {
                 worker[name] = {};
             }
             worker[name][key] = (args, callback) => {
-                this.callToWorker(cmd, args, callback);
+                if (typeof args === "function") {
+                    this.callToWorker(cmd, null, args);
+                } else {
+                    this.callToWorker(cmd, args, callback);
+                }
             };
         }
 
