@@ -5,7 +5,7 @@ import {useCurrentSidebarCategory} from '@docusaurus/theme-common';
 
 :::caution 注意
 
-以下所有多线程特性暂时仅适用于微信小游戏平台。
+本章节所有多线程特性暂时仅适用于微信小游戏平台。
 
 并且在微信小游戏平台下还有以下改进：
 
@@ -27,6 +27,8 @@ import {useCurrentSidebarCategory} from '@docusaurus/theme-common';
 - CC_WORKER_ASSET_PIPELINE（是否启用 Worker 驱动资源管线）
 - CC_WORKER_AUDIO_SYSTEM（是否启用 Worker 驱动音频系统）
 - CC_WORKER_DEBUG（是否启用 Worker 调试模式）
+- CC_CUSTOM_WORKER（是否启用自定义 Worker）
+- CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL（Worker 音频系统同步音频属性的间隔时间（单位：毫秒））
 
 例如这样：
 

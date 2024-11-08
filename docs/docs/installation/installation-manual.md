@@ -65,6 +65,12 @@ description: "需掌握一定的自定义引擎知识。"
 
 部分代码编辑器可能需要重启之后类型提示才会生效。
 
+## 更新多线程扩展的 TypeScript 类型提示（可选）
+
+如果你正在将项目升级到社区版的新版本，并且之前还创建了多线程扩展的话，可以通过依次点击菜单项 **扩展 - 创建新扩展插件... - 项目多线程扩展** 来更新 `creator-worker.d.ts` 文件。
+
+关于多线程扩展请阅读文档：[多线程支持](../user-guide/multithread/thread-intro)。
+
 ## 重启 Cocos Creator
 
 完成以上的步骤后重启 Cocos Creator。
