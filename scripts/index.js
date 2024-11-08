@@ -291,7 +291,7 @@ if (extensionPath) {
 
     // 手动修改 config.json
     await confirm({
-        message: `请将压缩文件上传至各网盘，并修改 config.json 指向下载链接`,
+        message: `请修改 lastVersion；增加新版本 main-menu；将压缩文件上传至各网盘；并修改 config.json 指向下载链接`,
         default: true,
     });
 
