@@ -415,7 +415,7 @@ if (needUpdateDemo) {
 const tag = `v${kitVersion}`;
 let releaseUrl = "(undefined)";
 const needPublish = await confirm({
-    message: `是否上传至 Github Release？（请先在源码分支创建 '${tag}' Tag）`,
+    message: `是否上传至 Github Release？（请先在源码分支创建 '${tag}' Tag，可使用命令：'git tag -a ${tag} -m "更新版本号至 ${kitVersion}"'，然后使用命令 'git push origin ${tag}' 推送）`,
     default: true,
 });
 if (needPublish && !DRYRUN) {
@@ -481,7 +481,7 @@ if (needPublish) {
 
 // 手动发布新版本文档
 await confirm({
-    message: `请使用命令 npm run docusaurus docs:version 1.1.0 创建新版本文档，并在 docs 目录执行 USE_SSH=true GIT_USER=<user_name> npm run deploy 发布`,
+    message: `请使用命令 npm run docusaurus docs:version ${kitVersion} 创建新版本文档，并在 docs 目录执行 USE_SSH=true GIT_USER=<user_name> npm run deploy 发布`,
     default: true,
 });
 
