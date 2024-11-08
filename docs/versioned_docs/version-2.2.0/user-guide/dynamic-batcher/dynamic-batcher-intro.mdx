@@ -1,0 +1,10 @@
+import DocCardList from '@theme/DocCardList';
+import {useCurrentSidebarCategory} from '@docusaurus/theme-common';
+
+# 动态合图
+
+动态合图是一个非常好的合批手段，但是在之前引擎实现的比较简陋，所以社区版重构了动态合图系统，在原有功能基础上增加了许多重要特性。
+
+比如支持复用废弃碎图空间，优化了图集装箱算法，所有图集作为一个整体进行管理等等，你可以阅读下面的文档了解详情：
+
+<DocCardList items={useCurrentSidebarCategory().items}/>
