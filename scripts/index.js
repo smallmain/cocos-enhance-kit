@@ -186,7 +186,7 @@ const zipPath = join(masterTempPath, `cocos-enhance-kit-v${kitVersion}-v${engine
 if (!DRYRUN) {
     console.log("开始编译 JavaScript 引擎");
     try {
-        await $$({ cwd: jsPath })`gulp build-dev`;
+        await $$({ cwd: jsPath })`npx gulp build-dev`;
     } catch (error) {
         await confirm({
             message: `自动编译 JavaScript 引擎失败，请手动编译后继续`,
@@ -198,8 +198,8 @@ console.log("已编译 JavaScript 引擎");
 if (!DRYRUN && COMPILING_SIMULATOR) {
     console.log("开始编译当前平台的原生模拟器");
     try {
-        await $$({ cwd: cppPath })`gulp gen-simulator`;
-        await $$({ cwd: cppPath })`gulp update-simulator-config`;
+        await $$({ cwd: cppPath })`npx gulp gen-simulator`;
+        await $$({ cwd: cppPath })`npx gulp update-simulator-config`;
     } catch (error) {
         await confirm({
             message: `自动编译当前平台的原生模拟器失败，请手动编译后继续`,
