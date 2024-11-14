@@ -1,0 +1,9 @@
+{
+  "label": "多线程支持",
+  "position": 6,
+  "collapsed": true,
+  "link": {
+    "type": "doc",
+    "id": "thread-intro"
+  }
+}
