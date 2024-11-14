@@ -58,5 +58,8 @@
     "vinyl-source-stream": "2.0.0",
     "vinyl-sourcemaps-apply": "0.2.1",
     "watchify": "3.7.0"
+  },
+  "engines": {
+    "node": "10.24.1"
   }
 }
