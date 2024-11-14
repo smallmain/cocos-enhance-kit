@@ -21681,7 +21681,7 @@
           var dirname = cc.path.dirname(url);
           var basename = cc.path.basename(url);
           url = dirname + "." + hashValue + "/" + basename;
-        } else url = url.replace(/.*[/\\][0-9a-fA-F]{2}[/\\]([0-9a-fA-F-]{8,})/, (function(match, uuid) {
+        } else url = url.replace(/.*[\/\\][0-9a-fA-F]{2}[\/\\]([0-9a-fA-F-]{8,})/, (function(match, uuid) {
           return match + "." + hashValue;
         }));
         return url;
@@ -22841,7 +22841,7 @@
     var helper = {
       decodeUuid: require("../utils/decode-uuid"),
       getUuidFromURL: (function() {
-        var _uuidRegex = /.*[/\\][0-9a-fA-F]{2}[/\\]([0-9a-fA-F-]{8,})/;
+        var _uuidRegex = /.*[\/\\][0-9a-fA-F]{2}[\/\\]([0-9a-fA-F-]{8,})/;
         return function(url) {
           var matches = url.match(_uuidRegex);
           if (matches) return matches[1];
@@ -46119,7 +46119,7 @@
     function parseInstances(data) {
       var instances = data[5];
       var instanceTypes = data[6];
-      var instanceTypesLen = 0 === instanceTypes ? 0 : instanceTypes.length;
+      var instanceTypesLen = instanceTypes === EMPTY_PLACEHOLDER ? 0 : instanceTypes.length;
       var rootIndex = instances[instances.length - 1];
       var normalObjectCount = instances.length - instanceTypesLen;
       if ("number" !== typeof rootIndex) rootIndex = 0; else {
@@ -46171,8 +46171,8 @@
         var klassLayout = classes[i];
         if ("string" !== typeof klassLayout) {
           true;
-          if ("function" === typeof klassLayout[0]) throw new Error("Can not deserialize the same JSON data again.");
-          var _type5 = klassLayout[0];
+          if ("function" === typeof klassLayout[CLASS_TYPE]) throw new Error("Can not deserialize the same JSON data again.");
+          var _type5 = klassLayout[CLASS_TYPE];
           doLookupClass(classFinder, _type5, klassLayout, CLASS_TYPE, silent, customFinder);
         } else doLookupClass(classFinder, klassLayout, classes, i, silent, customFinder);
       }
@@ -46183,7 +46183,7 @@
         var classes = data[3];
         for (var i = 0; i < masks.length; ++i) {
           var mask = masks[i];
-          mask[0] = classes[mask[0]];
+          mask[MASK_CLASS] = classes[mask[MASK_CLASS]];
         }
       }
     }
@@ -46219,7 +46219,7 @@
         preprocessed = version.preprocessed;
         version = version.version;
       }
-      if (version < 1) throw new Error(cc.debug.getError(5304, version));
+      if (version < SUPPORT_MIN_FORMAT_VERSION) throw new Error(cc.debug.getError(5304, version));
       options._version = version;
       options.result = details;
       data[0] = options;
@@ -46242,7 +46242,7 @@
       this.version = version;
     };
     function unpackJSONs(data, classFinder) {
-      if (data[0] < 1) throw new Error(cc.debug.getError(5304, data[0]));
+      if (data[0] < SUPPORT_MIN_FORMAT_VERSION) throw new Error(cc.debug.getError(5304, data[0]));
       lookupClasses(data, true, classFinder);
       cacheMasks(data);
       var version = new FileInfo(data[0]);
@@ -46255,7 +46255,7 @@
       return sections;
     }
     function packCustomObjData(type, data, hasNativeDep) {
-      return [ 1, EMPTY_PLACEHOLDER, EMPTY_PLACEHOLDER, [ type ], EMPTY_PLACEHOLDER, hasNativeDep ? [ data, -1 ] : [ data ], [ 0 ], EMPTY_PLACEHOLDER, [], [], [] ];
+      return [ SUPPORT_MIN_FORMAT_VERSION, EMPTY_PLACEHOLDER, EMPTY_PLACEHOLDER, [ type ], EMPTY_PLACEHOLDER, hasNativeDep ? [ data, -1 ] : [ data ], [ 0 ], EMPTY_PLACEHOLDER, [], [], [] ];
     }
     function hasNativeDep(data) {
       var instances = data[5];
@@ -56928,7 +56928,7 @@
     "use strict";
     cc.sp = {
       inited: false,
-      version: "2.2.0",
+      version: "2.3.0",
       MAX_MULTITEXTURE_NUM: -1,
       autoSwitchMaterial: true,
       allowDynamicAtlas: true,
