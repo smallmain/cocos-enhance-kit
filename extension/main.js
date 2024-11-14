@@ -110,6 +110,7 @@ function getSettings() {
             CC_WORKER_SCHEDULER: getMacroBooleanValue(content, "CC_WORKER_SCHEDULER"),
             CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL: getMacroIntegerValue(content, "CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL"),
             CC_CUSTOM_WORKER: getMacroBooleanValue(content, "CC_CUSTOM_WORKER"),
+            CC_WORKER_HTTP_REQUEST: getMacroBooleanValue(content, "CC_WORKER_HTTP_REQUEST"),
         };
     }
 }
@@ -174,7 +175,7 @@ function checkAndModifyWorkerFiles() {
         const gameJson = JSON.parse(fs.readFileSync(gameJsonPath, { encoding: "utf-8" }));
 
         // 是否启用 Worker
-        if (result.CC_WORKER_ASSET_PIPELINE || result.CC_WORKER_AUDIO_SYSTEM || result.CC_CUSTOM_WORKER) {
+        if (result.CC_WORKER_ASSET_PIPELINE || result.CC_WORKER_AUDIO_SYSTEM || result.CC_CUSTOM_WORKER || result.CC_WORKER_HTTP_REQUEST) {
             // 没有 Worker 目录与配置的话提醒用户重新安装
             if (!(gameJson.workers && fs.existsSync(workerDir))) {
                 Editor.error(t('thread_not_right_workers_dir'));

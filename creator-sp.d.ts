@@ -963,6 +963,11 @@ declare var CC_WORKER_AUDIO_SYSTEM: boolean;
 declare var CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL: number;
 
 /**
+ * 是否启用 Worker 驱动 HTTP 请求
+ */
+declare var CC_WORKER_HTTP_REQUEST: boolean;
+
+/**
  * 是否启用自定义 Worker
  */
 declare var CC_CUSTOM_WORKER: boolean;

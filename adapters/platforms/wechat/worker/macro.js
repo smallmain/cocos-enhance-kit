@@ -28,6 +28,13 @@ if (!("CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL" in globalThis)) {
     globalThis.CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL = 500;
 }
 
+// 是否启用 Worker 驱动 HTTP 请求
+if (!("CC_WORKER_HTTP_REQUEST" in globalThis)) {
+    globalThis.CC_WORKER_HTTP_REQUEST = false;
+    // NOTE 截止 2024.10.22，微信未修复 iOS、Windows、Mac 上仅文件系统 API 可以正常使用的问题
+    globalThis.CC_WORKER_HTTP_REQUEST = (isAndroid || isDevtools) && globalThis.CC_WORKER_HTTP_REQUEST;
+}
+
 // 是否启用自定义 Worker
 if (!("CC_CUSTOM_WORKER" in globalThis)) {
     globalThis.CC_CUSTOM_WORKER = false;
@@ -35,7 +42,7 @@ if (!("CC_CUSTOM_WORKER" in globalThis)) {
 
 // 是否启用 Worker
 if (!("CC_USE_WORKER" in globalThis)) {
-    globalThis.CC_USE_WORKER = (CC_WORKER_ASSET_PIPELINE || CC_WORKER_AUDIO_SYSTEM || CC_CUSTOM_WORKER) && hasWorker && !isSubContext;
+    globalThis.CC_USE_WORKER = (CC_WORKER_ASSET_PIPELINE || CC_WORKER_AUDIO_SYSTEM || CC_CUSTOM_WORKER || CC_WORKER_HTTP_REQUEST) && hasWorker && !isSubContext;
 }
 
 // 是否启用 Worker 调试模式

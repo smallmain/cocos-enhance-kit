@@ -56,6 +56,8 @@ module.exports = {
     'thread_debug_desc': '启用后将会输出详细日志以便进行调试，这可能会大幅降低性能。',
     'thread_custom': '项目多线程扩展',
     'thread_custom_desc': '启用后将会激活项目 worker 目录下的自定义扩展。',
+    'thread_http': '多线程驱动 XMLHttpRequest',
+    'thread_http_desc': '启用后 XMLHttpRequest 将会移至线程中执行，由于存在数据往返的耗时，请实际测试对性能是否有提升。',
     'thread_asset_pipeline': '多线程驱动资源管线',
     'thread_asset_pipeline_desc': '启用后将资源管线移至线程中执行，减少由资源下载、缓存与加载导致的卡顿。',
     'thread_audio_system': '多线程驱动音频系统',

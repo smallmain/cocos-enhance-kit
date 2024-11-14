@@ -14,6 +14,8 @@ module.exports = {
                     CC_WORKER_ASSET_PIPELINE,
                     CC_WORKER_AUDIO_SYSTEM,
                     CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL,
+                    CC_CUSTOM_WORKER,
+                    CC_WORKER_HTTP_REQUEST,
                     CC_WORKER_SCHEDULER,
                     CC_WORKER_FS_SYNC,
                     CC_WORKER_SUB_PACKAGE,

@@ -6,6 +6,19 @@ const _requestHeader = new WeakMap()
 const _responseHeader = new WeakMap()
 const _requestTask = new WeakMap()
 
+let _worker_id = 0;
+const methodMap = {
+  'GET': 1,
+  'POST': 2,
+  'HEAD': 3,
+  'PUT': 4,
+  'DELETE': 5,
+  'CONNECT': 6,
+  'OPTIONS': 7,
+  'TRACE': 8,
+  'PATCH': 9,
+};
+
 function _triggerEvent(type, ...args) {
   if (typeof this[`on${type}`] === 'function') {
     this[`on${type}`].apply(this, args)
@@ -58,10 +71,14 @@ export default class XMLHttpRequest extends EventTarget {
   }
 
   abort() {
-    const myRequestTask =  _requestTask.get(this)
+    const myRequestTask = _requestTask.get(this)
 
     if (myRequestTask) {
-      myRequestTask.abort()
+      if (CC_WORKER_HTTP_REQUEST) {
+        worker.http.abort([myRequestTask]);
+      } else {
+        myRequestTask.abort()
+      }
     }
   }
 
@@ -90,66 +107,92 @@ export default class XMLHttpRequest extends EventTarget {
     if (this.readyState !== XMLHttpRequest.OPENED) {
       throw new Error("Failed to execute 'send' on 'XMLHttpRequest': The object's state must be OPENED.")
     } else {
-      let myRequestTask = wx.request({
-        data,
-        url: _url.get(this),
-        method: _method.get(this),
-        header: _requestHeader.get(this),
-        dataType: 'other',
-        responseType: this.responseType === 'arraybuffer' ? 'arraybuffer' : 'text',
-        timeout: this.timeout || undefined,
-        success: ({ data, statusCode, header }) => {
-          this.status = statusCode
-          _responseHeader.set(this, header)
-          _triggerEvent.call(this, 'loadstart')
-          _changeReadyState.call(this, XMLHttpRequest.HEADERS_RECEIVED)
-          _changeReadyState.call(this, XMLHttpRequest.LOADING)
+      const onSuccess = ({ data, statusCode, header }) => {
+        this.status = statusCode
+        _responseHeader.set(this, header)
+        _triggerEvent.call(this, 'loadstart')
+        _changeReadyState.call(this, XMLHttpRequest.HEADERS_RECEIVED)
+        _changeReadyState.call(this, XMLHttpRequest.LOADING)
 
-          switch (this.responseType) {
-            case 'json':
-              this.responseText = data;
-              try {
-                this.response = JSON.parse(data);
-              }
-              catch (e) {
-                this.response = null;
-              }
-              break;
-            case '':
-            case 'text':
-              this.responseText = this.response = data;
-              break;
-            case 'arraybuffer': 
-              this.response = data;
-              this.responseText = '';
-              var bytes = new Uint8Array(data);
-              var len = bytes.byteLength;
-
-              for (var i = 0; i < len; i++) {
-                this.responseText += String.fromCharCode(bytes[i]);
-              }
-              break;
-            default:
+        switch (this.responseType) {
+          case 'json':
+            this.responseText = data;
+            try {
+              this.response = JSON.parse(data);
+            }
+            catch (e) {
               this.response = null;
-          }
-          _changeReadyState.call(this, XMLHttpRequest.DONE)
-          _triggerEvent.call(this, 'load')
-          _triggerEvent.call(this, 'loadend')
-        },
-        fail: ({ errMsg }) => {
-          // TODO 规范错误
-          if (errMsg.indexOf('abort') !== -1) {
-            _triggerEvent.call(this, 'abort')
-          } else if (errMsg.indexOf('timeout') !== -1) {
-            _triggerEvent.call(this, 'timeout')
-          } else {
-            _triggerEvent.call(this, 'error', errMsg)
-          }
-          _triggerEvent.call(this, 'loadend')
-        }
-      })
+            }
+            break;
+          case '':
+          case 'text':
+            this.responseText = this.response = data;
+            break;
+          case 'arraybuffer':
+            this.response = data;
+            this.responseText = '';
+            var bytes = new Uint8Array(data);
+            var len = bytes.byteLength;
 
-      _requestTask.set(this, myRequestTask);
+            for (var i = 0; i < len; i++) {
+              this.responseText += String.fromCharCode(bytes[i]);
+            }
+            break;
+          default:
+            this.response = null;
+        }
+        _changeReadyState.call(this, XMLHttpRequest.DONE)
+        _triggerEvent.call(this, 'load')
+        _triggerEvent.call(this, 'loadend')
+      };
+
+      const onFail = ({ errMsg }) => {
+        // TODO 规范错误
+        if (errMsg.indexOf('abort') !== -1) {
+          _triggerEvent.call(this, 'abort')
+        } else if (errMsg.indexOf('timeout') !== -1) {
+          _triggerEvent.call(this, 'timeout')
+        } else {
+          _triggerEvent.call(this, 'error', errMsg)
+        }
+        _triggerEvent.call(this, 'loadend')
+      };
+
+      if (CC_WORKER_HTTP_REQUEST) {
+        const id = ++_worker_id;
+        worker.http.request(
+          [
+            id,
+            data,
+            _url.get(this),
+            methodMap[_method.get(this)],
+            _requestHeader.get(this),
+            this.responseType === 'arraybuffer' ? 0 : 1,
+            this.timeout,
+          ],
+          ([success, arg, statusCode, header]) => {
+            if (success) {
+              onSuccess({ data: arg, statusCode, header });
+            } else {
+              onFail({ errMsg: arg });
+            }
+          },
+        );
+        _requestTask.set(this, id);
+      } else {
+        let myRequestTask = wx.request({
+          data,
+          url: _url.get(this),
+          method: _method.get(this),
+          header: _requestHeader.get(this),
+          dataType: 'other',
+          responseType: this.responseType === 'arraybuffer' ? 'arraybuffer' : 'text',
+          timeout: this.timeout || undefined,
+          success: onSuccess,
+          fail: onFail,
+        });
+        _requestTask.set(this, myRequestTask);
+      }
     }
   }
 
@@ -161,12 +204,12 @@ export default class XMLHttpRequest extends EventTarget {
   }
 
   addEventListener(type, listener) {
-      if (typeof listener === 'function') {
-          let _this = this
-          let event = { target: _this }
-          this['on' + type] = function (event) {
-              listener.call(_this, event)
-          }
+    if (typeof listener === 'function') {
+      let _this = this
+      let event = { target: _this }
+      this['on' + type] = function (event) {
+        listener.call(_this, event)
       }
+    }
   }
 }

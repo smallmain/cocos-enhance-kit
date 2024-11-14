@@ -39,6 +39,9 @@ Editor.Panel.extend({
                     </ui-prop>
                 </div>
             </ui-prop>
+            <ui-prop id="th" tabindex="-1" name="${t('thread_http')}" tooltip="${t('thread_http_desc')}">
+                <ui-checkbox id="thc" tabindex="-1"></ui-checkbox>
+            </ui-prop>
             <ui-prop id="ts" tabindex="-1" name="${t('thread_scheduler')}" tooltip="${t('thread_scheduler_desc')}">
                         <ui-checkbox id="tsc" tabindex="-1"></ui-checkbox>
             </ui-prop>
@@ -56,6 +59,8 @@ Editor.Panel.extend({
         thread_asset_pipeline_checkbox: '#tapc',
         thread_custom: '#tc',
         thread_custom_checkbox: '#tcc',
+        thread_http: '#th',
+        thread_http_checkbox: '#thc',
         thread_audio_system: '#fs',
         thread_audio_system_checkbox: '#fsc',
         thread_audio_system_interval: '#fsi',
@@ -81,6 +86,7 @@ Editor.Panel.extend({
                 this.$thread_asset_pipeline_checkbox.checked = data.CC_WORKER_ASSET_PIPELINE;
                 this.$thread_audio_system_checkbox.checked = data.CC_WORKER_AUDIO_SYSTEM;
                 this.$thread_audio_system_interval_input.value = data.CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL;
+                this.$thread_http_checkbox.checked = data.CC_WORKER_HTTP_REQUEST;
                 this.$thread_scheduler_checkbox.checked = data.CC_WORKER_SCHEDULER;
 
                 this.$thread_debug_checkbox.addEventListener('change', () => {
@@ -93,6 +99,10 @@ Editor.Panel.extend({
 
                 this.$thread_custom_checkbox.addEventListener('change', () => {
                     this.setSettings("CC_CUSTOM_WORKER", this.$thread_custom_checkbox.checked);
+                });
+
+                this.$thread_http_checkbox.addEventListener('change', () => {
+                    this.setSettings("CC_WORKER_HTTP_REQUEST", this.$thread_http_checkbox.checked);
                 });
 
                 const onAudioSystemEnableChange = (enabled) => {

@@ -56,6 +56,8 @@ module.exports = {
     'thread_debug_desc': 'When enabled, detailed logs will be output for debugging, which may significantly reduce performance.',
     'thread_custom': 'Project multithreading extension',
     'thread_custom_desc': 'This will activate the multithreading extension in the project\'s worker directory.',
+    'thread_http': 'Multi-threaded XMLHttpRequest',
+    'thread_http_desc': 'When enabled, XMLHttpRequest will be moved to a thread for execution, because there is a data roundtrip time, please actually test whether there is an improvement in performance.',
     'thread_asset_pipeline': 'Multi-threaded Asset Pipeline',
     'thread_asset_pipeline_desc': 'When enabled, the asset pipeline will be executed in a separate thread, reducing stuttering caused by resource downloading, caching, and loading.',
     'thread_audio_system': 'Multi-threaded Audio System',
