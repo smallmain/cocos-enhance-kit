@@ -104,7 +104,8 @@ var builtins = {
         if (CC_EDITOR) {
             cc.assetManager.loadAny(Editor.assetdb.remote.urlToUuid('db://enhance-kit-resources/sp/effects/' + name + '.effect'), function (err, effect) {
                 if (err) {
-                    return Editor.error(err);
+                    Editor.error("Please check if the supporting extension is installed correctly.");
+                    Editor.error(err);
                 } else {
                     cb(effect);
                 }
