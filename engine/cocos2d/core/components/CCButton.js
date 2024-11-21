@@ -71,7 +71,7 @@ const State = cc.Enum({
 /**
  * !#en
  * Button component. Can be pressed or clicked. Button has 4 Transition types:
- * 
+ *
  *   - Button.Transition.NONE   // Button will do nothing
  *   - Button.Transition.COLOR  // Button will change target's color
  *   - Button.Transition.SPRITE // Button will change target Sprite's sprite
@@ -79,12 +79,12 @@ const State = cc.Enum({
  *
  * The button can bind events (but you must be on the button's node to bind events).<br/>
  * The following events can be triggered on all platforms.
- * 
+ *
  *  - cc.Node.EventType.TOUCH_START  // Press
  *  - cc.Node.EventType.TOUCH_MOVE   // After pressing and moving
  *  - cc.Node.EventType.TOUCH_END    // After pressing and releasing
  *  - cc.Node.EventType.TOUCH_CANCEL // Press to cancel
- * 
+ *
  * The following events are only triggered on the PC platform:
  *
  *   - cc.Node.EventType.MOUSE_DOWN
@@ -100,7 +100,7 @@ const State = cc.Enum({
  * 按钮组件。可以被按下，或者点击。
  *
  * 按钮可以通过修改 Transition 来设置按钮状态过渡的方式：
- * 
+ *
  *   - Button.Transition.NONE   // 不做任何过渡
  *   - Button.Transition.COLOR  // 进行颜色之间过渡
  *   - Button.Transition.SPRITE // 进行精灵之间过渡
@@ -108,21 +108,21 @@ const State = cc.Enum({
  *
  * 按钮可以绑定事件（但是必须要在按钮的 Node 上才能绑定事件）：<br/>
  * 以下事件可以在全平台上都触发：
- * 
+ *
  *   - cc.Node.EventType.TOUCH_START  // 按下时事件
  *   - cc.Node.EventType.TOUCH_MOVE   // 按住移动后事件
  *   - cc.Node.EventType.TOUCH_END    // 按下后松开后事件
  *   - cc.Node.EventType.TOUCH_CANCEL // 按下取消事件
- * 
+ *
  * 以下事件只在 PC 平台上触发：
- * 
+ *
  *   - cc.Node.EventType.MOUSE_DOWN  // 鼠标按下时事件
  *   - cc.Node.EventType.MOUSE_MOVE  // 鼠标按住移动后事件
  *   - cc.Node.EventType.MOUSE_ENTER // 鼠标进入目标事件
  *   - cc.Node.EventType.MOUSE_LEAVE // 鼠标离开目标事件
  *   - cc.Node.EventType.MOUSE_UP    // 鼠标松开事件
  *   - cc.Node.EventType.MOUSE_WHEEL // 鼠标滚轮事件
- * 
+ *
  * 用户可以通过获取 __点击事件__ 回调函数的参数 event 的 target 属性获取当前点击对象。
  * @class Button
  * @extends Component
@@ -184,11 +184,13 @@ let Button = cc.Class({
         interactable: {
             default: true,
             tooltip: CC_DEV && 'i18n:COMPONENT.button.interactable',
-            notify () {
-                this._updateState();
+            notify (oldValue) {
+                if (oldValue !== this.interactable) {
+                    this._updateState();
 
-                if (!this.interactable) {
-                    this._resetState();
+                    if (!this.interactable) {
+                        this._resetState();
+                    }
                 }
             },
             animatable: false
@@ -469,7 +471,7 @@ let Button = cc.Class({
         if (this.disabledSprite) {
             this.disabledSprite.ensureLoadTexture();
         }
-        
+
         if (!CC_EDITOR) {
             this._registerNodeEvent();
         }
@@ -581,7 +583,6 @@ let Button = cc.Class({
     },
 
     update (dt) {
-        let target = this._getTarget();
         if (this._transitionFinished) return;
         if (this.transition !== Transition.COLOR && this.transition !== Transition.SCALE) return;
 
@@ -602,6 +603,7 @@ let Button = cc.Class({
         }
         // Skip if _originalScale is invalid
         else if (this.transition === Transition.SCALE && this._originalScale) {
+            let target = this._getTarget();
             target.scale = this._fromScale.lerp(this._toScale, ratio);
         }
 
