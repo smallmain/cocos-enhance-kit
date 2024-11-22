@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "ES5",
+        "skipLibCheck": true,
+        "downlevelIteration": true,
+        "allowSyntheticDefaultImports": true,
+    },
+    "include": [
+        "src",
+        "creator-worker.d.ts"
+    ],
+}
