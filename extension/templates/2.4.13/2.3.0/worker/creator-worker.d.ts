@@ -74,3 +74,8 @@ declare var CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL: number;
  * 是否启用 Worker 驱动 HTTP 请求
  */
 declare var CC_WORKER_HTTP_REQUEST: boolean;
+
+/**
+ * 是否启用 Worker 驱动 WebSocket
+ */
+declare var CC_WORKER_WEBSOCKET: boolean;

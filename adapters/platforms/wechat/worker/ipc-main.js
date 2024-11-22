@@ -112,6 +112,7 @@ const ipcMain = {
             CC_WORKER_AUDIO_SYSTEM,
             CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL,
             CC_WORKER_HTTP_REQUEST,
+            CC_WORKER_WEBSOCKET,
         ]);
     },
 

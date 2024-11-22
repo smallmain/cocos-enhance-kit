@@ -147,6 +147,7 @@ function _initFromWorker(id, meta) {
         CC_WORKER_AUDIO_SYSTEM,
         CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL,
         CC_WORKER_HTTP_REQUEST,
+        CC_WORKER_WEBSOCKET,
     ] = meta;
 
     for (const wrapper of wrappers) {
@@ -164,6 +165,7 @@ function _initFromWorker(id, meta) {
     globalThis.CC_WORKER_AUDIO_SYSTEM = CC_WORKER_AUDIO_SYSTEM;
     globalThis.CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL = CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL;
     globalThis.CC_WORKER_HTTP_REQUEST = CC_WORKER_HTTP_REQUEST;
+    globalThis.CC_WORKER_WEBSOCKET = CC_WORKER_WEBSOCKET;
 
     _inited = true;
     if (_initCallback) _initCallback();

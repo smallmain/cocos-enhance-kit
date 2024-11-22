@@ -111,6 +111,8 @@ function getSettings() {
             CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL: getMacroIntegerValue(content, "CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL"),
             CC_CUSTOM_WORKER: getMacroBooleanValue(content, "CC_CUSTOM_WORKER"),
             CC_WORKER_HTTP_REQUEST: getMacroBooleanValue(content, "CC_WORKER_HTTP_REQUEST"),
+            CC_WORKER_WEBSOCKET: getMacroBooleanValue(content, "CC_WORKER_WEBSOCKET"),
+            CC_WORKER_SUB_PACKAGE: getMacroBooleanValue(content, "CC_WORKER_SUB_PACKAGE"),
         };
     }
 }
@@ -175,13 +177,19 @@ function checkAndModifyWorkerFiles() {
         const gameJson = JSON.parse(fs.readFileSync(gameJsonPath, { encoding: "utf-8" }));
 
         // 是否启用 Worker
-        if (result.CC_WORKER_ASSET_PIPELINE || result.CC_WORKER_AUDIO_SYSTEM || result.CC_CUSTOM_WORKER || result.CC_WORKER_HTTP_REQUEST) {
+        if (result.CC_WORKER_ASSET_PIPELINE || result.CC_WORKER_AUDIO_SYSTEM || result.CC_CUSTOM_WORKER || result.CC_WORKER_HTTP_REQUEST || result.CC_WORKER_WEBSOCKET) {
             // 没有 Worker 目录与配置的话提醒用户重新安装
             if (!(gameJson.workers && fs.existsSync(workerDir))) {
                 Editor.error(t('thread_not_right_workers_dir'));
             }
         } else {
             Editor.warn(t('thread_need_delete_files'));
+        }
+
+        // 是否使用子包
+        if (gameJson.workers) {
+            gameJson.workers.isSubpackage = result.CC_WORKER_SUB_PACKAGE;
+            fs.writeFileSync(gameJsonPath, JSON.stringify(gameJson, null, 2));
         }
     }
 }

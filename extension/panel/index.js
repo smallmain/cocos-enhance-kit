@@ -28,9 +28,6 @@ Editor.Panel.extend({
                         <ui-prop id="tap" tabindex="-1" name="${t('thread_asset_pipeline')}" tooltip="${t('thread_asset_pipeline_desc')}">
                 <ui-checkbox id="tapc" tabindex="-1"></ui-checkbox>
             </ui-prop>
-            <ui-prop id="tc" tabindex="-1" name="${t('thread_custom')}" tooltip="${t('thread_custom_desc')}">
-                <ui-checkbox id="tcc" tabindex="-1"></ui-checkbox>
-            </ui-prop>
             <ui-prop id="fs" tabindex="-1" name="${t('thread_audio_system')}" tooltip="${t('thread_audio_system_desc')}" foldable>
                 <ui-checkbox id="fsc" tabindex="-1"></ui-checkbox>
                 <div slot="child">
@@ -42,8 +39,17 @@ Editor.Panel.extend({
             <ui-prop id="th" tabindex="-1" name="${t('thread_http')}" tooltip="${t('thread_http_desc')}">
                 <ui-checkbox id="thc" tabindex="-1"></ui-checkbox>
             </ui-prop>
+            <ui-prop id="tw" tabindex="-1" name="${t('thread_ws')}" tooltip="${t('thread_ws_desc')}">
+                <ui-checkbox id="twc" tabindex="-1"></ui-checkbox>
+            </ui-prop>
+            <ui-prop id="tc" tabindex="-1" name="${t('thread_custom')}" tooltip="${t('thread_custom_desc')}">
+                <ui-checkbox id="tcc" tabindex="-1"></ui-checkbox>
+            </ui-prop>
             <ui-prop id="ts" tabindex="-1" name="${t('thread_scheduler')}" tooltip="${t('thread_scheduler_desc')}">
-                        <ui-checkbox id="tsc" tabindex="-1"></ui-checkbox>
+                <ui-checkbox id="tsc" tabindex="-1"></ui-checkbox>
+            </ui-prop>
+            <ui-prop id="tsp" tabindex="-1" name="${t('thread_subpackage')}" tooltip="${t('thread_subpackage_desc')}">
+                <ui-checkbox id="tspc" tabindex="-1"></ui-checkbox>
             </ui-prop>
         </div>
     </div>
@@ -61,12 +67,16 @@ Editor.Panel.extend({
         thread_custom_checkbox: '#tcc',
         thread_http: '#th',
         thread_http_checkbox: '#thc',
+        thread_ws: '#tw',
+        thread_ws_checkbox: '#twc',
         thread_audio_system: '#fs',
         thread_audio_system_checkbox: '#fsc',
         thread_audio_system_interval: '#fsi',
         thread_audio_system_interval_input: '#fsii',
         thread_scheduler: '#ts',
         thread_scheduler_checkbox: '#tsc',
+        thread_subpackage: '#tsp',
+        thread_subpackage_checkbox: '#tspc',
     },
 
     ready() {
@@ -87,6 +97,8 @@ Editor.Panel.extend({
                 this.$thread_audio_system_checkbox.checked = data.CC_WORKER_AUDIO_SYSTEM;
                 this.$thread_audio_system_interval_input.value = data.CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL;
                 this.$thread_http_checkbox.checked = data.CC_WORKER_HTTP_REQUEST;
+                this.$thread_ws_checkbox.checked = data.CC_WORKER_WEBSOCKET;
+                this.$thread_subpackage_checkbox.checked = data.CC_WORKER_SUB_PACKAGE;
                 this.$thread_scheduler_checkbox.checked = data.CC_WORKER_SCHEDULER;
 
                 this.$thread_debug_checkbox.addEventListener('change', () => {
@@ -103,6 +115,14 @@ Editor.Panel.extend({
 
                 this.$thread_http_checkbox.addEventListener('change', () => {
                     this.setSettings("CC_WORKER_HTTP_REQUEST", this.$thread_http_checkbox.checked);
+                });
+
+                this.$thread_ws_checkbox.addEventListener('change', () => {
+                    this.setSettings("CC_WORKER_WEBSOCKET", this.$thread_ws_checkbox.checked);
+                });
+
+                this.$thread_subpackage_checkbox.addEventListener('change', () => {
+                    this.setSettings("CC_WORKER_SUB_PACKAGE", this.$thread_subpackage_checkbox.checked);
                 });
 
                 const onAudioSystemEnableChange = (enabled) => {

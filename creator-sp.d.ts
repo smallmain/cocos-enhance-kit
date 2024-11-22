@@ -968,6 +968,11 @@ declare var CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL: number;
 declare var CC_WORKER_HTTP_REQUEST: boolean;
 
 /**
+ * 是否启用 Worker 驱动 WebSocket
+ */
+declare var CC_WORKER_WEBSOCKET: boolean;
+
+/**
  * 是否启用自定义 Worker
  */
 declare var CC_CUSTOM_WORKER: boolean;
