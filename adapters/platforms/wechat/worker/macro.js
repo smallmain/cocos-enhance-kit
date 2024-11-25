@@ -7,19 +7,19 @@ const sdkVersion = sysinfo.SDKVersion.split('.').map(Number);
 // >= 2.20.2
 const hasWorker = sdkVersion[0] > 2 || (sdkVersion[0] === 2 && (sdkVersion[1] > 20 || (sdkVersion[1] === 20 && sdkVersion[2] >= 2)));
 // >= 2.27.3
-const useSubpackage = sdkVersion[0] > 2 || (sdkVersion[0] === 2 && (sdkVersion[1] > 27 || (sdkVersion[1] === 27 && sdkVersion[2] >= 3)));
+const hasSubpackage = sdkVersion[0] > 2 || (sdkVersion[0] === 2 && (sdkVersion[1] > 27 || (sdkVersion[1] === 27 && sdkVersion[2] >= 3)));
 
 // 是否启用 Worker 驱动资源管线
 if (!("CC_WORKER_ASSET_PIPELINE" in globalThis)) {
     globalThis.CC_WORKER_ASSET_PIPELINE = false;
-    // NOTE 截止 2024.10.22，微信未修复 iOS、Windows、Mac 上仅文件系统 API 可以正常使用的问题
+    // NOTE 截止 2024.10.22，微信未修复 iOS、Windows、Mac 上不可用的问题
     globalThis.CC_WORKER_ASSET_PIPELINE = (isAndroid || isDevtools) && globalThis.CC_WORKER_ASSET_PIPELINE;
 }
 
 // 是否启用 Worker 驱动音频系统
 if (!("CC_WORKER_AUDIO_SYSTEM" in globalThis)) {
     globalThis.CC_WORKER_AUDIO_SYSTEM = false;
-    // NOTE 截止 2024.10.22，微信未修复 iOS、Windows、Mac 上仅文件系统 API 可以正常使用的问题
+    // NOTE 截止 2024.10.22，微信未修复 iOS、Windows、Mac 上不可用的问题
     globalThis.CC_WORKER_AUDIO_SYSTEM = (isAndroid || isDevtools) && globalThis.CC_WORKER_AUDIO_SYSTEM;
 }
 
@@ -31,15 +31,15 @@ if (!("CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL" in globalThis)) {
 // 是否启用 Worker 驱动 HTTP 请求
 if (!("CC_WORKER_HTTP_REQUEST" in globalThis)) {
     globalThis.CC_WORKER_HTTP_REQUEST = false;
-    // NOTE 截止 2024.10.22，微信未修复 iOS、Windows、Mac 上仅文件系统 API 可以正常使用的问题
+    // NOTE 截止 2024.10.22，微信未修复 iOS、Windows、Mac 上不可用的问题
     globalThis.CC_WORKER_HTTP_REQUEST = (isAndroid || isDevtools) && globalThis.CC_WORKER_HTTP_REQUEST;
 }
 
 // 是否启用 Worker 驱动 WebSocket
 if (!("CC_WORKER_WEBSOCKET" in globalThis)) {
     globalThis.CC_WORKER_WEBSOCKET = false;
-    // NOTE 截止 2024.10.22，微信未修复 iOS、Windows、Mac 上仅文件系统 API 可以正常使用的问题
-    globalThis.CC_WORKER_WEBSOCKET = (isAndroid || isDevtools) && globalThis.CC_WORKER_WEBSOCKET;
+    // NOTE 截止 2024.11.25，微信未修复 iOS、Windows、Mac、开发者工具上不可用的问题
+    globalThis.CC_WORKER_WEBSOCKET = (isAndroid) && globalThis.CC_WORKER_WEBSOCKET;
 }
 
 // 是否启用自定义 Worker
@@ -68,6 +68,6 @@ if (!("CC_WORKER_FS_SYNC" in globalThis)) {
 
 // 是否启用 Worker 子包
 if (!("CC_WORKER_SUB_PACKAGE" in globalThis)) {
-    // NOTE 截止 2024.10.22，部分安卓机型声明使用子包 Worker 会报 java.string 错误
-    globalThis.CC_WORKER_SUB_PACKAGE = false;   // useSubpackage
+    globalThis.CC_WORKER_SUB_PACKAGE = false;
+    globalThis.CC_WORKER_SUB_PACKAGE = hasSubpackage && globalThis.CC_WORKER_SUB_PACKAGE;
 }
