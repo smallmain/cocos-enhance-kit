@@ -138,7 +138,7 @@ var audioWorkerAdapter = {
     },
 
     destroy(id) {
-        worker.audio.destroy(id);
+        worker.audio.destroy([id]);
         delete this.audios[id];
     },
 };
