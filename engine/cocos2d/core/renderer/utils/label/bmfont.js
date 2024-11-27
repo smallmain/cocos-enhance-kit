@@ -232,6 +232,10 @@ export default class BmfontAssembler extends Assembler2D {
         }
     }
 
+    _clearHorizontalKerning() {
+        _horizontalKernings.length = 0;
+    }
+
     _multilineTextWrap (nextTokenFunc) {
         let textLen = _string.length;
 
