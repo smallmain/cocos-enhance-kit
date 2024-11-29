@@ -28888,9 +28888,11 @@
         interactable: {
           default: true,
           tooltip: (true, "i18n:COMPONENT.button.interactable"),
-          notify: function notify() {
-            this._updateState();
-            this.interactable || this._resetState();
+          notify: function notify(oldValue) {
+            if (oldValue !== this.interactable) {
+              this._updateState();
+              this.interactable || this._resetState();
+            }
           },
           animatable: false
         },
@@ -29137,7 +29139,6 @@
         }
       },
       update: function update(dt) {
-        var target = this._getTarget();
         if (this._transitionFinished) return;
         if (this.transition !== Transition.COLOR && this.transition !== Transition.SCALE) return;
         this.time += dt;
@@ -29147,7 +29148,10 @@
         if (this.transition === Transition.COLOR) {
           var color = this._fromColor.lerp(this._toColor, ratio);
           this._setTargetColor(color);
-        } else this.transition === Transition.SCALE && this._originalScale && (target.scale = this._fromScale.lerp(this._toScale, ratio));
+        } else if (this.transition === Transition.SCALE && this._originalScale) {
+          var target = this._getTarget();
+          target.scale = this._fromScale.lerp(this._toScale, ratio);
+        }
         1 === ratio && (this._transitionFinished = true);
       },
       _registerNodeEvent: function _registerNodeEvent() {
@@ -46119,7 +46123,7 @@
     function parseInstances(data) {
       var instances = data[5];
       var instanceTypes = data[6];
-      var instanceTypesLen = instanceTypes === EMPTY_PLACEHOLDER ? 0 : instanceTypes.length;
+      var instanceTypesLen = 0 === instanceTypes ? 0 : instanceTypes.length;
       var rootIndex = instances[instances.length - 1];
       var normalObjectCount = instances.length - instanceTypesLen;
       if ("number" !== typeof rootIndex) rootIndex = 0; else {
@@ -46171,8 +46175,8 @@
         var klassLayout = classes[i];
         if ("string" !== typeof klassLayout) {
           true;
-          if ("function" === typeof klassLayout[CLASS_TYPE]) throw new Error("Can not deserialize the same JSON data again.");
-          var _type5 = klassLayout[CLASS_TYPE];
+          if ("function" === typeof klassLayout[0]) throw new Error("Can not deserialize the same JSON data again.");
+          var _type5 = klassLayout[0];
           doLookupClass(classFinder, _type5, klassLayout, CLASS_TYPE, silent, customFinder);
         } else doLookupClass(classFinder, klassLayout, classes, i, silent, customFinder);
       }
@@ -46183,7 +46187,7 @@
         var classes = data[3];
         for (var i = 0; i < masks.length; ++i) {
           var mask = masks[i];
-          mask[MASK_CLASS] = classes[mask[MASK_CLASS]];
+          mask[0] = classes[mask[0]];
         }
       }
     }
@@ -46219,7 +46223,7 @@
         preprocessed = version.preprocessed;
         version = version.version;
       }
-      if (version < SUPPORT_MIN_FORMAT_VERSION) throw new Error(cc.debug.getError(5304, version));
+      if (version < 1) throw new Error(cc.debug.getError(5304, version));
       options._version = version;
       options.result = details;
       data[0] = options;
@@ -46242,7 +46246,7 @@
       this.version = version;
     };
     function unpackJSONs(data, classFinder) {
-      if (data[0] < SUPPORT_MIN_FORMAT_VERSION) throw new Error(cc.debug.getError(5304, data[0]));
+      if (data[0] < 1) throw new Error(cc.debug.getError(5304, data[0]));
       lookupClasses(data, true, classFinder);
       cacheMasks(data);
       var version = new FileInfo(data[0]);
@@ -46255,7 +46259,7 @@
       return sections;
     }
     function packCustomObjData(type, data, hasNativeDep) {
-      return [ SUPPORT_MIN_FORMAT_VERSION, EMPTY_PLACEHOLDER, EMPTY_PLACEHOLDER, [ type ], EMPTY_PLACEHOLDER, hasNativeDep ? [ data, -1 ] : [ data ], [ 0 ], EMPTY_PLACEHOLDER, [], [], [] ];
+      return [ 1, EMPTY_PLACEHOLDER, EMPTY_PLACEHOLDER, [ type ], EMPTY_PLACEHOLDER, hasNativeDep ? [ data, -1 ] : [ data ], [ 0 ], EMPTY_PLACEHOLDER, [], [], [] ];
     }
     function hasNativeDep(data) {
       var instances = data[5];
@@ -50454,6 +50458,9 @@
           }
         } else horizontalKernings.length = 0;
       };
+      _proto._clearHorizontalKerning = function _clearHorizontalKerning() {
+        _horizontalKernings.length = 0;
+      };
       _proto._multilineTextWrap = function _multilineTextWrap(nextTokenFunc) {
         var textLen = _string.length;
         var lineIndex = 0;
@@ -51271,7 +51278,9 @@
         _isBold && (fontDesc = "bold " + fontDesc);
         return fontDesc;
       };
-      _proto2._computeHorizontalKerningForText = function _computeHorizontalKerningForText() {};
+      _proto2._computeHorizontalKerningForText = function _computeHorizontalKerningForText() {
+        this._clearHorizontalKerning();
+      };
       _proto2._determineRect = function _determineRect(tempRect) {
         return false;
       };
@@ -56928,7 +56937,7 @@
     "use strict";
     cc.sp = {
       inited: false,
-      version: "2.3.0",
+      version: "2.4.0",
       MAX_MULTITEXTURE_NUM: -1,
       autoSwitchMaterial: true,
       allowDynamicAtlas: true,
