@@ -13,13 +13,13 @@ description: "在多线程中使用 WebSocket。"
 
 下面是在 Android 设备上，在优化前对游戏帧耗时的分析图：
 
-![alt text](./assets/th-a.png)
+![alt text](./assets/tws_2.png)
 
 下面是优化后：
 
-![alt text](./assets/th-b.png)
+![alt text](./assets/tws_1.png)
 
-可以看到网络请求的耗时从 ms 降低至 ms。
+可以看到网络请求的耗时从 5.8ms 降低至 0.7ms。
 
 :::caution 注意
 
