@@ -26,11 +26,13 @@ export default class WebSocket {
     this.url = url
     this.readyState = WebSocket.CONNECTING
 
-    const socketTask = wx.connectSocket({
-      url,
-      protocols: Array.isArray(protocols) ? protocols : [protocols],
-      tcpNoDelay: true
-    })
+    const socketTask = CC_WORKER_WEBSOCKET
+      ? new WorkerWebSocket(url, Array.isArray(protocols) ? protocols : [protocols])
+      : wx.connectSocket({
+        url,
+        protocols: Array.isArray(protocols) ? protocols : [protocols],
+        tcpNoDelay: true
+      });
 
     _socketTask.set(this, socketTask)
 
@@ -74,8 +76,10 @@ export default class WebSocket {
   }
 
   send(data) {
-    if (typeof data !== 'string' && !(data instanceof ArrayBuffer) && !ArrayBuffer.isView(data)) {
-      throw new TypeError(`Failed to send message: The data ${data} is invalid`)
+    if (!CC_WORKER_WEBSOCKET) {
+      if (typeof data !== 'string' && !(data instanceof ArrayBuffer) && !ArrayBuffer.isView(data)) {
+        throw new TypeError(`Failed to send message: The data ${data} is invalid`)
+      }
     }
 
     const socketTask = _socketTask.get(this)

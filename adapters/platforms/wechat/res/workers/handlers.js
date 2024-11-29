@@ -14,3 +14,8 @@ if (globalThis.CC_WORKER_HTTP_REQUEST) {
     const http = require("./http-worker.js");
     registerHandler("http", http);
 }
+
+if (globalThis.CC_WORKER_WEBSOCKET) {
+    const ws = require("./ws-worker.js");
+    registerHandler("ws", ws);
+}
