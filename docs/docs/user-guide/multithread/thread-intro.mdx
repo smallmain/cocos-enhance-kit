@@ -29,6 +29,8 @@ import {useCurrentSidebarCategory} from '@docusaurus/theme-common';
 - CC_WORKER_DEBUG（是否启用 Worker 调试模式）
 - CC_CUSTOM_WORKER（是否启用自定义 Worker）
 - CC_WORKER_AUDIO_SYSTEM_SYNC_INTERVAL（Worker 音频系统同步音频属性的间隔时间（单位：毫秒））
+- CC_WORKER_WEBSOCKET（是否启用 Worker 驱动 WebSocket）
+- CC_WORKER_HTTP_REQUEST（是否启用 Worker 驱动 HTTP 请求）
 
 例如这样：
 
@@ -42,6 +44,10 @@ __globalAdapter.init();
 ```
 
 当 `init` 执行之后，由于引擎已经初始化完毕，就不能再对设置进行修改了。
+
+## 将 workers 代码目录设为子包
+
+依次点击编辑器的菜单项 **项目 - 社区版设置**，然后勾选 **设为小游戏子包**，即可启用这一特性。
 
 ## 注意事项
 
