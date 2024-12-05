@@ -1,8 +1,12 @@
 {
-    "editor.formatOnSave": false,
-    "editor.codeActionsOnSave": {},
+    "files.trimFinalNewlines": false,
+    "files.trimTrailingWhitespace": false,
+    "files.trimTrailingWhitespaceInRegexAndStrings": false,
+    "editor.trimAutoWhitespace": false,
     "[javascript][typescript][javascriptreact][typescriptreact]": {
         "editor.formatOnSave": false,
-        "editor.codeActionsOnSave": {},
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "never",
+        },
     },
 }

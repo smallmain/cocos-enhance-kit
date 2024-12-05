@@ -1,0 +1,25 @@
+{
+	"folders": [
+		{
+			"path": "../../cocos-service-pack"
+		},
+		{
+			"path": "../../cocos-service-pack-extension"
+		},
+		{
+			"path": ".."
+		}
+	],
+	"settings": {
+		"files.trimFinalNewlines": false,
+		"files.trimTrailingWhitespace": false,
+		"files.trimTrailingWhitespaceInRegexAndStrings": false,
+		"editor.trimAutoWhitespace": false,
+		"[javascript][typescript][javascriptreact][typescriptreact]": {
+			"editor.formatOnSave": false,
+			"editor.codeActionsOnSave": {
+				"source.organizeImports": "never"
+			},
+		},
+	}
+}
