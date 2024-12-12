@@ -44,29 +44,46 @@ if(CC_JSB) {
 
 Label._canvasPool = {
     pool: [],
+    used: 0,
+    max: 32,
     get () {
         let data = this.pool.pop();
 
         if (!data) {
-            let canvas = document.createElement("canvas");
-            let context = canvas.getContext("2d");
-            data = {
-                canvas: canvas,
-                context: context
-            }
-
-            // default text info
-            context.textBaseline = 'alphabetic';
+            data = this._create();
         }
 
+        this.used++;
         return data;
     },
     put (canvas) {
-        if (this.pool.length >= 32) {
+        this.used--;
+        if (this.pool.length >= this.max) {
             return;
         }
         this.pool.push(canvas);
-    }
+    },
+    _create() {
+        let canvas = document.createElement("canvas");
+        let context = canvas.getContext("2d");
+        
+        const data = {
+            canvas: canvas,
+            context: context
+        }
+
+        // default text info
+        context.textBaseline = 'alphabetic';  
+        return data;
+    },
+    cache(count) {
+        const target = Math.min(this.max, count);
+        let total = this.used + this.pool.length;
+        while (total < target) {
+            this.pool.push(this._create());
+            total++;
+        }
+    },
 };
 
 Assembler.register(cc.Label, {
