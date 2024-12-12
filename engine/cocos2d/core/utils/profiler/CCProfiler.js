@@ -36,7 +36,7 @@ let _rootNode = null;
 let _label = null;
 
 function generateStats () {
-    if (_stats) return;
+    if (_stats && !cc.macro.ENABLE_CUSTOM_PROFILER) return;
     
     _stats = {
         fps: { desc: 'Framerate (FPS)', below: 30, average: 500 },
@@ -47,9 +47,86 @@ function generateStats () {
         mode: { desc: cc.game.renderType === cc.game.RENDER_TYPE_WEBGL ? 'WebGL' : 'Canvas', min: 1 }
     };
 
+    if (cc.macro.ENABLE_CUSTOM_PROFILER) {
+        delete _stats["mode"];
+    }
+
     let now = performance.now();
     for (let id in _stats) {
         _stats[id]._counter = new PerfCounter(id, _stats[id], now);
+    }
+    
+    if (cc.macro.ENABLE_CUSTOM_PROFILER) {
+        if (cc.Label) {
+            if (cc.profiler.showLabelCanvasCounter) {
+                _stats.label_canvas = {
+                    desc: 'Label Canvas',
+                    _counter: {
+                        sample(now) {
+
+                        },
+                        human() {
+                            const used = cc.Label._canvasPool.used;
+                            const surplus = cc.Label._canvasPool.pool.length;
+                            return `${used} / ${surplus + used}`;
+                        }
+                    },
+                };
+            }
+            if (cc.profiler.showLabelCharAtlasCounter) {
+                _stats.label_atlas = {
+                    desc: 'Char Atlas',
+                    _counter: {
+                        sample(now) {
+
+                        },
+                        human() {
+                            const atlases = cc.Label._shareAtlas.atlases;
+                            let used = 0;
+                            let usedLess = 0;
+                            for (const atlas of atlases) {
+                                const max = atlas._width * atlas._height;
+                                let _used = atlas._width * atlas._nexty;
+                                for (const area of atlas.frees) {
+                                    _used -= area._width * area._height;
+                                }
+                                let _usedLess = _used;
+                                for (const area of atlas.waitCleans) {
+                                    if (area.ref === 0) {
+                                        _usedLess -= area._width * area._height;
+                                    }
+                                }
+                                used += _used / max;
+                                usedLess += _usedLess / max;
+                            }
+                            return `${(usedLess / atlases.length).toFixed(2)} / ${(used / atlases.length).toFixed(2)} / ${atlases.length}`;
+                        }
+                    },
+                };
+            }
+        }
+        if (cc.profiler.showDynamicAtlasCounter) {
+            _stats.dynamic_atlas = {
+                desc: 'Dynamic Atlas',
+                _counter: {
+                    sample(now) {
+
+                    },
+                    human() {
+                        const atlases = cc.dynamicAtlasManager.atlases;
+                        const max = cc.dynamicAtlasManager.maxAtlasCount;
+                        const curLess = cc.dynamicAtlasManager.atlasCount;
+                        const oneOfMax = cc.dynamicAtlasManager.textureSize * cc.dynamicAtlasManager.textureSize;
+                        let cur = 0;
+                        for (const key in cc.dynamicAtlasManager.rects) {
+                            const rect = cc.dynamicAtlasManager.rects[key];
+                            cur += rect.sizes;
+                        }
+                        return `${(cur / oneOfMax).toFixed(2)} / ${curLess} / ${max}`;
+                    }
+                },
+            };
+        }
     }
 }
 
@@ -144,6 +221,10 @@ function afterDraw () {
 }
 
 cc.profiler = module.exports = {
+    showLabelCanvasCounter: true,
+    showLabelCharAtlasCounter: true,
+    showDynamicAtlasCounter: true,
+    
     isShowingStats () {
         return _showFPS;
     },

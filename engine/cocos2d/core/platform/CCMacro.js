@@ -386,7 +386,19 @@ cc.macro = {
      * @property {Boolean} ENABLE_NATIVE_TTF_RENDERER
      * @default false
      */
-    ENABLE_NATIVE_TTF_RENDERER: false
+    ENABLE_NATIVE_TTF_RENDERER: false,
+
+    /**
+     * !#en
+     * Enable advanced performance indicators, allowing for customization and display of more performance metrics.
+     * 
+     * !#zh
+     * 启用高级性能指示器，允许自定义和显示更多性能指标。
+     * 
+     * @property {Boolean} ENABLE_CUSTOM_PROFILER
+     * @default false
+     */
+    ENABLE_CUSTOM_PROFILER: false,
 
 };
 
