@@ -327,6 +327,22 @@ class LetterAtlases {
      */
     _fontDefDictionary = new FontAtlas(null);
 
+    /**
+     * 所有获取过的字符集合
+     */
+    letterCache = null;
+    
+    /**
+     * 是否记录所有获取过的字符
+     */
+    get enableLetterCache() {
+        return this._enableLetterCache;
+    }
+    set enableLetterCache(v) {
+        this._enableLetterCache = v;
+        this.letterCache = v ? {} : null;
+    }
+    _enableLetterCache = false;
 
     constructor() {
         const handler = new cc.sp.MultiHandler();
@@ -336,6 +352,12 @@ class LetterAtlases {
         cc.director.on(cc.Director.EVENT_BEFORE_SCENE_LAUNCH, this.beforeSceneLoad, this);
     }
 
+    static init() {
+        if (!_shareAtlas) {
+            _shareAtlas = new LetterAtlases();
+            cc.Label._shareAtlas = _shareAtlas;
+        }
+    }
 
     insertLetterTexture(letterTexture) {
         for (const atlas of this.atlases) {
@@ -428,6 +450,21 @@ class LetterAtlases {
         let hash = char.charCodeAt(0) + labelInfo.hash;
         let letter = this._fontDefDictionary._letterDefinitions[hash];
         if (!letter) {
+            if (this._enableLetterCache) {
+                const canvas = Label._canvasPool.get();
+                this.letterCache[hash] = {
+                    char,
+                    hash: labelInfo.hash,
+                    measure: textUtils.safeMeasureText(canvas.context, char, labelInfo.fontDesc),
+                    fontDesc: labelInfo.fontDesc,
+                    fontSize: labelInfo.fontSize,
+                    margin: labelInfo.margin,
+                    out: labelInfo.out.toHEX(),
+                    color: labelInfo.color.toHEX(),
+                    isOutlined: labelInfo.isOutlined,
+                };
+                Label._canvasPool.put(canvas);
+            }
             let temp = new LetterTexture(char, labelInfo);
             temp.updateRenderData();
             letter = this.insertLetterTexture(temp);
@@ -441,6 +478,36 @@ class LetterAtlases {
         }
 
         return letter;
+    }
+    
+    
+    cacheLetter(info) {
+        textUtils.applyMeasureCache({ [textUtils.computeHash(info.char, info.fontDesc)]: info.measure });
+        shareLabelInfo.hash = info.hash;
+        shareLabelInfo.fontDesc = info.fontDesc;
+        shareLabelInfo.margin = info.margin;
+        shareLabelInfo.out = cc.Color.fromHEX(cc.color(), info.out);
+        shareLabelInfo.fontSize = info.fontSize;
+        shareLabelInfo.color = cc.Color.fromHEX(cc.color(), info.color);
+        shareLabelInfo.isOutlined = info.isOutlined;
+        this.getLetterDefinitionForChar(info.char, shareLabelInfo);
+    }
+    
+    
+    getLetterCache() {
+        const arr = [];
+        for (const key in this.letterCache) {
+            const cache = this.letterCache[key];
+            arr.push(cache);
+        }
+        return arr;
+    }
+    
+    
+    applyLetterCache(data) {
+        for (const cache of data) {
+            this.cacheLetter(cache);
+        }
     }
 
 
@@ -629,3 +696,5 @@ export default class LetterFontAssembler extends WebglBmfontAssembler {
 LetterFontAssembler.prototype.floatsPerVert = 6;
 LetterFontAssembler.prototype.texIdOffset = 5;
 LetterFontAssembler.prototype.isMulti = true;
+
+Label.LetterAtlases = LetterAtlases;
