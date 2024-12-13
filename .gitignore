@@ -28,6 +28,7 @@ Thumbs.db
 !.vscode/settings.json
 !.vscode/launch.json
 !.vscode/**/*.code-snippets
+!.vscode/mega.code-workspace
 
 #/////////////////////////////////////////////////////////////////////////////
 # Temp files

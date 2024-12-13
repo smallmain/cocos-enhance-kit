@@ -187,6 +187,11 @@ declare module cc {
 
         }
 
+        /**
+         * 内置多纹理合批管理器实例
+         */
+        const multiBatcher: MultiBatcher;
+
     };
 
     namespace RenderComponent {
@@ -307,6 +312,21 @@ declare module cc {
         }
 
         /**
+         * CHAR 字符缓存
+         */
+        interface LetterCache {
+            char: string;
+            hash: string;
+            measure: number;
+            fontDesc: string;
+            fontSize: number;
+            margin: number;
+            out: string;
+            color: string;
+            isOutlined: boolean;
+        }
+
+        /**
          * CHAR 缓存模式图集管理类
          */
         class LetterAtlases {
@@ -332,6 +352,21 @@ declare module cc {
             _fontDefDictionary: any;
 
             /**
+             * 字符缓存
+             */
+            letterCache: Record<string, LetterCache> | null;
+
+            /**
+             * 是否开启记录字符缓存
+             */
+            enableLetterCache: boolean;
+            
+            /**
+             * 初始化
+             */
+            static init(): void;
+
+            /**
              * 使用该接口在显示字符前将字符打入 CHAR 图集
              */
             getLetterDefinitionForChar(char: string, labelInfo: any): any;
@@ -340,6 +375,21 @@ declare module cc {
              * 获取已存在的字符信息
              */
             getLetter(key: string): cc.BitmapFont.FontLetterDefinition;
+
+            /**
+             * 缓存字符纹理
+             */
+            cacheLetter(info: LetterCache): void;
+
+            /**
+             * 获取字符缓存
+             */
+            getLetterCache(): LetterCache[];
+
+            /**
+             * 应用字符缓存
+             */
+            applyLetterCache(data: LetterCache[]): void;
 
             /**
              * 从图集中删除字符
@@ -363,6 +413,42 @@ declare module cc {
          */
         const _shareAtlas: LetterAtlases;
 
+        /**
+         * Label Canvas 对象池
+         */
+        const _canvasPool: {
+            /**
+             * 对象池数组
+             */
+            pool: object[];
+
+            /** 
+             * 正在使用的数量
+             */
+            used: number;
+
+            /** 
+             * 最大数量
+             */
+            max: number;
+
+            /** 
+             * 获取对象
+             */
+            get(): object;
+
+            /** 
+             * 放回对象
+             */
+            put(canvas: object): void;
+
+            /** 
+             * 缓存指定数量的对象
+             * 
+             * 无论指定任何数量，最终对象池都不会大于最大数量
+             */
+            cache(count: number): void;
+        };
     }
 
     namespace BitmapFont {
@@ -786,7 +872,58 @@ declare module cc {
 
     }
 
+    export namespace macro {
 
+        /**
+         * !#en
+         * Enable advanced performance indicators, allowing for customization and display of more performance metrics.
+         * 
+         * !#zh
+         * 启用高级性能指示器，允许自定义和显示更多性能指标。
+         * 
+         * @property {Boolean} ENABLE_CUSTOM_PROFILER
+         * @default false
+         */
+        export let ENABLE_CUSTOM_PROFILER: boolean;
+
+    }
+
+    /**
+     * 文本渲染工具函数
+     */
+    export const textUtils: {
+        /**
+         * 测量值缓存
+         */
+        measureCache: {
+            count: number;
+            limit: number;
+            size: number;
+            datas: Record<string, { value: number }>;
+        };
+
+        /** 
+         * 测量文本宽度
+         * 
+         * `ctx` 可从 `cc.Label._canvasPool` 中获取。
+         */
+        safeMeasureText(ctx: object, string: string, desc: string): number;
+
+        /**
+         * 获取缓存哈希值
+         */
+        computeHash(string: string, desc: string): string;
+
+        /**
+         * 获取测量值缓存
+         */
+        getMeasureCache(): Record<string, number>;
+
+        /** 
+         * 应用测量值缓存
+         */
+        applyMeasureCache(data: Record<string, number>): void;
+    };
 
 }
 
