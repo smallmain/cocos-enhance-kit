@@ -1,6 +1,6 @@
 {
   "name": "enhance-kit",
-  "version": "2.4.0",
+  "version": "3.0.0",
   "description": "This extension provides support for cocos enhance kit.",
   "author": "SmallMain",
   "main": "main.js",

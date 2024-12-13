@@ -34036,7 +34036,10 @@
             this._texIdDirty = true;
           } else {
             var textureImpl = texture && texture.getImpl();
-            material.getProperty("texture") !== textureImpl && material.setProperty("texture", texture);
+            if (material.getProperty("texture") !== textureImpl) {
+              material.setProperty("texture", texture);
+              this.setVertsDirty();
+            }
           }
           this._assembler && (isMultiMaterial && !this._assembler.isMulti || !isMultiMaterial && this._assembler.isMulti) && this._resetAssembler();
         }
@@ -44090,7 +44093,8 @@
       SHOW_MESH_NORMAL: false,
       ENABLE_MULTI_TOUCH: true,
       ALLOW_IMAGE_BITMAP: !cc.sys.isMobile,
-      ENABLE_NATIVE_TTF_RENDERER: false
+      ENABLE_NATIVE_TTF_RENDERER: false,
+      ENABLE_CUSTOM_PROFILER: false
     };
     Object.defineProperty(cc.macro, "ROTATE_ACTION_CCW", {
       set: function set(value) {
@@ -46175,8 +46179,8 @@
         var klassLayout = classes[i];
         if ("string" !== typeof klassLayout) {
           true;
-          if ("function" === typeof klassLayout[0]) throw new Error("Can not deserialize the same JSON data again.");
-          var _type5 = klassLayout[0];
+          if ("function" === typeof klassLayout[CLASS_TYPE]) throw new Error("Can not deserialize the same JSON data again.");
+          var _type5 = klassLayout[CLASS_TYPE];
           doLookupClass(classFinder, _type5, klassLayout, CLASS_TYPE, silent, customFinder);
         } else doLookupClass(classFinder, klassLayout, classes, i, silent, customFinder);
       }
@@ -46187,7 +46191,7 @@
         var classes = data[3];
         for (var i = 0; i < masks.length; ++i) {
           var mask = masks[i];
-          mask[0] = classes[mask[0]];
+          mask[MASK_CLASS] = classes[mask[MASK_CLASS]];
         }
       }
     }
@@ -46223,7 +46227,7 @@
         preprocessed = version.preprocessed;
         version = version.version;
       }
-      if (version < 1) throw new Error(cc.debug.getError(5304, version));
+      if (version < SUPPORT_MIN_FORMAT_VERSION) throw new Error(cc.debug.getError(5304, version));
       options._version = version;
       options.result = details;
       data[0] = options;
@@ -46246,7 +46250,7 @@
       this.version = version;
     };
     function unpackJSONs(data, classFinder) {
-      if (data[0] < 1) throw new Error(cc.debug.getError(5304, data[0]));
+      if (data[0] < SUPPORT_MIN_FORMAT_VERSION) throw new Error(cc.debug.getError(5304, data[0]));
       lookupClasses(data, true, classFinder);
       cacheMasks(data);
       var version = new FileInfo(data[0]);
@@ -46259,7 +46263,7 @@
       return sections;
     }
     function packCustomObjData(type, data, hasNativeDep) {
-      return [ 1, EMPTY_PLACEHOLDER, EMPTY_PLACEHOLDER, [ type ], EMPTY_PLACEHOLDER, hasNativeDep ? [ data, -1 ] : [ data ], [ 0 ], EMPTY_PLACEHOLDER, [], [], [] ];
+      return [ SUPPORT_MIN_FORMAT_VERSION, EMPTY_PLACEHOLDER, EMPTY_PLACEHOLDER, [ type ], EMPTY_PLACEHOLDER, hasNativeDep ? [ data, -1 ] : [ data ], [ 0 ], EMPTY_PLACEHOLDER, [], [], [] ];
     }
     function hasNativeDep(data) {
       var instances = data[5];
@@ -50857,6 +50861,23 @@
       };
       return _setPrototypeOf(o, p);
     }
+    function _defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        "value" in descriptor && (descriptor.writable = true);
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+    function _createClass(Constructor, protoProps, staticProps) {
+      protoProps && _defineProperties(Constructor.prototype, protoProps);
+      staticProps && _defineProperties(Constructor, staticProps);
+      Object.defineProperty(Constructor, "prototype", {
+        writable: false
+      });
+      return Constructor;
+    }
     function _createForOfIteratorHelperLoose(o, allowArrayLike) {
       var it = "undefined" !== typeof Symbol && o[Symbol.iterator] || o["@@iterator"];
       if (it) return (it = it.call(o)).next.bind(it);
@@ -51102,11 +51123,19 @@
           material: null
         };
         this._fontDefDictionary = new FontAtlas(null);
+        this.letterCache = null;
+        this._enableLetterCache = false;
         var handler = new cc.sp.MultiHandler();
         this.material = handler.material;
         this.fakeMaterial.material = this.material;
         cc.director.on(cc.Director.EVENT_BEFORE_SCENE_LAUNCH, this.beforeSceneLoad, this);
       }
+      LetterAtlases.init = function init() {
+        if (!_shareAtlas) {
+          _shareAtlas = new LetterAtlases();
+          cc.Label._shareAtlas = _shareAtlas;
+        }
+      };
       var _proto = LetterAtlases.prototype;
       _proto.insertLetterTexture = function insertLetterTexture(letterTexture) {
         for (var _iterator2 = _createForOfIteratorHelperLoose(this.atlases), _step2; !(_step2 = _iterator2()).done; ) {
@@ -51172,6 +51201,21 @@
         var hash = _char2.charCodeAt(0) + labelInfo.hash;
         var letter = this._fontDefDictionary._letterDefinitions[hash];
         if (!letter) {
+          if (this._enableLetterCache) {
+            var canvas = Label._canvasPool.get();
+            this.letterCache[hash] = {
+              char: _char2,
+              hash: labelInfo.hash,
+              measure: textUtils.safeMeasureText(canvas.context, _char2, labelInfo.fontDesc),
+              fontDesc: labelInfo.fontDesc,
+              fontSize: labelInfo.fontSize,
+              margin: labelInfo.margin,
+              out: labelInfo.out.toHEX(),
+              color: labelInfo.color.toHEX(),
+              isOutlined: labelInfo.isOutlined
+            };
+            Label._canvasPool.put(canvas);
+          }
           var temp = new LetterTexture(_char2, labelInfo);
           temp.updateRenderData();
           letter = this.insertLetterTexture(temp);
@@ -51183,6 +51227,33 @@
           this.checkMaterialAndUpdateTexId(letter);
         }
         return letter;
+      };
+      _proto.cacheLetter = function cacheLetter(info) {
+        var _textUtils$applyMeasu;
+        textUtils.applyMeasureCache((_textUtils$applyMeasu = {}, _textUtils$applyMeasu[textUtils.computeHash(info["char"], info.fontDesc)] = info.measure, 
+        _textUtils$applyMeasu));
+        shareLabelInfo.hash = info.hash;
+        shareLabelInfo.fontDesc = info.fontDesc;
+        shareLabelInfo.margin = info.margin;
+        shareLabelInfo.out = cc.Color.fromHEX(cc.color(), info.out);
+        shareLabelInfo.fontSize = info.fontSize;
+        shareLabelInfo.color = cc.Color.fromHEX(cc.color(), info.color);
+        shareLabelInfo.isOutlined = info.isOutlined;
+        this.getLetterDefinitionForChar(info["char"], shareLabelInfo);
+      };
+      _proto.getLetterCache = function getLetterCache() {
+        var arr = [];
+        for (var key in this.letterCache) {
+          var cache = this.letterCache[key];
+          arr.push(cache);
+        }
+        return arr;
+      };
+      _proto.applyLetterCache = function applyLetterCache(data) {
+        for (var _iterator6 = _createForOfIteratorHelperLoose(data), _step6; !(_step6 = _iterator6()).done; ) {
+          var cache = _step6.value;
+          this.cacheLetter(cache);
+        }
       };
       _proto.checkMaterialAndUpdateTexId = function checkMaterialAndUpdateTexId(letter) {
         var atlas = letter.atlas;
@@ -51208,6 +51279,16 @@
           _usedMaterial = _shareAtlas.fakeMaterial;
         }
       };
+      _createClass(LetterAtlases, [ {
+        key: "enableLetterCache",
+        get: function get() {
+          return this._enableLetterCache;
+        },
+        set: function set(v) {
+          this._enableLetterCache = v;
+          this.letterCache = v ? {} : null;
+        }
+      } ]);
       return LetterAtlases;
     })();
     function computeHash(labelInfo) {
@@ -51289,8 +51370,8 @@
         _usedMaterial = _assembler._renderComp._materials[0];
         _needCheckMaterial = true;
         _firstTraverse = true;
-        for (var _iterator6 = _createForOfIteratorHelperLoose(_shareAtlas.atlases), _step6; !(_step6 = _iterator6()).done; ) {
-          var atlas = _step6.value;
+        for (var _iterator7 = _createForOfIteratorHelperLoose(_shareAtlas.atlases), _step7; !(_step7 = _iterator7()).done; ) {
+          var atlas = _step7.value;
           atlas._tmpId = -1;
         }
         this._recycleLetterRef();
@@ -51302,8 +51383,8 @@
         _firstTraverse = false;
       };
       _proto2._recycleLetterRef = function _recycleLetterRef() {
-        for (var _iterator7 = _createForOfIteratorHelperLoose(this._letterRefs), _step7; !(_step7 = _iterator7()).done; ) {
-          var letter = _step7.value;
+        for (var _iterator8 = _createForOfIteratorHelperLoose(this._letterRefs), _step8; !(_step8 = _iterator8()).done; ) {
+          var letter = _step8.value;
           _shareAtlas.deleteLetter(letter);
         }
         this._letterRefs.length = 0;
@@ -51332,6 +51413,7 @@
     LetterFontAssembler.prototype.floatsPerVert = 6;
     LetterFontAssembler.prototype.texIdOffset = 5;
     LetterFontAssembler.prototype.isMulti = true;
+    Label.LetterAtlases = LetterAtlases;
     module.exports = exports["default"];
   }), {
     "../../../assets/CCRenderTexture": 145,
@@ -53762,22 +53844,36 @@
     NativeTTF = require("./2d/nativeTTF");
     _CCLabel["default"]._canvasPool = {
       pool: [],
+      used: 0,
+      max: 32,
       get: function get() {
         var data = this.pool.pop();
-        if (!data) {
-          var canvas = document.createElement("canvas");
-          var context = canvas.getContext("2d");
-          data = {
-            canvas: canvas,
-            context: context
-          };
-          context.textBaseline = "alphabetic";
-        }
+        data || (data = this._create());
+        this.used++;
         return data;
       },
       put: function put(canvas) {
-        if (this.pool.length >= 32) return;
+        this.used--;
+        if (this.pool.length >= this.max) return;
         this.pool.push(canvas);
+      },
+      _create: function _create() {
+        var canvas = document.createElement("canvas");
+        var context = canvas.getContext("2d");
+        var data = {
+          canvas: canvas,
+          context: context
+        };
+        context.textBaseline = "alphabetic";
+        return data;
+      },
+      cache: function cache(count) {
+        var target = Math.min(this.max, count);
+        var total = this.used + this.pool.length;
+        while (total < target) {
+          this.pool.push(this._create());
+          total++;
+        }
       }
     };
     _assembler["default"].register(cc.Label, {
@@ -56937,7 +57033,7 @@
     "use strict";
     cc.sp = {
       inited: false,
-      version: "2.4.0",
+      version: "3.0.0",
       MAX_MULTITEXTURE_NUM: -1,
       autoSwitchMaterial: true,
       allowDynamicAtlas: true,
@@ -58357,6 +58453,37 @@
   }), {} ],
   390: [ (function(require, module, exports) {
     "use strict";
+    function _createForOfIteratorHelperLoose(o, allowArrayLike) {
+      var it = "undefined" !== typeof Symbol && o[Symbol.iterator] || o["@@iterator"];
+      if (it) return (it = it.call(o)).next.bind(it);
+      if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && "number" === typeof o.length) {
+        it && (o = it);
+        var i = 0;
+        return function() {
+          if (i >= o.length) return {
+            done: true
+          };
+          return {
+            done: false,
+            value: o[i++]
+          };
+        };
+      }
+      throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+    }
+    function _unsupportedIterableToArray(o, minLen) {
+      if (!o) return;
+      if ("string" === typeof o) return _arrayLikeToArray(o, minLen);
+      var n = Object.prototype.toString.call(o).slice(8, -1);
+      "Object" === n && o.constructor && (n = o.constructor.name);
+      if ("Map" === n || "Set" === n) return Array.from(o);
+      if ("Arguments" === n || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+    }
+    function _arrayLikeToArray(arr, len) {
+      (null == len || len > arr.length) && (len = arr.length);
+      for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+      return arr2;
+    }
     var macro = require("../../platform/CCMacro");
     var PerfCounter = require("./perf-counter");
     var _showFPS = false;
@@ -58365,7 +58492,7 @@
     var _rootNode = null;
     var _label = null;
     function generateStats() {
-      if (_stats) return;
+      if (_stats && !cc.macro.ENABLE_CUSTOM_PROFILER) return;
       _stats = {
         fps: {
           desc: "Framerate (FPS)",
@@ -58400,8 +58527,72 @@
           min: 1
         }
       };
+      cc.macro.ENABLE_CUSTOM_PROFILER && delete _stats["mode"];
       var now = performance.now();
       for (var id in _stats) _stats[id]._counter = new PerfCounter(id, _stats[id], now);
+      if (cc.macro.ENABLE_CUSTOM_PROFILER) {
+        if (cc.Label) {
+          cc.profiler.showLabelCanvasCounter && (_stats.label_canvas = {
+            desc: "Label Canvas",
+            _counter: {
+              sample: function sample(now) {},
+              human: function human() {
+                var used = cc.Label._canvasPool.used;
+                var surplus = cc.Label._canvasPool.pool.length;
+                return used + " / " + (surplus + used);
+              }
+            }
+          });
+          cc.profiler.showLabelCharAtlasCounter && (_stats.label_atlas = {
+            desc: "Char Atlas",
+            _counter: {
+              sample: function sample(now) {},
+              human: function human() {
+                var atlases = cc.Label._shareAtlas.atlases;
+                var used = 0;
+                var usedLess = 0;
+                for (var _iterator = _createForOfIteratorHelperLoose(atlases), _step; !(_step = _iterator()).done; ) {
+                  var atlas = _step.value;
+                  var max = atlas._width * atlas._height;
+                  var _used = atlas._width * atlas._nexty;
+                  for (var _iterator2 = _createForOfIteratorHelperLoose(atlas.frees), _step2; !(_step2 = _iterator2()).done; ) {
+                    var area = _step2.value;
+                    _used -= area._width * area._height;
+                  }
+                  var _usedLess = _used;
+                  for (var _iterator3 = _createForOfIteratorHelperLoose(atlas.waitCleans), _step3; !(_step3 = _iterator3()).done; ) {
+                    var _area = _step3.value;
+                    0 === _area.ref && (_usedLess -= _area._width * _area._height);
+                  }
+                  used += _used / max;
+                  usedLess += _usedLess / max;
+                }
+                return (usedLess / atlases.length).toFixed(2) + " / " + (used / atlases.length).toFixed(2) + " / " + atlases.length;
+              }
+            }
+          });
+        }
+        cc.profiler.showDynamicAtlasCounter && (_stats.dynamic_atlas = {
+          desc: "Dynamic Atlas",
+          _counter: {
+            sample: function sample(now) {},
+            human: function human() {
+              if (cc.dynamicAtlasManager && cc.dynamicAtlasManager.enabled) {
+                var max = cc.dynamicAtlasManager.maxAtlasCount;
+                var curLess = cc.dynamicAtlasManager.atlasCount;
+                var oneOfMax = cc.dynamicAtlasManager.textureSize * cc.dynamicAtlasManager.textureSize;
+                var cur = 0;
+                for (var key in cc.dynamicAtlasManager.rects) {
+                  var rect = cc.dynamicAtlasManager.rects[key];
+                  cur += rect.sizes;
+                }
+                return (cur / oneOfMax).toFixed(2) + " / " + curLess + " / " + max;
+              }
+              return "disabled";
+            }
+          }
+        });
+      }
     }
     function generateNode() {
       if (_rootNode && _rootNode.isValid) return;
@@ -58472,6 +58663,9 @@
       }
     }
     cc.profiler = module.exports = {
+      showLabelCanvasCounter: true,
+      showLabelCharAtlasCounter: true,
+      showDynamicAtlasCounter: true,
       isShowingStats: function isShowingStats() {
         return _showFPS;
       },
@@ -58684,6 +58878,7 @@
       __CHINESE_REG: /^[\u4E00-\u9FFF\u3400-\u4DFF]+$/,
       __JAPANESE_REG: /[\u3000-\u303F]|[\u3040-\u309F]|[\u30A0-\u30FF]|[\uFF00-\uFFEF]|[\u4E00-\u9FAF]|[\u2605-\u2606]|[\u2190-\u2195]|\u203B/g,
       __KOREAN_REG: /^[\u1100-\u11FF]|[\u3130-\u318F]|[\uA960-\uA97F]|[\uAC00-\uD7AF]|[\uD7B0-\uD7FF]+$/,
+      measureCache: measureCache,
       isUnicodeCJK: function isUnicodeCJK(ch) {
         return this.__CHINESE_REG.test(ch) || this.__JAPANESE_REG.test(ch) || this.__KOREAN_REG.test(ch);
       },
@@ -58693,13 +58888,24 @@
       },
       safeMeasureText: function safeMeasureText(ctx, string, desc) {
         var font = desc || ctx.font;
-        var key = font + "\ud83c\udfae" + string;
+        var key = this.computeHash(string, font);
         var cache = measureCache.get(key);
         if (null !== cache) return cache;
         var metric = ctx.measureText(string);
         var width = metric && metric.width || 0;
         measureCache.put(key, width);
         return width;
+      },
+      computeHash: function computeHash(string, desc) {
+        return desc + "\ud83c\udfae" + string;
+      },
+      getMeasureCache: function getMeasureCache() {
+        var data = {};
+        for (var key in measureCache.datas) data[key] = measureCache.datas[key].value;
+        return data;
+      },
+      applyMeasureCache: function applyMeasureCache(data) {
+        for (var key in data) measureCache.put(key, data[key]);
       },
       _safeSubstring: function _safeSubstring(targetString, startIndex, endIndex) {
         var newStartIndex = startIndex, newEndIndex = endIndex;
