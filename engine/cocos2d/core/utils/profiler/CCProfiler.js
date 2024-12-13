@@ -113,16 +113,19 @@ function generateStats () {
 
                     },
                     human() {
-                        const atlases = cc.dynamicAtlasManager.atlases;
-                        const max = cc.dynamicAtlasManager.maxAtlasCount;
-                        const curLess = cc.dynamicAtlasManager.atlasCount;
-                        const oneOfMax = cc.dynamicAtlasManager.textureSize * cc.dynamicAtlasManager.textureSize;
-                        let cur = 0;
-                        for (const key in cc.dynamicAtlasManager.rects) {
-                            const rect = cc.dynamicAtlasManager.rects[key];
-                            cur += rect.sizes;
+                        if (cc.dynamicAtlasManager && cc.dynamicAtlasManager.enabled) {
+                            const max = cc.dynamicAtlasManager.maxAtlasCount;
+                            const curLess = cc.dynamicAtlasManager.atlasCount;
+                            const oneOfMax = cc.dynamicAtlasManager.textureSize * cc.dynamicAtlasManager.textureSize;
+                            let cur = 0;
+                            for (const key in cc.dynamicAtlasManager.rects) {
+                                const rect = cc.dynamicAtlasManager.rects[key];
+                                cur += rect.sizes;
+                            }
+                            return `${(cur / oneOfMax).toFixed(2)} / ${curLess} / ${max}`;
+                        } else {
+                            return 'disabled';
                         }
-                        return `${(cur / oneOfMax).toFixed(2)} / ${curLess} / ${max}`;
                     }
                 },
             };
