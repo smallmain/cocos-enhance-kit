@@ -1,0 +1,50 @@
+import DocCardList from '@theme/DocCardList';
+import {useCurrentSidebarCategory} from '@docusaurus/theme-common';
+
+# 多纹理渲染
+
+:::tip 提示
+
+多纹理渲染属于底层设施，若你不准备手动使用多纹理材质或者多纹理合批管理器的话，请跳过本特性文档。
+
+:::
+
+## 什么是多纹理渲染？
+
+在以前的认识里，我们知道相邻的节点使用不同的纹理（Texture）会导致不能合并批次。
+
+其根本原因是纹理是使用 uniform 变量传给着色器的，而需要合并批次的话不允许每次渲染都拥有不同的 uniform 变量值。
+
+社区版现在的实现是先设置多个 uniform 变量，比如将 8 张纹理写入到 "texture1" "texture2" "texture3"... 的 8 个 uniform 变量中，然后在着色器里再判断应该在渲染时使用哪个 uniform 变量。
+
+这样的话如果所有渲染都只用这 8 张纹理，就都能合并为 1 个批次。
+
+这要求设备支持采样多个纹理，而在现代绝大多数设备中都至少支持采样 8 张纹理，所以这不是问题。
+
+当然除了这种方法，还有另外几种进行多纹理合批的方法，例如 "Texture Array" 和 "Bindless"，但都有实用性与兼容性的问题。
+
+:::info 那么，代价是什么？
+
+因为会多传递一个顶点属性，并且需要在着色器中去判断该使用哪个纹理，导致**合并批次并不一定会提升性能**。
+
+所以我们建议在多个档次设备中实际测试项目是否使用多纹理渲染的性能差距。
+
+:::
+
+为了让多纹理渲染能以最简单的方式在引擎中使用，社区版已经在内部对其做好了一些封装：
+
+<DocCardList items={useCurrentSidebarCategory().items}/>
+
+:::caution 注意
+
+- **支持的渲染组件**
+
+    cc.Sprite、cc.Label、cc.RichText、cc.MotionSteak、Spine 组件。
+
+- **不支持的渲染组件**
+
+    cc.ParticleSystem、TiledMap 组件：这两个组件当前的引擎实现会强制打断合批，暂时不支持。
+
+    DragonBones 组件：因人力有限，并且这个组件与 Spine 组件可以相互代替，所以暂时不支持该组件。
+
+:::
