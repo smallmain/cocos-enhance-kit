@@ -82,6 +82,10 @@ Label 一直是项目优化的最难点，因为它完全不能和其它的渲�
 
 ![demo3](/docs/static/demo-imgs/demo3.png)
 
+除了以上优化之外，在 v3.x 版本中，还支持了**文本测量值烘焙**和**预加载 Label Canvas 和 `Char` 图集**。
+
+这两项优化可大幅降低文本渲染在低端设备上的性能消耗，使游戏界面打开时不再卡顿。
+
 ### Spine 组件增强
 
 除了 Label 之外，如果你的项目用到了 Spine 组件，那么它大概率会成为项目第二个优化难点。
@@ -95,6 +99,16 @@ Label 一直是项目优化的最难点，因为它完全不能和其它的渲�
 单个 TiledMap 组件可能存在多个 TiledLayer，启用 Culling 特性后，每个 Layer 都需要单独计算 Culling 数据。
 
 现在在满足条件的情况下可以**复用 Culling 数据，以减少项目 CPU 的性能消耗**。
+
+### 性能指示器增强
+
+社区版优化了引擎自带的性能指示器，增加了三个重要的性能指标：
+
+- Label Canvas（Label 组件的 Canvas 数量）
+- Char Atlas（Char 字符图集使用情况）
+- Dynamic Atlas（动态图集使用情况）
+
+![demo6](/docs/static/demo-imgs/demo6.png)
 
 ### 多线程支持
 

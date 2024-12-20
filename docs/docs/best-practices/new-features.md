@@ -36,3 +36,13 @@ skeletonComponent.setRegionData('Head', 'Head', new sp.RegionData(spriteFrame));
 ## 支持 RichText 自定义材质
 
 可前往 [RichText 自定义材质](../user-guide/text-render/text-richtext.md) 文档了解更多详情。
+
+## 性能指示器增强
+
+优化了引擎自带的性能指示器，增加了三个重要的性能指标：
+
+- Label Canvas（Label 组件的 Canvas 数量）
+- Char Atlas（Char 字符图集使用情况）
+- Dynamic Atlas（动态图集使用情况）
+
+![demo6](/demo-imgs/demo6.png)

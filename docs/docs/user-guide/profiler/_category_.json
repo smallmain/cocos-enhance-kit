@@ -1,0 +1,9 @@
+{
+  "label": "Profiler",
+  "position": 7,
+  "collapsed": true,
+  "link": {
+    "type": "doc",
+    "id": "profiler-intro"
+  }
+}
