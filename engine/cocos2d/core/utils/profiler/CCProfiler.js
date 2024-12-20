@@ -82,24 +82,19 @@ function generateStats () {
                         },
                         human() {
                             const atlases = cc.Label._shareAtlas.atlases;
+                            const chars = cc.Label._shareAtlas._fontDefDictionary._letterDefinitions;
+                            const oneOfMax = atlases.reduce((a, b) => a + b._width * b._height, 0) / atlases.length;
                             let used = 0;
                             let usedLess = 0;
-                            for (const atlas of atlases) {
-                                const max = atlas._width * atlas._height;
-                                let _used = atlas._width * atlas._nexty;
-                                for (const area of atlas.frees) {
-                                    _used -= area._width * area._height;
+                            for (const key in chars) {
+                                const char = chars[key];
+                                const size = char._height * char._width;
+                                usedLess += size;
+                                if (char.ref > 0) {
+                                    used += size;
                                 }
-                                let _usedLess = _used;
-                                for (const area of atlas.waitCleans) {
-                                    if (area.ref === 0) {
-                                        _usedLess -= area._width * area._height;
-                                    }
-                                }
-                                used += _used / max;
-                                usedLess += _usedLess / max;
                             }
-                            return `${(usedLess / atlases.length).toFixed(2)} / ${(used / atlases.length).toFixed(2)} / ${atlases.length}`;
+                            return `${(used / oneOfMax).toFixed(2)} / ${(usedLess / oneOfMax).toFixed(2)} / ${atlases.length}`;
                         }
                     },
                 };
