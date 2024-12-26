@@ -162,7 +162,7 @@ cc.js.mixin(LetterAtlas.prototype, {
 
             for (let i = 0; i < this.frees.length; i++) {
                 const freeLetter = this.frees[i];
-                if (freeLetter._width === width && freeLetter._height === height) {
+                if (freeLetter._width >= width && freeLetter._height >= height) {
                     areaFit = freeLetter._width * freeLetter._height - width * height;
                     if (areaFit < score) {
                         original = freeLetter;
@@ -235,7 +235,7 @@ cc.js.mixin(LetterAtlas.prototype, {
         this._texture.drawTextureAt(texture, this._x, this._y);
 
         this._dirty = true;
-        
+
         let letter = new FontLetterDefinition();
         letter.u = this._x + bleed / 2;
         letter.v = this._y + bleed / 2;
@@ -255,7 +255,7 @@ cc.js.mixin(LetterAtlas.prototype, {
         this._x += width + space;
 
         this._atlases._fontDefDictionary.addLetterDefinitions(letterTexture._hash, letter);
-        
+
         return letter
     },
 
@@ -331,7 +331,7 @@ class LetterAtlases {
      * 所有获取过的字符集合
      */
     letterCache = null;
-    
+
     /**
      * 是否记录所有获取过的字符
      */
@@ -479,8 +479,8 @@ class LetterAtlases {
 
         return letter;
     }
-    
-    
+
+
     cacheLetter(info) {
         textUtils.applyMeasureCache({ [textUtils.computeHash(info.char, info.fontDesc)]: info.measure });
         shareLabelInfo.hash = info.hash;
@@ -492,8 +492,8 @@ class LetterAtlases {
         shareLabelInfo.isOutlined = info.isOutlined;
         this.getLetterDefinitionForChar(info.char, shareLabelInfo);
     }
-    
-    
+
+
     getLetterCache() {
         const arr = [];
         for (const key in this.letterCache) {
@@ -502,8 +502,8 @@ class LetterAtlases {
         }
         return arr;
     }
-    
-    
+
+
     applyLetterCache(data) {
         for (const cache of data) {
             this.cacheLetter(cache);
@@ -554,7 +554,7 @@ function computeHash (labelInfo) {
     if (labelInfo.isOutlined && labelInfo.margin > 0) {
         out = out + labelInfo.margin + labelInfo.out.toHEX();
     }
-    
+
     return hashData + labelInfo.fontSize + labelInfo.fontFamily + color + out;
 }
 
@@ -590,7 +590,7 @@ export default class LetterFontAssembler extends WebglBmfontAssembler {
             _shareAtlas = new LetterAtlases();
             cc.Label._shareAtlas = _shareAtlas;
         }
-        
+
         return _shareAtlas.getTexture();
     }
 
