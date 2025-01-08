@@ -459,8 +459,8 @@ class LetterAtlases {
                     fontDesc: labelInfo.fontDesc,
                     fontSize: labelInfo.fontSize,
                     margin: labelInfo.margin,
-                    out: labelInfo.out.toHEX(),
-                    color: labelInfo.color.toHEX(),
+                    out: labelInfo.out.toHEX('#rrggbbaa'),
+                    color: labelInfo.color.toHEX('#rrggbbaa'),
                     isOutlined: labelInfo.isOutlined,
                 };
                 Label._canvasPool.put(canvas);
@@ -549,10 +549,10 @@ class LetterAtlases {
 
 function computeHash (labelInfo) {
     let hashData = '|';
-    let color = labelInfo.color.toHEX();
+    let color = labelInfo.color.toHEX('#rrggbbaa');
     let out = '';
     if (labelInfo.isOutlined && labelInfo.margin > 0) {
-        out = out + labelInfo.margin + labelInfo.out.toHEX();
+        out = out + labelInfo.margin + labelInfo.out.toHEX('#rrggbbaa');
     }
 
     return hashData + labelInfo.fontSize + labelInfo.fontFamily + color + out;
