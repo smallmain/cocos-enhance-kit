@@ -101,7 +101,7 @@ export default class TTFAssembler extends Assembler2D {
 
     updateRenderData (comp) {
         super.updateRenderData(comp);
-        
+
         if (!comp._vertsDirty) return false;
 
         this._updateProperties(comp);
@@ -297,7 +297,7 @@ export default class TTFAssembler extends Assembler2D {
         if (_shadowComp) {
             this._setupShadow();
         }
-        
+
         if (_outlineComp) {
             this._setupOutline();
         }
@@ -387,19 +387,19 @@ export default class TTFAssembler extends Assembler2D {
             frame._texture._uuid = _fontDesc
                 + _overflow
                 + (_premultiply ? 'P' : 'NP')
-                + comp.node.color.toHEX()
+                + comp.node.color.toHEX('#rrggbbaa')
                 + (_enableUnderline ? 'UL' : 'NUL')
                 + _string;
 
             if (_outlineComp) {
-                frame._texture._uuid += _outlineComp.color.toHEX()
+                frame._texture._uuid += _outlineComp.color.toHEX('#rrggbbaa')
                     + ','
                     + _outlineComp.width
                     + ',';
             }
 
             if (_shadowComp) {
-                frame._texture._uuid += _shadowComp.color.toHEX()
+                frame._texture._uuid += _shadowComp.color.toHEX('#rrggbbaa')
                     + _shadowComp.offset.x
                     + ','
                     + _shadowComp.offset.y
@@ -476,7 +476,7 @@ export default class TTFAssembler extends Assembler2D {
 
     _calculateShrinkFont (paragraphedStrings) {
         let paragraphLength = this._calculateParagraphLength(paragraphedStrings, _context);
-        
+
         let i = 0;
         let totalHeight = 0;
         let maxLength = 0;
