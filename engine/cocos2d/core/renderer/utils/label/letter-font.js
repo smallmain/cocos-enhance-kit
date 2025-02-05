@@ -452,6 +452,7 @@ class LetterAtlases {
         if (!letter) {
             if (this._enableLetterCache) {
                 const canvas = Label._canvasPool.get();
+                canvas.context.font = labelInfo.fontDesc;
                 this.letterCache[hash] = {
                     char,
                     hash: labelInfo.hash,
