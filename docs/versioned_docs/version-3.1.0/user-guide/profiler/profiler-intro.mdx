@@ -1,0 +1,14 @@
+import DocCardList from '@theme/DocCardList';
+import {useCurrentSidebarCategory} from '@docusaurus/theme-common';
+
+# Profiler
+
+社区版对引擎自带的 Profiler 进行了一些改进，默认情况下是禁用的，可通过宏来开启：
+
+```
+cc.macro.ENABLE_CUSTOM_PROFILER = true;
+```
+
+你可以阅读下面的文档了解详情：
+
+<DocCardList items={useCurrentSidebarCategory().items}/>
