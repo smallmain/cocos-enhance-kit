@@ -45922,7 +45922,7 @@
 
        case _mat["default"]:
         var res = new Array(17);
-        res[0] = typeId;
+        res[VALUETYPE_SETTER] = typeId;
         _mat["default"].toArray(res, obj, 1);
         return res;
 
@@ -46127,7 +46127,7 @@
     function parseInstances(data) {
       var instances = data[5];
       var instanceTypes = data[6];
-      var instanceTypesLen = 0 === instanceTypes ? 0 : instanceTypes.length;
+      var instanceTypesLen = instanceTypes === EMPTY_PLACEHOLDER ? 0 : instanceTypes.length;
       var rootIndex = instances[instances.length - 1];
       var normalObjectCount = instances.length - instanceTypesLen;
       if ("number" !== typeof rootIndex) rootIndex = 0; else {
@@ -46179,8 +46179,8 @@
         var klassLayout = classes[i];
         if ("string" !== typeof klassLayout) {
           true;
-          if ("function" === typeof klassLayout[CLASS_TYPE]) throw new Error("Can not deserialize the same JSON data again.");
-          var _type5 = klassLayout[CLASS_TYPE];
+          if ("function" === typeof klassLayout[0]) throw new Error("Can not deserialize the same JSON data again.");
+          var _type5 = klassLayout[0];
           doLookupClass(classFinder, _type5, klassLayout, CLASS_TYPE, silent, customFinder);
         } else doLookupClass(classFinder, klassLayout, classes, i, silent, customFinder);
       }
@@ -46191,7 +46191,7 @@
         var classes = data[3];
         for (var i = 0; i < masks.length; ++i) {
           var mask = masks[i];
-          mask[MASK_CLASS] = classes[mask[MASK_CLASS]];
+          mask[0] = classes[mask[0]];
         }
       }
     }
@@ -51014,7 +51014,7 @@
           var originalIndex = 0;
           for (var i = 0; i < this.frees.length; i++) {
             var freeLetter = this.frees[i];
-            if (freeLetter._width === width && freeLetter._height === height) {
+            if (freeLetter._width >= width && freeLetter._height >= height) {
               areaFit = freeLetter._width * freeLetter._height - width * height;
               if (areaFit < score) {
                 original = freeLetter;
@@ -51203,6 +51203,7 @@
         if (!letter) {
           if (this._enableLetterCache) {
             var canvas = Label._canvasPool.get();
+            canvas.context.font = labelInfo.fontDesc;
             this.letterCache[hash] = {
               char: _char2,
               hash: labelInfo.hash,
@@ -51210,8 +51211,8 @@
               fontDesc: labelInfo.fontDesc,
               fontSize: labelInfo.fontSize,
               margin: labelInfo.margin,
-              out: labelInfo.out.toHEX(),
-              color: labelInfo.color.toHEX(),
+              out: labelInfo.out.toHEX("#rrggbbaa"),
+              color: labelInfo.color.toHEX("#rrggbbaa"),
               isOutlined: labelInfo.isOutlined
             };
             Label._canvasPool.put(canvas);
@@ -51293,9 +51294,9 @@
     })();
     function computeHash(labelInfo) {
       var hashData = "|";
-      var color = labelInfo.color.toHEX();
+      var color = labelInfo.color.toHEX("#rrggbbaa");
       var out = "";
-      labelInfo.isOutlined && labelInfo.margin > 0 && (out = out + labelInfo.margin + labelInfo.out.toHEX());
+      labelInfo.isOutlined && labelInfo.margin > 0 && (out = out + labelInfo.margin + labelInfo.out.toHEX("#rrggbbaa"));
       return hashData + labelInfo.fontSize + labelInfo.fontFamily + color + out;
     }
     var _shareAtlas = null;
@@ -51687,9 +51688,9 @@
       _proto.packDynamicAtlasAndCheckMaterial = function packDynamicAtlasAndCheckMaterial(comp, frame) {
         var allowDynamicAtlas = comp.allowDynamicAtlas;
         if (cc.sp.allowDynamicAtlas && 0 === allowDynamicAtlas || 1 === allowDynamicAtlas) {
-          frame._texture._uuid = _fontDesc + _overflow + (_premultiply ? "P" : "NP") + comp.node.color.toHEX() + (_enableUnderline ? "UL" : "NUL") + _string;
-          _outlineComp && (frame._texture._uuid += _outlineComp.color.toHEX() + "," + _outlineComp.width + ",");
-          _shadowComp && (frame._texture._uuid += _shadowComp.color.toHEX() + _shadowComp.offset.x + "," + _shadowComp.offset.y + "," + _shadowComp.blur);
+          frame._texture._uuid = _fontDesc + _overflow + (_premultiply ? "P" : "NP") + comp.node.color.toHEX("#rrggbbaa") + (_enableUnderline ? "UL" : "NUL") + _string;
+          _outlineComp && (frame._texture._uuid += _outlineComp.color.toHEX("#rrggbbaa") + "," + _outlineComp.width + ",");
+          _shadowComp && (frame._texture._uuid += _shadowComp.color.toHEX("#rrggbbaa") + _shadowComp.offset.x + "," + _shadowComp.offset.y + "," + _shadowComp.blur);
         }
         return _Assembler2D.prototype.packDynamicAtlasAndCheckMaterial.call(this, comp, frame);
       };
@@ -57033,7 +57034,7 @@
     "use strict";
     cc.sp = {
       inited: false,
-      version: "3.0.0",
+      version: "3.1.0",
       MAX_MULTITEXTURE_NUM: -1,
       autoSwitchMaterial: true,
       allowDynamicAtlas: true,
@@ -58453,37 +58454,6 @@
   }), {} ],
   390: [ (function(require, module, exports) {
     "use strict";
-    function _createForOfIteratorHelperLoose(o, allowArrayLike) {
-      var it = "undefined" !== typeof Symbol && o[Symbol.iterator] || o["@@iterator"];
-      if (it) return (it = it.call(o)).next.bind(it);
-      if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && "number" === typeof o.length) {
-        it && (o = it);
-        var i = 0;
-        return function() {
-          if (i >= o.length) return {
-            done: true
-          };
-          return {
-            done: false,
-            value: o[i++]
-          };
-        };
-      }
-      throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-    }
-    function _unsupportedIterableToArray(o, minLen) {
-      if (!o) return;
-      if ("string" === typeof o) return _arrayLikeToArray(o, minLen);
-      var n = Object.prototype.toString.call(o).slice(8, -1);
-      "Object" === n && o.constructor && (n = o.constructor.name);
-      if ("Map" === n || "Set" === n) return Array.from(o);
-      if ("Arguments" === n || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
-    }
-    function _arrayLikeToArray(arr, len) {
-      (null == len || len > arr.length) && (len = arr.length);
-      for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
-      return arr2;
-    }
     var macro = require("../../platform/CCMacro");
     var PerfCounter = require("./perf-counter");
     var _showFPS = false;
@@ -58549,25 +58519,19 @@
               sample: function sample(now) {},
               human: function human() {
                 var atlases = cc.Label._shareAtlas.atlases;
+                var chars = cc.Label._shareAtlas._fontDefDictionary._letterDefinitions;
+                var oneOfMax = atlases.reduce((function(a, b) {
+                  return a + b._width * b._height;
+                }), 0) / atlases.length;
                 var used = 0;
                 var usedLess = 0;
-                for (var _iterator = _createForOfIteratorHelperLoose(atlases), _step; !(_step = _iterator()).done; ) {
-                  var atlas = _step.value;
-                  var max = atlas._width * atlas._height;
-                  var _used = atlas._width * atlas._nexty;
-                  for (var _iterator2 = _createForOfIteratorHelperLoose(atlas.frees), _step2; !(_step2 = _iterator2()).done; ) {
-                    var area = _step2.value;
-                    _used -= area._width * area._height;
-                  }
-                  var _usedLess = _used;
-                  for (var _iterator3 = _createForOfIteratorHelperLoose(atlas.waitCleans), _step3; !(_step3 = _iterator3()).done; ) {
-                    var _area = _step3.value;
-                    0 === _area.ref && (_usedLess -= _area._width * _area._height);
-                  }
-                  used += _used / max;
-                  usedLess += _usedLess / max;
+                for (var key in chars) {
+                  var _char = chars[key];
+                  var size = _char._height * _char._width;
+                  usedLess += size;
+                  _char.ref > 0 && (used += size);
                 }
-                return (usedLess / atlases.length).toFixed(2) + " / " + (used / atlases.length).toFixed(2) + " / " + atlases.length;
+                return (used / oneOfMax).toFixed(2) + " / " + (usedLess / oneOfMax).toFixed(2) + " / " + atlases.length;
               }
             }
           });
