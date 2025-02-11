@@ -1,4 +1,5 @@
 import { confirm, input } from "@inquirer/prompts";
+import OSS from "ali-oss";
 import { $ } from "execa";
 import gracefulFs from "graceful-fs";
 import { Octokit } from 'octokit';
@@ -95,9 +96,21 @@ async function uploadBySFTP(host, port, username, password, filePath, targetFile
     });
 }
 
+async function uploadByOSS(sourceFile, targetFile) {
+    const client = new OSS({
+        region: env.OSS_REGION,
+        accessKeyId: env.OSS_ACCESS_KEY_ID,
+        accessKeySecret: env.OSS_ACCESS_KEY_SECRET,
+        bucket: env.OSS_BUCKET,
+    });
+    await client.put(targetFile, sourceFile, { timeout: 6000000 });
+}
+
 // 试运行
 const DRYRUN = false;
+const COMPILING_JS = false;
 const COMPILING_SIMULATOR = false;
+const CREATE_ZIP = false;
 
 // 目录
 const masterPath = cwd();
@@ -183,7 +196,7 @@ const minigamePath = join(sourcePath, "adapters");
 const dtsPath = join(sourcePath, "creator-sp.d.ts");
 const zipPath = join(masterTempPath, `cocos-enhance-kit-v${kitVersion}-v${engineVersion}.zip`);
 
-if (!DRYRUN) {
+if (!DRYRUN && COMPILING_JS) {
     console.log("开始编译 JavaScript 引擎");
     try {
         await $$({ cwd: jsPath })`npx gulp build-dev`;
@@ -228,7 +241,7 @@ console.log("移动目录", cppBuildPath, "->", tempCppBuildPath);
 console.log("移动目录", jsNpmPath, "->", tempJsNpmPath);
 
 // 创建压缩包
-if (!DRYRUN) {
+if (!DRYRUN && CREATE_ZIP) {
     const sourceZipFile = new Zip();
     console.log("正在压缩", jsPath);
     sourceZipFile.addFolder(jsPath, "engine");
@@ -250,7 +263,7 @@ console.log("已压缩至文件", zipPath);
 if (extensionPath) {
     // 创建压缩包
     const payZipPath = join(masterTempPath, `${kitVersion}.zip`);
-    if (!DRYRUN) {
+    if (!DRYRUN && CREATE_ZIP) {
         const sourceZipFile = new Zip();
         console.log("正在压缩", jsPath);
         sourceZipFile.addFolder(jsPath, `${kitVersion}/engine`);
@@ -271,14 +284,15 @@ if (extensionPath) {
     if (!DRYRUN) {
         console.log("正在上传文件", payZipPath);
         try {
-            await uploadBySFTP(
-                env.HOST,
-                env.PORT,
-                env.USERNAME,
-                env.PASSWORD,
-                payZipPath,
-                `/www/wwwroot/download.smallmain.com/cocos-enhance-kit/${engineVersion}/${kitVersion}.zip`,
-            );
+            // await uploadBySFTP(
+            //     env.SFTP_HOST,
+            //     env.SFTP_PORT,
+            //     env.SFTP_USERNAME,
+            //     env.SFTP_PASSWORD,
+            //     payZipPath,
+            //     `/www/wwwroot/download.smallmain.com/cocos-enhance-kit/${engineVersion}/${kitVersion}.zip`,
+            // );
+            await uploadByOSS(payZipPath, `/cocos-enhance-kit/${engineVersion}/${kitVersion}.zip`);
         } catch (error) {
             console.error(error);
             await confirm({
