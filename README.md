@@ -194,4 +194,3 @@ Label 一直是项目优化的最难点，因为它完全不能和其它的渲�
 社区版的开发需要大量的工作来进行，你的支持是我们最大的动力：
 
 - 请给我们的项目仓库一个 [Star](https://github.com/smallmain/cocos-enhance-kit)！
-- 购买可有可无的 [一键安装扩展](https://store.cocos.com/app/detail/3824) 赞助我们！
